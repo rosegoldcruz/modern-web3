@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Skitbit | 3D Animation Made Simple, Reliable & Scalable",
   description:
     "From product launches to full-scale campaigns, Skitbit delivers 3D animation that's fast, consistent, and built to wow your audience.",
-  generator: "v0.app",
+  generator: "Iron Vault Token",
 }
 
 export default function RootLayout({
