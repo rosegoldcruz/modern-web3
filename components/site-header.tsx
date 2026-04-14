@@ -9,9 +9,9 @@ import { Menu, Briefcase, Tag, HelpCircle, FileText, Info } from "lucide-react"
 export function SiteHeader() {
   const links = [
     { href: "/", label: "Home", icon: Briefcase },
-    { href: "#pricing", label: "Pricing", icon: Tag },
+    { href: "#pricing", label: "How It Works", icon: Tag },
     { href: "faq", label: "FAQ", icon: HelpCircle },
-    { href: "#blog", label: "Blog", icon: FileText },
+    { href: "#blog", label: "Education", icon: FileText },
     { href: "About", label: "About", icon: Info },
   ]
 
@@ -23,12 +23,12 @@ export function SiteHeader() {
           <Link href="/" className="flex items-center gap-1.5">
             <Image
               src="/icons/skitbit-white.svg"
-              alt="Skitbit logo"
+              alt="Iron Vault logo"
               width={20}
               height={20}
               className="h-5 w-5"
             />
-            <span className="font-semibold tracking-wide text-white">Skitbit</span>
+            <span className="font-semibold tracking-wide text-white">Iron Vault</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -52,7 +52,7 @@ export function SiteHeader() {
                          hover:bg-lime-300 hover:shadow-md hover:scale-[1.02]
                          transition-all"
             >
-              <Link href="#contact">Chat With Us</Link>
+              <Link href="tel:8883682502">Call Us Today</Link>
             </Button>
           </div>
 
@@ -109,7 +109,7 @@ export function SiteHeader() {
                                hover:bg-lime-300 hover:shadow-md hover:scale-[1.02]
                                transition-all"
                   >
-                    <Link href="https://wa.link/65mf3i">Get a Quote</Link>
+                    <Link href="tel:8883682502">Call Us Today</Link>
                   </Button>
                 </div>
               </SheetContent>
