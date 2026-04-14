@@ -11,8 +11,8 @@ interface FeaturesContent {
 }
 
 const defaultContent: FeaturesContent = {
-  title: "What makes us the best studio for you.",
-  subtitle: "Discover our unique approach to 3D animation",
+  title: "What makes Iron Vault different.",
+  subtitle: "An education-first entry point into tokenized real estate.",
 }
 
 export function Features() {
@@ -43,8 +43,8 @@ export function Features() {
         {/* Adaptability Card - Hidden on mobile */}
         <Card className="hidden md:block liquid-glass border border-white/10 bg-white/5 backdrop-blur-xl">
           <CardHeader>
-            <p className="text-[11px] tracking-widest text-neutral-400">ADAPTABILITY</p>
-            <CardTitle className="mt-1 text-xl text-white">Make the experience truly intuitive</CardTitle>
+            <p className="text-[11px] tracking-widest text-neutral-400">EDUCATION FIRST</p>
+            <CardTitle className="mt-1 text-xl text-white">Build understanding before utility</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
@@ -75,9 +75,9 @@ export function Features() {
         {/* Client Love Card - Always visible */}
         <Card className="liquid-glass border border-white/10 bg-white/5 backdrop-blur-xl">
           <CardHeader>
-            <p className="text-[11px] tracking-widest text-neutral-400">CLIENT LOVE</p>
+            <p className="text-[11px] tracking-widest text-neutral-400">COMMUNITY TRUST</p>
             <CardTitle className="mt-1 text-xl text-white">
-              Their work didn't just look good, it moved the needle — our audience felt the difference instantly.
+              Iron Vault gave me the framework to understand real estate in a way I never had before. This is the entry point I was looking for.
             </CardTitle>
           </CardHeader>
           <CardContent>
