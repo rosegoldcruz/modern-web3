@@ -72,7 +72,7 @@ export function AppverseFooter() {
                 <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
                   {/* Lazy-loaded video fills the screen */}
                   <LazyVideo
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Timeline%202-YFaCK7cEiHWSMRv8XEHaLCoYj2SUAi.mp4"
+                    src="/videos/footer-preview.mp4"
                     className="absolute inset-0 h-full w-full object-cover"
                     autoplay={true}
                     loop={true}

@@ -63,7 +63,7 @@ function PhoneCard({
         <LazyVideo
           src={
             videoSrc ??
-            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/b0f3222371106db366a14ca1c29cef55-1b1EWVSa4w3FL2zslcaCGYTy9vcxjF.mp4"
+            "/videos/hero-default.mp4"
           }
           className="absolute inset-0 h-full w-full object-cover"
           autoplay={true}
@@ -94,33 +94,34 @@ const phoneData = [
     sub: "Understand why tokenized real estate matters.",
     tone: "phase 1",
     gradient: "from-[#0b0b0b] via-[#0f172a] to-[#020617]",
-    videoSrc:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/A%20new%20chapter%20in%20the%20story%20of%20success.__Introducing%20the%20new%20TAG%20Heuer%20Carrera%20Day-Date%20collection%2C%20reimagined%20with%20bold%20colors%2C%20refined%20finishes%2C%20and%20upgraded%20functionality%20to%20keep%20you%20focused%20on%20your%20goals.%20__Six%20-nDNoRQyFaZ8oaaoty4XaQz8W8E5bqA.mp4",
+    videoSrc: "/videos/hero-education.mp4",
   },
   {
     title: "Liquidity",
     sub: "Access markets once locked to the few.",
     tone: "phase 2",
     gradient: "from-[#0b1a0b] via-[#052e16] to-[#022c22]",
+    videoSrc: "/videos/hero-liquidity.mp4",
   },
   {
     title: "Transparency",
     sub: "No black boxes. No guessing.",
     tone: "phase 3",
     gradient: "from-[#001028] via-[#0b355e] to-[#052e5e]",
-    videoSrc:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Timeline%201-Ku3Y2Hgaw8hCiFEFg1ELtYp631rSzR.webm",
+    videoSrc: "/videos/hero-transparency.mp4",
   },
   {
     title: "Programmable",
     sub: "Assets that move at the speed of code.",
     tone: "defi",
     gradient: "from-[#0b0b0b] via-[#1f2937] to-[#0b1220]",
+    videoSrc: "/videos/hero-programmable.mp4",
   },
   {
     title: "Global Access",
     sub: "Own real estate exposure from anywhere.",
     tone: "global",
     gradient: "from-[#0b0b0b] via-[#111827] to-[#052e16]",
+    videoSrc: "/videos/hero-global-access.mp4",
   },
 ]
