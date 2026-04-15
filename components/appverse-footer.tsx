@@ -131,14 +131,6 @@ export function AppverseFooter() {
           {/* Bottom bar */}
           <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-neutral-500 sm:flex-row">
             <p>{content.copyright}</p>
-            <div className="flex items-center gap-6">
-              <Link href="/revisions" className="hover:text-lime-300">
-                Revision Policy
-              </Link>
-              <Link href="/t&c" className="hover:text-lime-300">
-                Terms & Conditions
-              </Link>
-            </div>
           </div>
         </div>
       </footer>

@@ -10,10 +10,10 @@ export function Hero() {
         loop
         muted
         playsInline
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-75 origin-center"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         aria-hidden="true"
       >
-        <source src="/videos/download%20(7).mp4" type="video/mp4" />
+        <source src="/videos/video_2026-04-15_14-23-54.mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay so text stays readable */}
@@ -39,14 +39,14 @@ export function Hero() {
               asChild
               className="rounded-lg bg-lime-400 px-8 py-3 text-base font-semibold text-black hover:bg-lime-300 transition-all"
             >
-              <Link href="#blog">Start Free</Link>
+              <Link href="#blog">🎓 Start Learning Now</Link>
             </Button>
 
             <Button
               asChild
               className="rounded-lg border border-yellow-600 bg-neutral-950 px-8 py-3 text-base font-semibold text-yellow-500 hover:bg-yellow-600/10 hover:text-yellow-400 transition-all"
             >
-              <Link href="/checkout">Get Early Access</Link>
+              <Link href="#pricing">🪙 Get Early Access</Link>
             </Button>
           </div>
 

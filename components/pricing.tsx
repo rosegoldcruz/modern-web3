@@ -173,13 +173,6 @@ export function Pricing() {
                 >
                   Learn More
                 </Button>
-                <Button
-                  asChild
-                  className="flex-1 rounded-full px-4 py-2 text-sm font-medium text-black shadow transition-[box-shadow,transform,filter] active:translate-y-[1px]"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  <Link href="/checkout?plan=startup">Join Now</Link>
-                </Button>
               </div>
             </CardHeader>
 
@@ -232,13 +225,6 @@ export function Pricing() {
                 >
                   Learn More
                 </Button>
-                <Button
-                  asChild
-                  className="flex-1 rounded-full px-4 py-2 text-sm font-medium text-black shadow transition-[box-shadow,transform,filter] active:translate-y-[1px]"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  <Link href="/checkout?plan=pro">Join Now</Link>
-                </Button>
               </div>
             </CardHeader>
 
@@ -289,13 +275,6 @@ export function Pricing() {
                   }}
                 >
                   Learn More
-                </Button>
-                <Button
-                  asChild
-                  className="flex-1 rounded-full px-4 py-2 text-sm font-medium text-black shadow transition-[box-shadow,transform,filter] active:translate-y-[1px]"
-                  style={{ backgroundColor: ACCENT }}
-                >
-                  <Link href="/checkout?plan=premium">Join Now</Link>
                 </Button>
               </div>
             </CardHeader>

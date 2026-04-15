@@ -30,9 +30,6 @@ function PhoneCard({
           <div className="space-y-1 px-1">
             <div className="text-3xl font-bold leading-snug text-lime-300">{title}</div>
             <p className="text-xs text-white/70">{sub}</p>
-            <div className="mt-3 inline-flex items-center rounded-full bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-lime-300">
-              {tone}
-            </div>
           </div>
         </div>
       </div>

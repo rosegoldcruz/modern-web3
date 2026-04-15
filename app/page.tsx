@@ -3,7 +3,6 @@ import { Hero } from "@/components/hero"
 import { PhoneCards } from "@/components/phone-cards"
 import { Features } from "@/components/features"
 import OrbitingImages from "@/components/orbiting-images"
-import { Pricing } from "@/components/pricing"
 import { AppverseFooter } from "@/components/appverse-footer"
 import Script from "next/script"
 
@@ -11,41 +10,6 @@ import Script from "next/script"
 export const dynamic = "force-static"
 
 export default function Page() {
-  // Structured data for pricing
-  const pricingStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebPageElement",
-    "@id": "https://theskitbit.com/#pricing",
-    name: "The 3-Step Funnel",
-    description: "Iron Vault 3-step ecosystem funnel: Presale Awareness, Tokenomics, and Real Estate Integration",
-    url: "https://theskitbit.com/#pricing",
-    mainEntity: {
-      "@type": "ItemList",
-      name: "Iron Vault Ecosystem Phases",
-      description: "Education-first approach to tokenized real estate",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Presale Awareness",
-          description: "Early supporter onboarding and community-first access",
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Tokenomics",
-          description: "Supply structure, distribution logic, and utility pathways",
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: "Real Estate Integration",
-          description: "Real estate-backed frameworks and asset-linked token structures",
-        },
-      ],
-    },
-  }
-
   // Structured data for main page
   const pageStructuredData = {
     "@context": "https://schema.org",
@@ -61,14 +25,6 @@ export default function Page() {
       url: "https://theskitbit.com",
       sameAs: [],
     },
-    hasPart: [
-      {
-        "@type": "WebPageElement",
-        "@id": "https://theskitbit.com/#pricing",
-        name: "How It Works",
-        url: "https://theskitbit.com/#pricing",
-      },
-    ],
   }
 
   return (
@@ -109,20 +65,10 @@ export default function Page() {
             className="px-4 md:px-6"
           />
         </section>
-        <Pricing />
         <AppverseFooter />
       </main>
 
       {/* JSON-LD structured data */}
-      <Script
-        id="pricing-structured-data"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(pricingStructuredData),
-        }}
-      />
-
       <Script
         id="page-structured-data"
         type="application/ld+json"
