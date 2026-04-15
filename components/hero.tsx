@@ -17,7 +17,7 @@ export function Hero() {
       </video>
 
       {/* Radial vignette to blend video edges into background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.6)_70%,rgba(0,0,0,0.95)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(0,0,0,0.5)_50%,rgba(0,0,0,0.95)_80%,rgba(0,0,0,1)_100%)]" />
 
       {/* Dark overlay so text stays readable */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent" />
