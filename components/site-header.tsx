@@ -17,22 +17,30 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 p-4">
-      <div className="container mx-auto max-w-4xl">
-        <div className="flex h-14 items-center justify-between px-6 liquid-glass-header rounded-full">
+      <div className="container mx-auto max-w-6xl">
+        <div className="flex min-h-20 items-center justify-between gap-6 px-6 py-3 liquid-glass-header rounded-[2rem]">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-1.5">
+          <Link href="/" className="flex min-w-0 items-center gap-3">
             <Image
-              src="/icons/skitbit-white.svg"
-              alt="Iron Vault logo"
-              width={20}
-              height={20}
-              className="h-5 w-5"
+              src="/pwcw-logo.webp"
+              alt="Commonwealth Ventures LLC logo"
+              width={188}
+              height={44}
+              className="h-auto w-[156px] shrink-0 object-contain lg:w-[188px]"
+              priority
             />
-            <span className="font-semibold tracking-wide text-white">Iron Vault</span>
+            <div className="hidden min-w-0 flex-col md:flex">
+              <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-lime-300/85 lg:text-[11px]">
+                Presents the Iron Vault token
+              </span>
+              <span className="text-xs text-white/60 lg:text-sm">
+                Real estate exposure through decentralized infrastructure
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden items-center gap-6 text-sm text-gray-300 md:flex">
+          <nav className="hidden items-center gap-5 text-sm text-gray-300 lg:flex xl:gap-6">
             {links.map((l) => (
               <Link
                 key={l.href}
@@ -45,7 +53,7 @@ export function SiteHeader() {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex">
+          <div className="hidden lg:flex">
             <Button
               asChild
               className="bg-lime-400 text-black font-medium rounded-lg px-6 py-2.5
@@ -74,15 +82,20 @@ export function SiteHeader() {
                 className="liquid-glass border-gray-800 p-0 w-64 flex flex-col"
               >
                 {/* Brand Header */}
-                <div className="flex items-center gap-1.5 px-4 py-4 border-b border-gray-800">
+                <div className="flex items-center gap-3 border-b border-gray-800 px-4 py-4">
                   <Image
-                    src="/icons/skitbit-white.svg"
-                    alt="Skitbit logo"
-                    width={24}
-                    height={24}
-                    className="h-6 w-6"
+                    src="/pwcw-logo.webp"
+                    alt="Commonwealth Ventures LLC logo"
+                    width={160}
+                    height={38}
+                    className="h-auto w-[140px] object-contain"
                   />
-                  <span className="font-semibold tracking-wide text-white text-lg">Skitbit</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-lime-300/85">
+                      Presents Iron Vault
+                    </span>
+                    <span className="text-xs text-white/60">The Commonwealth Ventures token product</span>
+                  </div>
                 </div>
 
                 {/* Nav Links */}

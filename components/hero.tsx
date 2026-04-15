@@ -27,16 +27,12 @@ export function Hero() {
           <div className="mt-6">{buttonNew}</div>
 
           {/* Phone grid mimic */}
-          <div className="mt-10 grid w-full gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-            {phoneData.map((p, i) => {
-              const visibility = i <= 2 ? "block" : i === 3 ? "hidden md:block" : i === 4 ? "hidden xl:block" : "hidden"
-
-              return (
-                <div key={i} className={visibility}>
-                  <PhoneCard title={p.title} sub={p.sub} tone={p.tone} gradient={p.gradient} videoSrc={p.videoSrc} />
-                </div>
-              )
-            })}
+          <div className="mt-10 grid w-full grid-cols-2 gap-4 lg:grid-cols-4">
+            {phoneData.map((card) => (
+              <div key={card.title}>
+                <PhoneCard title={card.title} sub={card.sub} tone={card.tone} gradient={card.gradient} videoSrc={card.videoSrc} />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -109,13 +105,6 @@ const phoneData = [
     tone: "phase 3",
     gradient: "from-[#001028] via-[#0b355e] to-[#052e5e]",
     videoSrc: "/videos/hero-transparency.mp4",
-  },
-  {
-    title: "Programmable",
-    sub: "Assets that move at the speed of code.",
-    tone: "defi",
-    gradient: "from-[#0b0b0b] via-[#1f2937] to-[#0b1220]",
-    videoSrc: "/videos/hero-programmable.mp4",
   },
   {
     title: "Global Access",

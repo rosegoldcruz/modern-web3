@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
 import { Features } from "@/components/features"
-import { LogoMarquee } from "@/components/logo-marquee"
+import OrbitingImages from "@/components/orbiting-images"
 import { Pricing } from "@/components/pricing"
 import { AppverseFooter } from "@/components/appverse-footer"
 import Script from "next/script"
@@ -76,7 +76,37 @@ export default function Page() {
         <SiteHeader />
         <Hero />
         <Features />
-        <LogoMarquee />
+        <section className="mx-auto w-full max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+          <h2 className="mb-8 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            The Flow of Real Estate Into Decentralized Infrastructure
+          </h2>
+          <OrbitingImages
+            images={[
+              "/commercial%203.png",
+              "/commercial%204.png",
+              "/cw.png",
+              "/office%201.png",
+              "/office%205.png",
+              "/office%207.png",
+              "/solana.png",
+              "/the%20coin.png",
+              "/Iron%20Vault%20Shield.png"
+            ]}
+            shape="ellipse"
+            direction="reverse"
+            radiusX={600}
+            radiusY={110}
+            radius={110}
+            rotation={-13}
+            duration={25}
+            itemSize={108}
+            fill
+            showPath
+            paused={false}
+            responsive
+            className="px-4 md:px-6"
+          />
+        </section>
         <Pricing />
         <AppverseFooter />
       </main>
