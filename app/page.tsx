@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
+import { PhoneCards } from "@/components/phone-cards"
 import { Features } from "@/components/features"
 import OrbitingImages from "@/components/orbiting-images"
 import { Pricing } from "@/components/pricing"
@@ -75,6 +76,7 @@ export default function Page() {
       <main className="min-h-[100dvh] text-white">
         <SiteHeader />
         <Hero />
+        <PhoneCards />
         <Features />
         <section className="mx-auto w-full max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
           <h2 className="mb-8 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">

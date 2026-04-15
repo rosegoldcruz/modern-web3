@@ -10,7 +10,7 @@ export function Hero() {
         loop
         muted
         playsInline
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-75 origin-center"
         aria-hidden="true"
       >
         <source src="/download%20(7).mp4" type="video/mp4" />
