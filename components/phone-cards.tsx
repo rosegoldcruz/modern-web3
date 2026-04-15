@@ -28,7 +28,7 @@ function PhoneCard({
         <div className="relative z-10 p-3">
           <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-white/20" />
           <div className="space-y-1 px-1">
-            <div className="text-3xl font-bold leading-snug text-white/90">{title}</div>
+            <div className="text-3xl font-bold leading-snug text-lime-300">{title}</div>
             <p className="text-xs text-white/70">{sub}</p>
             <div className="mt-3 inline-flex items-center rounded-full bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-lime-300">
               {tone}
@@ -42,25 +42,25 @@ function PhoneCard({
 
 const phoneData = [
   {
-    title: "Education",
+    title: "Foundation",
     sub: "Understand how money, real estate, and digital assets actually work.",
     tone: "foundation",
     videoSrc: "/videos/hero-education.mp4",
   },
   {
-    title: "Liquidity",
+    title: "Access",
     sub: "See how blockchain changes access to traditionally locked systems.",
     tone: "access",
     videoSrc: "/videos/hero-liquidity.mp4",
   },
   {
-    title: "Transparency",
+    title: "Clarity",
     sub: "No guesswork. No hidden mechanics. Just how it actually works.",
     tone: "clarity",
     videoSrc: "/videos/hero-transparency.mp4",
   },
   {
-    title: "Global Access",
+    title: "Reach",
     sub: "Learn and participate in emerging financial systems from anywhere.",
     tone: "reach",
     videoSrc: "/videos/hero-global-access.mp4",
