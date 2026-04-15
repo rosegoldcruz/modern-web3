@@ -43,26 +43,26 @@ function PhoneCard({
 const phoneData = [
   {
     title: "Education",
-    sub: "Understand why tokenized real estate matters.",
-    tone: "phase 1",
+    sub: "Understand how money, real estate, and digital assets actually work.",
+    tone: "foundation",
     videoSrc: "/videos/hero-education.mp4",
   },
   {
     title: "Liquidity",
-    sub: "Access markets once locked to the few.",
-    tone: "phase 2",
+    sub: "See how blockchain changes access to traditionally locked systems.",
+    tone: "access",
     videoSrc: "/videos/hero-liquidity.mp4",
   },
   {
     title: "Transparency",
-    sub: "No black boxes. No guessing.",
-    tone: "phase 3",
+    sub: "No guesswork. No hidden mechanics. Just how it actually works.",
+    tone: "clarity",
     videoSrc: "/videos/hero-transparency.mp4",
   },
   {
     title: "Global Access",
-    sub: "Own real estate exposure from anywhere.",
-    tone: "global",
+    sub: "Learn and participate in emerging financial systems from anywhere.",
+    tone: "reach",
     videoSrc: "/videos/hero-global-access.mp4",
   },
 ]
@@ -70,6 +70,16 @@ const phoneData = [
 export function PhoneCards() {
   return (
     <div className="container mx-auto px-4 pb-14">
+      {/* Section header */}
+      <div className="mb-10 text-center">
+        <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          How the System Starts
+        </h2>
+        <p className="mt-3 text-base text-neutral-400 sm:text-lg">
+          Four pillars that take you from confusion to clarity before participation.
+        </p>
+      </div>
+
       <div className="grid w-full grid-cols-2 gap-4 lg:grid-cols-4">
         {phoneData.map((card) => (
           <div key={card.title}>
