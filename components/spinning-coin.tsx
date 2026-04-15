@@ -22,7 +22,7 @@ function Coin() {
   const coinThickness = 0.18
 
   return (
-    <mesh ref={meshRef} rotation={[0.15, 0, 0.05]}>
+    <mesh ref={meshRef} rotation={[Math.PI / 2, 0, 0]}>
       <cylinderGeometry args={[coinRadius, coinRadius, coinThickness, 64]} />
 
       {/* Edge material (index 0) — dark gold */}
@@ -59,7 +59,8 @@ export default function SpinningCoin() {
     <Canvas
       gl={{ alpha: true, antialias: true }}
       camera={{ position: [0, 0, 6.5], fov: 45 }}
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: "100%", height: "100%", background: "transparent" }}
+      onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
     >
       {/* Ambient fill */}
       <ambientLight intensity={0.4} />
@@ -91,7 +92,7 @@ export default function SpinningCoin() {
       <Coin />
 
       {/* Bloom glow */}
-      <EffectComposer>
+      <EffectComposer multisampling={0} stencilBuffer={false}>
         <Bloom
           luminanceThreshold={0.3}
           luminanceSmoothing={0.9}

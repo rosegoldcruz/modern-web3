@@ -45,7 +45,7 @@ export function Hero() {
           </div>
 
           {/* Right — 3D coin */}
-          <div className="relative mx-auto aspect-square w-full max-w-md lg:max-w-lg">
+          <div className="relative mx-auto aspect-square w-full max-w-md lg:max-w-lg" style={{ background: 'transparent' }}>
             <SpinningCoin />
           </div>
         </div>

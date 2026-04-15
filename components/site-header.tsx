@@ -33,9 +33,6 @@ export function SiteHeader() {
               <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-lime-300/85 lg:text-[11px]">
                 Presents the Iron Vault token
               </span>
-              <span className="text-xs text-white/60 lg:text-sm">
-                Real estate exposure through decentralized infrastructure
-              </span>
             </div>
           </Link>
 
