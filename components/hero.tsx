@@ -10,11 +10,14 @@ export function Hero() {
         loop
         muted
         playsInline
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-[0.85] origin-center"
         aria-hidden="true"
       >
         <source src="/videos/heroee.mp4" type="video/mp4" />
       </video>
+
+      {/* Radial vignette to blend video edges into background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.6)_70%,rgba(0,0,0,0.95)_100%)]" />
 
       {/* Dark overlay so text stays readable */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent" />
