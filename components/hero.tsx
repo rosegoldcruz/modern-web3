@@ -13,7 +13,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 h-full w-full object-cover scale-75 origin-center"
         aria-hidden="true"
       >
-        <source src="/download%20(7).mp4" type="video/mp4" />
+        <source src="/videos/download%20(7).mp4" type="video/mp4" />
       </video>
 
       {/* Dark overlay so text stays readable */}

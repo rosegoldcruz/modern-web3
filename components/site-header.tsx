@@ -22,7 +22,7 @@ export function SiteHeader() {
           {/* Brand Logo */}
           <Link href="/" className="flex min-w-0 items-center gap-3">
             <Image
-              src="/pwcw-logo.webp"
+              src="/logos/pwcw-logo.webp"
               alt="Commonwealth Ventures LLC logo"
               width={188}
               height={44}
@@ -81,7 +81,7 @@ export function SiteHeader() {
                 {/* Brand Header */}
                 <div className="flex items-center gap-3 border-b border-gray-800 px-4 py-4">
                   <Image
-                    src="/pwcw-logo.webp"
+                    src="/logos/pwcw-logo.webp"
                     alt="Commonwealth Ventures LLC logo"
                     width={160}
                     height={38}

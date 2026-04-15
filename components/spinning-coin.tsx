@@ -9,7 +9,7 @@ function Coin() {
   const meshRef = useRef<Mesh>(null)
 
   // Load coin face texture
-  const texture = useLoader(TextureLoader, "/the%20coin.png")
+  const texture = useLoader(TextureLoader, "/logos/the%20coin.png")
 
   // Continuous Y-axis rotation
   useFrame((_state, delta) => {

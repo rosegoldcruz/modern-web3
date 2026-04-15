@@ -84,15 +84,15 @@ export default function Page() {
           </h2>
           <OrbitingImages
             images={[
-              "/commercial%203.png",
-              "/commercial%204.png",
-              "/cw.png",
-              "/office%201.png",
-              "/office%205.png",
-              "/office%207.png",
-              "/solana.png",
-              "/the%20coin.png",
-              "/Iron%20Vault%20Shield.png"
+              "/images/commercial%203.png",
+              "/images/commercial%204.png",
+              "/logos/cw.png",
+              "/images/office%201.png",
+              "/images/office%205.png",
+              "/images/office%207.png",
+              "/images/solana.png",
+              "/logos/the%20coin.png",
+              "/images/Iron%20Vault%20Shield.png"
             ]}
             shape="ellipse"
             direction="reverse"
