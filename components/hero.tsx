@@ -4,10 +4,7 @@ import { Button } from "@/components/ui/button"
 export function Hero() {
   return (
     <section className="relative isolate min-h-[85vh] overflow-hidden">
-      {/* Dark overlay so text stays readable */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent" />
-
-      {/* Content — left-aligned over the video */}
+      {/* Content — left-aligned over the background */}
       <div className="container relative z-10 mx-auto flex min-h-[85vh] items-center px-4">
         <div className="flex max-w-xl flex-col items-start justify-center py-20">
           <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
