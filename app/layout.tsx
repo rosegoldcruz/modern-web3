@@ -64,13 +64,13 @@ export default function RootLayout({
         </Script>
       </head>
       <body>
-        <div className="fixed inset-0 z-0 bg-black">
+        <div className="fixed inset-0 z-0 bg-neutral-950">
           <Plasma
             color="#8b5cf6"
             speed={0.8}
             direction="forward"
             scale={1.5}
-            opacity={0.4}
+            opacity={0.7}
             mouseInteractive={true}
           />
         </div>
