@@ -1,9 +1,9 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
-import { PhoneCards } from "@/components/phone-cards"
 import { Features } from "@/components/features"
 import OrbitingImages from "@/components/orbiting-images"
 import { AppverseFooter } from "@/components/appverse-footer"
+import { IronVaultShowcase } from "@/components/iron-vault-showcase"
 import Script from "next/script"
 
 // ✅ Force static generation for low TTFB
@@ -32,7 +32,7 @@ export default function Page() {
       <main className="min-h-[100dvh] text-white">
         <SiteHeader />
         <Hero />
-        <PhoneCards />
+        <IronVaultShowcase />
         <Features />
         <section className="mx-auto w-full max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
           <h2 className="mb-8 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
