@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"], display: "swap" })
 export const metadata: Metadata = {
   title: "Iron Vault | Real Estate. Tokenized. Understood.",
   description:
-    "Iron Vault is an education-first entry point into understanding how real-world assets — specifically real estate — can be structured, represented, and integrated into decentralized financial systems.",
+    "Iron Vault is an education-first entry point into understanding how real-world assets â€” specifically real estate â€” can be structured, represented, and integrated into decentralized financial systems.",
   generator: "Iron Vault Token",
   icons: {
     icon: [
@@ -62,6 +62,12 @@ export default function RootLayout({
             gtag('config', 'G-W6LV22900R');
           `}
         </Script>
+        {/* GoHighLevel External Tracking */}
+        <Script
+          src="https://link.msgsndr.com/js/external-tracking.js"
+          data-tracking-id="tk_1af5c4023eac4b749a18eff1192fe942"
+          strategy="lazyOnload"
+        />
       </head>
       <body>
         <div className="fixed inset-0 z-0 bg-neutral-950">

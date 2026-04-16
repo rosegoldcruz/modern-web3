@@ -1,23 +1,23 @@
 ﻿import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
-import { Features } from "@/components/features"
+import { IronVaultDifference } from "@/components/iron-vault-difference"
+import { IronVaultCTA } from "@/components/iron-vault-cta"
 import OrbitingImages from "@/components/orbiting-images"
 import { AppverseFooter } from "@/components/appverse-footer"
 import { IronVaultShowcase } from "@/components/iron-vault-showcase"
 import Script from "next/script"
 
-// âœ… Force static generation for low TTFB
+// Force static generation for low TTFB
 export const dynamic = "force-static"
 
 export default function Page() {
-  // Structured data for main page
   const pageStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "@id": "https://theskitbit.com/",
     name: "Iron Vault | Real Estate. Tokenized. Understood.",
     description:
-      "Iron Vault is an education-first entry point into understanding how real-world assets â€” specifically real estate â€” can be structured, represented, and integrated into decentralized financial systems.",
+      "Iron Vault is an education-first entry point into understanding how real-world assets — specifically real estate — can be structured, represented, and integrated into decentralized financial systems.",
     url: "https://theskitbit.com/",
     mainEntity: {
       "@type": "Organization",
@@ -33,7 +33,7 @@ export default function Page() {
         <SiteHeader />
         <Hero />
         <IronVaultShowcase />
-        <Features />
+        <IronVaultDifference />
         <section className="mx-auto w-full max-w-[1400px] px-4 py-16 sm:px-6 sm:py-20">
           <h2 className="mb-4 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
             The Flow of Real Estate Into Decentralized Infrastructure
@@ -82,6 +82,7 @@ export default function Page() {
             className="px-4 md:px-6"
           />
         </section>
+        <IronVaultCTA />
         <AppverseFooter />
       </main>
 
@@ -93,6 +94,12 @@ export default function Page() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(pageStructuredData),
         }}
+      />
+
+      {/* GoHighLevel form embed script */}
+      <Script
+        src="https://link.msgsndr.com/js/form_embed.js"
+        strategy="lazyOnload"
       />
     </>
   )
