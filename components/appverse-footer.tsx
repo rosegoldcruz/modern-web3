@@ -67,9 +67,9 @@ export function AppverseFooter() {
             </div>
 
             {/* Right mockup */}
-            <div className="mx-auto w-full max-w-[320px]">
+            <div className="mx-auto w-full max-w-[380px]">
               <div className="relative rounded-[28px] liquid-glass p-2 shadow-2xl">
-                <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
+                <div className="relative aspect-[9/16] w-full overflow-hidden rounded-2xl bg-black">
                   {/* Lazy-loaded video fills the screen */}
                   <LazyVideo
                     src="/videos/footer.mp4"
