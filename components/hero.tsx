@@ -13,8 +13,17 @@ export function Hero() {
       {/* Background video */}
       <div className="absolute inset-0 z-0">
         <LazyVideo
+          src="/videos/Mobile%20hero.mp4"
+          className="h-full w-full object-cover md:hidden"
+          autoplay
+          loop
+          muted
+          playsInline
+          aria-label="Iron Vault hero background"
+        />
+        <LazyVideo
           src="/videos/hero.mp4"
-          className="h-full w-full object-cover"
+          className="hidden h-full w-full object-cover md:block"
           autoplay
           loop
           muted
