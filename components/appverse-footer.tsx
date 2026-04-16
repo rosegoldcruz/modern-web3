@@ -85,10 +85,6 @@ export function AppverseFooter() {
                     <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-white/20" />
                     <div className="space-y-1 px-1">
                       <div className="text-5xl font-extrabold text-lime-300">Real Estate Meets DeFi</div>
-                      <p className="text-xs text-white/80">From awareness to participation in three steps</p>
-                      <div className="mt-3 inline-flex items-center rounded-full bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-lime-300">
-                        Phase 1 Active
-                      </div>
                     </div>
                   </div>
                 </div>
