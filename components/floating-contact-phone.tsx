@@ -68,7 +68,7 @@ function PhoneContactScreen() {
     setStatus('sending')
     try {
       await fetch(
-        'https://services.leadconnectorhq.com/hooks/OOxBz4Jalnuam4eNqhvD/webhook-trigger/36faab3c-82c7-4513-91ef-dc6faed71169',
+        'https://services.leadconnectorhq.com/hooks/OOxBz4Jalnuam4eNqhvD/webhook-trigger/5cf2907d-c975-465d-99a3-222b524083c4',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
