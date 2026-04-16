@@ -6,7 +6,7 @@ import { motion } from "motion/react"
 import { Drawer } from "vaul"
 
 const WEBHOOK =
-  "https://services.leadconnectorhq.com/hooks/OOxBz4Jalnuam4eNqhvD/webhook-trigger/5cf2907d-c975-465d-99a3-222b524083c4"
+  "https://services.leadconnectorhq.com/hooks/OOxBz4Jalnuam4eNqhvD/webhook-trigger/F5gmZ0oC70UjqZxlI4UI"
 
 const spring = { type: "spring", stiffness: 260, damping: 28, mass: 0.9 } as const
 
