@@ -70,14 +70,14 @@ export function Hero() {
               asChild
               className="rounded-lg bg-lime-400 px-8 py-3 text-base font-semibold text-black hover:bg-lime-300 transition-all"
             >
-              <Link href="/education">ðŸŽ“ Start Learning Now</Link>
+              <Link href="/education">🎓 Start Learning Now</Link>
             </Button>
 
             <Button
               asChild
               className="rounded-lg border border-yellow-600 bg-neutral-950 px-8 py-3 text-base font-semibold text-yellow-500 hover:bg-yellow-600/10 hover:text-yellow-400 transition-all"
             >
-              <Link href="#difference">ðŸª™ Get Early Access</Link>
+              <Link href="#difference">🚀 Get Early Access</Link>
             </Button>
           </div>
 
