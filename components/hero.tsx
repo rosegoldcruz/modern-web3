@@ -8,7 +8,7 @@ export function Hero() {
       {/* Full-viewport background video */}
       <div className="absolute inset-0 z-0">
         <LazyVideo
-          src="/videos/Herro.mov"
+          src="/videos/hero.mp4"
           className="h-full w-full object-cover"
           autoplay={true}
           loop={true}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
 interface LazyVideoProps {
   src: string
@@ -27,69 +27,54 @@ export default function LazyVideo({
   ...props
 }: LazyVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const [loaded, setLoaded] = useState(false)
+  const loadedRef = useRef(false)
 
   useEffect(() => {
     const el = videoRef.current
     if (!el) return
 
-    let observer: IntersectionObserver | null = null
-
     const onIntersect: IntersectionObserverCallback = (entries) => {
       entries.forEach(async (entry) => {
-        if (entry.isIntersecting && !loaded) {
-          // Set the src attribute to start loading
+        if (entry.isIntersecting && !loadedRef.current) {
+          loadedRef.current = true
           el.src = src
           el.load()
 
-          // If autoplay is enabled, try to play when ready
           if (autoplay) {
             const playVideo = async () => {
               try {
                 await el.play()
               } catch (error) {
-                // Autoplay might be blocked
                 console.log("Autoplay blocked:", error)
               }
             }
 
             if (el.readyState >= 3) {
-              // Video is already loaded enough to play
               playVideo()
             } else {
-              // Wait for video to load enough data
               el.addEventListener("canplay", playVideo, { once: true })
             }
           }
-
-          setLoaded(true)
-          // Don't disconnect observer - we want to keep monitoring visibility
-        } else if (!entry.isIntersecting && loaded && autoplay) {
-          // Video is out of view and has autoplay - pause it but keep it loaded
+        } else if (!entry.isIntersecting && loadedRef.current && autoplay) {
           try {
             el.pause()
-          } catch (error) {
-            console.log("Error pausing video:", error)
-          }
-        } else if (entry.isIntersecting && loaded && autoplay) {
-          // Video is back in view and has autoplay - resume playing
+          } catch {}
+        } else if (entry.isIntersecting && loadedRef.current && autoplay) {
           try {
             await el.play()
-          } catch (error) {
-            console.log("Error resuming video:", error)
-          }
+          } catch {}
         }
       })
     }
 
-    observer = new IntersectionObserver(onIntersect, {
-      rootMargin: "50px", // Start loading 50px before entering viewport
-      threshold: 0.1,
+    const observer = new IntersectionObserver(onIntersect, {
+      rootMargin: "200px",
+      threshold: 0.01,
     })
     observer.observe(el)
 
-    return () => observer?.disconnect()
-  }, [src, loaded, autoplay])
+    return () => observer.disconnect()
+  }, [src, autoplay])
 
   return (
     <video
