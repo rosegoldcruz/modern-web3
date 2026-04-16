@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -72,7 +72,7 @@ export function AppverseFooter() {
                 <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
                   {/* Lazy-loaded video fills the screen */}
                   <LazyVideo
-                    src="/videos/footer-preview.mp4"
+                    src="/videos/footer.mp4"
                     className="absolute inset-0 h-full w-full object-cover"
                     autoplay={true}
                     loop={true}
