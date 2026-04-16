@@ -9,10 +9,10 @@ import { Menu, Briefcase, Tag, HelpCircle, FileText, Info } from "lucide-react"
 export function SiteHeader() {
   const links = [
     { href: "/", label: "Home", icon: Briefcase },
-    { href: "#pricing", label: "How It Works", icon: Tag },
-    { href: "faq", label: "FAQ", icon: HelpCircle },
-    { href: "#blog", label: "Education", icon: FileText },
-    { href: "About", label: "About", icon: Info },
+    { href: "/how-it-works", label: "How It Works", icon: Tag },
+    { href: "/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/education", label: "Education", icon: FileText },
+    { href: "/about", label: "About", icon: Info },
   ]
 
   return (

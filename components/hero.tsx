@@ -50,7 +50,7 @@ export function Hero() {
         />
       </div>
 
-      {/* Content — text on left */}
+      {/* Content â€” text on left */}
       <div className="container relative z-10 mx-auto flex min-h-[85vh] items-center px-4">
         <div className="flex max-w-xl flex-col items-start justify-center py-20">
           <h1 className="text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
@@ -70,14 +70,14 @@ export function Hero() {
               asChild
               className="rounded-lg bg-lime-400 px-8 py-3 text-base font-semibold text-black hover:bg-lime-300 transition-all"
             >
-              <Link href="#blog">🎓 Start Learning Now</Link>
+              <Link href="/education">ðŸŽ“ Start Learning Now</Link>
             </Button>
 
             <Button
               asChild
               className="rounded-lg border border-yellow-600 bg-neutral-950 px-8 py-3 text-base font-semibold text-yellow-500 hover:bg-yellow-600/10 hover:text-yellow-400 transition-all"
             >
-              <Link href="#pricing">🪙 Get Early Access</Link>
+              <Link href="#difference">ðŸª™ Get Early Access</Link>
             </Button>
           </div>
 
