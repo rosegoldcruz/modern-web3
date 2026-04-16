@@ -101,7 +101,7 @@ export function AppverseFooter() {
             {/* Brand */}
             <div className="space-y-3">
               <div className="flex items-center gap-1.5">
-                <Image src="/icons/skitbit-white.svg" alt="Iron Vault logo" width={24} height={24} className="h-6 w-6" />
+                <Image src="/logos/the%20coin.png" alt="Iron Vault coin" width={32} height={32} className="h-8 w-8 object-contain" />
                 <span className="text-xl font-semibold text-lime-300">Iron Vault</span>
               </div>
               <p className="max-w-sm text-sm text-neutral-400">{content.tagline}</p>
