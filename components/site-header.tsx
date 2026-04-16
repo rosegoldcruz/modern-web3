@@ -1,130 +1,53 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import Image from "next/image"
-import { Menu, Briefcase, Tag, HelpCircle, FileText, Info } from "lucide-react"
+import { Phone } from "lucide-react"
 
 export function SiteHeader() {
-  const links = [
-    { href: "/", label: "Home", icon: Briefcase },
-    { href: "/how-it-works", label: "How It Works", icon: Tag },
-    { href: "/faq", label: "FAQ", icon: HelpCircle },
-    { href: "/education", label: "Education", icon: FileText },
-    { href: "/about", label: "About", icon: Info },
-  ]
-
   return (
-    <header className="sticky top-0 z-50 p-4">
+    <header className="sticky top-0 z-40 px-3 pt-3 sm:px-4 sm:pt-4">
       <div className="container mx-auto max-w-6xl">
-        <div className="flex min-h-20 items-center justify-between gap-6 px-6 py-3 liquid-glass-header rounded-[2rem]">
-          {/* Brand Logo */}
+        <div className="liquid-glass-header flex min-h-16 items-center justify-between gap-4 rounded-3xl px-4 py-2 sm:min-h-20 sm:px-6 sm:py-3">
           <Link href="/" className="flex min-w-0 items-center gap-3">
             <Image
               src="/logos/pwcw-logo.webp"
-              alt="Commonwealth Ventures LLC logo"
+              alt="Commonwealth Ventures LLC"
               width={188}
               height={44}
-              className="h-auto w-[156px] shrink-0 object-contain lg:w-[188px]"
+              className="h-auto w-[132px] shrink-0 object-contain sm:w-[156px] lg:w-[188px]"
               priority
             />
-            <div className="hidden min-w-0 flex-col md:flex">
-              <span className="text-[10px] font-medium uppercase tracking-[0.26em] text-lime-300/85 lg:text-[11px]">
-                Presents the Iron Vault token
-              </span>
-            </div>
+            <span className="hidden text-[10px] font-medium uppercase tracking-[0.26em] text-lime-300/85 md:inline lg:text-[11px]">
+              Presents the Iron Vault token
+            </span>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden items-center gap-5 text-sm text-gray-300 lg:flex xl:gap-6">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="hover:text-purple-300 transition-colors"
-              >
-                {l.label}
-              </Link>
-            ))}
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-6 text-sm text-gray-300 lg:flex">
+            <Link href="/" className="transition-colors hover:text-purple-300">Home</Link>
+            <Link href="/how-it-works" className="transition-colors hover:text-purple-300">How It Works</Link>
+            <Link href="/faq" className="transition-colors hover:text-purple-300">FAQ</Link>
+            <Link href="/education" className="transition-colors hover:text-purple-300">Education</Link>
+            <Link href="/about" className="transition-colors hover:text-purple-300">About</Link>
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex">
-            <Button
-              asChild
-              className="bg-lime-400 text-black font-medium rounded-lg px-6 py-2.5
-                         hover:bg-lime-300 hover:shadow-md hover:scale-[1.02]
-                         transition-all"
-            >
-              <Link href="tel:8883682502">Call Us Today</Link>
-            </Button>
-          </div>
+          <Link
+            href="tel:8883682502"
+            className="hidden min-h-[44px] items-center gap-2 rounded-xl bg-lime-400 px-5 text-sm font-semibold text-black transition-all hover:scale-[1.02] hover:bg-lime-300 hover:shadow-md lg:inline-flex"
+          >
+            Call Us Today
+          </Link>
 
-          {/* Mobile Nav */}
-          <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="border-gray-700 bg-gray-900/80 text-gray-200 hover:bg-gray-800"
-                >
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Open menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="liquid-glass border-gray-800 p-0 w-64 flex flex-col"
-              >
-                {/* Brand Header */}
-                <div className="flex items-center gap-3 border-b border-gray-800 px-4 py-4">
-                  <Image
-                    src="/logos/pwcw-logo.webp"
-                    alt="Commonwealth Ventures LLC logo"
-                    width={160}
-                    height={38}
-                    className="h-auto w-[140px] object-contain"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-lime-300/85">
-                      Presents Iron Vault
-                    </span>
-                    <span className="text-xs text-white/60">The Commonwealth Ventures token product</span>
-                  </div>
-                </div>
-
-                {/* Nav Links */}
-                <nav className="flex flex-col gap-1 mt-2 text-gray-200">
-                  {links.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-900 hover:text-purple-300 transition-colors"
-                    >
-                      <span className="inline-flex items-center justify-center w-5 h-5 text-gray-400">
-                        <l.icon className="h-4 w-4" />
-                      </span>
-                      <span className="text-sm">{l.label}</span>
-                    </Link>
-                  ))}
-                </nav>
-
-                {/* CTA Button at Bottom */}
-                <div className="mt-auto border-t border-gray-800 p-4">
-                  <Button
-                    asChild
-                    className="w-full bg-lime-400 text-black font-medium rounded-lg px-6 py-2.5
-                               hover:bg-lime-300 hover:shadow-md hover:scale-[1.02]
-                               transition-all"
-                  >
-                    <Link href="tel:8883682502">Call Us Today</Link>
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          {/* Mobile: tap-to-call (ergonomically primary action = keep accessible here too) */}
+          <Link
+            href="tel:8883682502"
+            aria-label="Call Iron Vault"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-lime-400 text-black shadow-[0_6px_16px_rgba(132,204,22,0.35)] lg:hidden"
+          >
+            <Phone className="h-5 w-5" />
+          </Link>
         </div>
       </div>
     </header>

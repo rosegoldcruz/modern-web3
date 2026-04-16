@@ -1,4 +1,5 @@
 ﻿import { SiteHeader } from "@/components/site-header"
+import { BottomNav } from "@/components/bottom-nav"
 import { Hero } from "@/components/hero"
 import { IronVaultDifference } from "@/components/iron-vault-difference"
 import { IronVaultCTA } from "@/components/iron-vault-cta"
@@ -29,7 +30,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="min-h-[100dvh] text-white">
+      <main className="min-h-[100dvh] pb-[calc(env(safe-area-inset-bottom)+88px)] text-white lg:pb-0">
         <SiteHeader />
         <Hero />
         <IronVaultShowcase />
@@ -85,6 +86,7 @@ export default function Page() {
         <IronVaultCTA />
         <AppverseFooter />
       </main>
+      <BottomNav />
 
       {/* JSON-LD structured data */}
       <Script
