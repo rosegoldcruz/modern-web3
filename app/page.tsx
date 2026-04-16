@@ -38,10 +38,10 @@ export default function Page() {
           <h2 className="mb-4 text-center text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
             The Flow of Real Estate Into Decentralized Infrastructure
           </h2>
-          <p className="mx-auto mb-6 max-w-4xl text-center text-lg font-medium text-white/80 sm:text-xl">
+          <p className="mb-6 text-lg font-medium text-white/80 sm:text-xl">
             How Physical Assets Enter the Blockchain Economy — And Why It Matters
           </p>
-          <div className="mx-auto mb-14 max-w-4xl space-y-4 text-center text-base leading-relaxed text-white/65 sm:text-lg sm:leading-8">
+          <div className="mb-14 space-y-4 text-base leading-relaxed text-white/65 sm:text-lg sm:leading-8">
             <p>
               Real estate is the world&apos;s most powerful asset class — but it&apos;s been locked behind slow transactions, opaque ownership, and high barriers to entry.
             </p>
