@@ -8,7 +8,7 @@ export function IronVaultShowcase() {
 
   return (
     <section className="relative overflow-hidden py-20 sm:py-28 lg:py-32">
-      <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-16 px-6 lg:flex-row lg:gap-20">
+      <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-16 px-6 lg:flex-row lg:gap-28">
         {/* Phone on the left */}
         <div className="flex w-full shrink-0 justify-center lg:w-auto">
           <FloatingContactPhone reducedMotion={reducedMotion} />

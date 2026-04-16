@@ -88,6 +88,15 @@ function PhoneContactScreen() {
           </label>
 
           <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-white/70">Phone</span>
+            <input
+              type="tel"
+              placeholder="(555) 123-4567"
+              className="h-9 w-full rounded-lg border border-white/20 bg-white/[0.04] px-2.5 text-sm text-[#E8EDF5] placeholder:text-white/45 outline-none focus:border-[#1a56e8]"
+            />
+          </label>
+
+          <label className="block">
             <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.08em] text-white/70">Interest</span>
             <select
               className="h-9 w-full rounded-lg border border-white/20 bg-white/[0.04] px-2.5 text-sm text-[#E8EDF5] outline-none focus:border-[#1a56e8]"
@@ -97,6 +106,7 @@ function PhoneContactScreen() {
               <option value="real-estate" className="bg-[#0f1220]">Real Estate</option>
               <option value="digital-assets" className="bg-[#0f1220]">Digital Assets</option>
               <option value="passive-income" className="bg-[#0f1220]">Passive Income</option>
+              <option value="education" className="bg-[#0f1220]">Education</option>
               <option value="stablecoin" className="bg-[#0f1220]">Stablecoin / RWA</option>
             </select>
           </label>
