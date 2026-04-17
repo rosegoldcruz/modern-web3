@@ -136,12 +136,9 @@ export default function FAQPage() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-lime-300">
               Iron Vault &mdash; Frequently Asked Questions
             </p>
-            <h1 className="mb-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
               Questions we&apos;d want answered if we were you.
             </h1>
-            <p className="max-w-2xl text-lg leading-relaxed text-white/60 sm:text-xl">
-              No hype. No fluff. Straight answers about what Iron Vault is, how it works, and what the real risks are.
-            </p>
           </div>
         </section>
 
