@@ -208,10 +208,6 @@ export default function AboutPage() {
                 }
               />
             </div>
-
-            <p className="mt-6 text-sm leading-relaxed text-white/45">
-              Verifiable in 30 seconds at azcc.gov. We are not anonymous. We are not hiding. Everything above is public record.
-            </p>
           </div>
         </section>
 
