@@ -21,7 +21,7 @@ const faqs: FAQSection[] = [
       },
       {
         q: "Who is this for?",
-        a: "Anyone who was never taught how wealth actually works. If school didn't cover compound interest, real estate investing, or how digital assets fit into the modern economy — this is where you start. We specifically built this for people 18–35 who are tired of feeling locked out of financial systems.",
+        a: "Anyone who was never taught how wealth actually works. If school didn't cover compound interest, real estate investing, or how digital assets fit into the modern economy — this is where you start. We built this for people who are tired of feeling locked out of financial systems, or who simply don't know enough yet to move confidently in the crypto market.",
       },
       {
         q: "Do I have to buy a token to participate?",
