@@ -21,7 +21,7 @@ const faqs: FAQSection[] = [
       },
       {
         q: "Who is this for?",
-        a: "Anyone who was never taught how wealth actually works. If school didn't cover compound interest, real estate investing, or how digital assets fit into the modern economy — this is where you start. We built this for people who are tired of feeling locked out of financial systems, or who simply don't know enough yet to move confidently in the crypto market.",
+        a: "Anyone who was never taught how wealth actually works. If school didn't cover compound interest, real estate investing, or how digital assets fit into the modern economy — this is where you start. We built this for people who are tired of feeling locked out of financial systems, or who simply don't know enough yet to move confidently.",
       },
       {
         q: "Do I have to buy a token to participate?",
@@ -29,7 +29,7 @@ const faqs: FAQSection[] = [
       },
       {
         q: "Who runs this?",
-        a: "Commonwealth Ventures LLC — a legally registered Arizona domestic LLC (Entity ID: 23883142), formed September 15, 2025, and active in good standing with the Arizona Corporation Commission. This is a real business with real accountability.",
+        a: "Commonwealth Ventures LLC — a legally registered Arizona domestic LLC (Entity ID: 23883142), formed September 15, 2025, and active in good standing with the Arizona Corporation Commission. Christopher Maxon serves as CEO. Daniel Cruz leads growth and platform development. Mark Hannah leads community.",
       },
     ],
   },
@@ -42,7 +42,7 @@ const faqs: FAQSection[] = [
       },
       {
         q: "What does the education cost?",
-        a: "Entry-level courses start at accessible price points designed for people just getting started. We're not gatekeeping knowledge behind high ticket prices. The goal is a large, informed community — not a small, wealthy one.",
+        a: "We offer three tracks: $100, $500, and $1,000 — each scaling with the depth of the curriculum. Entry-level modules are designed to be accessible. The goal is a large, informed community — not a small, wealthy one.",
       },
       {
         q: "Is the education connected to the token?",
@@ -60,6 +60,10 @@ const faqs: FAQSection[] = [
       {
         q: "When is the token launching?",
         a: "The full token launch is planned for November 2026. We are currently in the community-building and education phase. Early access positions are available for founding members who want to be part of the ecosystem from the ground up.",
+      },
+      {
+        q: "How do I get IV-SOL tokens?",
+        a: "Complete your chosen education track and tokens are delivered automatically to your wallet upon certificate completion. No sales call. No manual process. No waiting.\n\n$100 in coursework = 100,000 IV-SOL\n$500 in coursework = 500,000 IV-SOL\n$1,000 in coursework = 1,000,000 IV-SOL\n\nThe education is the presale.",
       },
       {
         q: "What is the 6% transaction fee and where does it go?",
@@ -191,7 +195,7 @@ export default function FAQPage() {
                               transition={spring}
                               className="overflow-hidden"
                             >
-                              <p className="pb-5 text-base leading-relaxed text-white/60 sm:text-lg">
+                              <p className="whitespace-pre-line pb-5 text-base leading-relaxed text-white/60 sm:text-lg">
                                 {item.a}
                               </p>
                             </motion.div>
