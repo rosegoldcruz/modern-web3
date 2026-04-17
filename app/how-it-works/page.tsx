@@ -7,6 +7,12 @@ import { SiteHeader } from "@/components/site-header"
 import { BottomNav } from "@/components/bottom-nav"
 import { AppverseFooter } from "@/components/appverse-footer"
 
+const tiers = [
+  { amount: "$100", tokens: "100,000", label: "Starter", featured: false },
+  { amount: "$500", tokens: "500,000", label: "Builder", featured: true },
+  { amount: "$1,000", tokens: "1,000,000", label: "Founder", featured: false },
+]
+
 const spring = { type: "spring", stiffness: 220, damping: 26, mass: 0.9 } as const
 
 const steps = [
@@ -18,14 +24,14 @@ const steps = [
   },
   {
     number: "02",
-    title: "Complete $500 in modules.",
-    body: "Work through the curriculum at your own pace. Every module you complete counts toward your total. When you hit $500 in completed coursework, something happens automatically.",
+    title: "Complete your chosen track.",
+    body: "Work through the curriculum at your own pace. Every module you complete counts toward your total. Choose the $100, $500, or $1,000 track — your token allocation scales with your commitment.",
     detail: "You don't have to talk to anyone. You don't have to apply. You just learn.",
   },
   {
     number: "03",
-    title: "Receive 100,000 IV-SOL tokens.",
-    body: "When you complete $500 worth of education, you receive 100,000 Iron Vault tokens. Not because you bought them off a presale page. Because you learned enough to actually understand what you're getting.",
+    title: "Receive your IV-SOL tokens automatically.",
+    body: "When you complete your track, tokens are delivered to your wallet automatically via smart contract. No manual process. No waiting on someone to send them. The certificate triggers the delivery.",
     detail: "This is the Iron Vault presale. The education is the entry point.",
   },
   {
@@ -113,36 +119,68 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
-        {/* Founding member offer */}
+        {/* Founding member tiers */}
         <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
-          <div className="mx-auto max-w-3xl rounded-2xl border border-lime-400/30 bg-white/[0.03] p-6 text-center backdrop-blur-sm sm:p-10">
-            <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">
-              The founding member offer
-            </p>
-            <div className="mb-6 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-              <div>
-                <p className="mb-1 text-xs uppercase tracking-wider text-white/40">Complete</p>
-                <p className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">$500</p>
-                <p className="mt-1 text-xs text-white/40">in coursework</p>
-              </div>
-              <ArrowRight className="h-6 w-6 text-lime-300/60" aria-hidden />
-              <div>
-                <p className="mb-1 text-xs uppercase tracking-wider text-white/40">Receive</p>
-                <p className="text-4xl font-extrabold tracking-tight text-lime-300 sm:text-5xl">
-                  100,000
-                </p>
-                <p className="mt-1 text-xs text-white/40">IV-SOL tokens</p>
-              </div>
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-2 flex items-center gap-3">
+              <span aria-hidden className="h-px w-7 bg-lime-300/50" />
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">
+                Founding member tiers
+              </p>
             </div>
-            <p className="mx-auto mb-6 max-w-xl text-base leading-relaxed text-white/55 sm:text-lg">
-              This is the Iron Vault presale price. The difference is you earn your position through education — not through a sales call or a countdown timer.
+            <p className="mb-6 text-sm text-white/45">
+              $1 = 1,000 IV-SOL. Every tier. No exceptions.
             </p>
-            <Link
-              href="/education"
-              className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
-            >
-              Start Learning Now
-            </Link>
+
+            <div className="flex flex-col gap-3">
+              {tiers.map((tier) => (
+                <motion.div
+                  key={tier.amount}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={spring}
+                  className={`flex flex-wrap items-center gap-5 rounded-2xl border p-5 backdrop-blur-sm transition-colors sm:gap-7 sm:p-6 ${
+                    tier.featured
+                      ? "border-lime-400/30 bg-lime-400/[0.04]"
+                      : "border-white/10 bg-white/[0.03] hover:border-lime-400/20"
+                  }`}
+                >
+                  <div>
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                      {tier.label}
+                    </p>
+                    <p className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                      {tier.amount}
+                    </p>
+                    <p className="mt-1 text-xs text-white/40">in coursework</p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-lime-300/50" aria-hidden />
+                  <div>
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                      Receive
+                    </p>
+                    <p className="text-3xl font-extrabold tracking-tight text-lime-300 sm:text-4xl">
+                      {tier.tokens}
+                    </p>
+                    <p className="mt-1 text-xs text-white/40">IV-SOL tokens</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="mt-6 text-sm leading-relaxed text-white/45">
+              Tokens delivered automatically via smart contract upon certificate completion. No agent. No sales call. No manual process.
+            </p>
+
+            <div className="mt-8 flex justify-center">
+              <Link
+                href="/education"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
+              >
+                Start Learning Now
+              </Link>
+            </div>
           </div>
         </section>
 
