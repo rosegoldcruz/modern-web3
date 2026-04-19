@@ -76,7 +76,7 @@ export function Hero() {
           className="flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:gap-4"
         >
           <Link
-            href="/education"
+            href="/learn"
             className="inline-flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-2xl bg-lime-400 px-6 text-base font-semibold text-black shadow-[0_10px_30px_rgba(132,204,22,0.35)] active:scale-[0.98] transition-transform"
           >
             <GraduationCap className="h-5 w-5" aria-hidden />

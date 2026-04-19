@@ -175,7 +175,7 @@ export default function HowItWorksPage() {
 
             <div className="mt-8 flex justify-center">
               <Link
-                href="/education"
+                href="/learn"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
               >
                 Start Learning Now
@@ -256,7 +256,7 @@ export default function HowItWorksPage() {
               </p>
               <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
                 <Link
-                  href="/education"
+                  href="/learn"
                   className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
                 >
                   Start Learning
