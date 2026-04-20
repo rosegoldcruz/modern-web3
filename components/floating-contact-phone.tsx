@@ -6,6 +6,7 @@ import { motion } from "motion/react"
 import { Drawer } from "vaul"
 
 const WEBHOOK =
+  process.env.NEXT_PUBLIC_CUSTOM_PHONE_FORM_WEBHOOK_URL ||
   "https://services.leadconnectorhq.com/hooks/OOxBz4Jalnuam4eNqhvD/webhook-trigger/rGungOMfItFXJPwniAGw"
 
 const spring = { type: "spring", stiffness: 260, damping: 28, mass: 0.9 } as const
@@ -203,7 +204,8 @@ function EarlyAccessForm({
           phone: data.get("phone"),
           interest: data.get("interest"),
           message: data.get("message"),
-          source: "iron-vault-phone-form",
+          source: "custom-phone-form",
+          form_label: "custom-phone-form",
         }),
       })
       setStatus("sent")
