@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`;
 
@@ -914,10 +915,10 @@ function ContentBlock({b}){
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────
 export default function IronVaultAcademy(){
-  // Auth state
-  const [user, setUser] = useState(null);
-  const [authTab, setAuthTab] = useState("register");
-  const [form, setForm] = useState({name:"",email:"",password:""});
+  const { isLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
+  const displayName = user?.fullName || user?.firstName || "Student";
+  const displayEmail = user?.primaryEmailAddress?.emailAddress || "";
 
   // Navigation
   const [view, setView] = useState("hub");
@@ -993,48 +994,10 @@ export default function IronVaultAcademy(){
     }
   }
 
-  function handleAuth(e){
-    e.preventDefault();
-    if(!form.email.trim()) return;
-    setUser({name: form.name || form.email.split("@")[0], email: form.email});
-    setView("hub");
-  }
-
   const letters=["A","B","C","D"];
 
-  // ── AUTH SCREEN ──
-  if(!user){
-    return(
-      <div className="iv">
-        <style>{CSS}</style>
-        <div className="iv-auth">
-          <div className="iv-auth-card">
-            <div className="iv-auth-logo"><div className="iv-dot"/>IRON VAULT ACADEMY</div>
-            <h1 className="iv-auth-title">The Knowledge<br/>They <span>Never</span><br/>Shared.</h1>
-            <p className="iv-auth-sub">5 modules. Elite strategies. The financial education that was always available — just never to you.</p>
-            <div className="iv-tab-row">
-              <button className={`iv-tab ${authTab==="register"?"active":""}`} onClick={()=>setAuthTab("register")}>NEW STUDENT</button>
-              <button className={`iv-tab ${authTab==="login"?"active":""}`} onClick={()=>setAuthTab("login")}>RETURNING</button>
-            </div>
-            <form onSubmit={handleAuth}>
-              {authTab==="register" && (
-                <><label className="iv-label">FULL NAME</label>
-                <input className="iv-input" placeholder="Your name" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/></>
-              )}
-              <label className="iv-label">EMAIL ADDRESS</label>
-              <input className="iv-input" type="email" placeholder="you@email.com" required value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))}/>
-              <label className="iv-label">PASSWORD</label>
-              <input className="iv-input" type="password" placeholder="••••••••" required value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}/>
-              <button type="submit" className="iv-btn iv-btn-lime" style={{marginTop:4}}>
-                {authTab==="register" ? "UNLOCK THE VAULT →" : "ENTER THE VAULT →"}
-              </button>
-            </form>
-            <p className="iv-auth-note">No credit card. No spam. Progress saved to your account.<br/>Supabase Auth wires in on deploy.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if(!isLoaded) return null;
+  if(!isSignedIn) return null;
 
   // ── HUB ──
   if(view==="hub"){
@@ -1048,8 +1011,8 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip" onClick={()=>{ setUser(null); setProgress(MODULES.map(()=>({done:new Set(),score:null,passed:false}))); }}>
-            👤 {user.name} · Sign Out
+          <div className="iv-chip" onClick={async()=>{ await signOut(); setProgress(MODULES.map(()=>({done:new Set(),score:null,passed:false}))); }}>
+            👤 {displayName}{displayEmail ? ` · ${displayEmail}` : ""} · Sign Out
           </div>
         </header>
         <div className="iv-hub">
@@ -1116,7 +1079,7 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip">👤 {user.name}</div>
+          <div className="iv-chip">👤 {displayName}</div>
         </header>
         <div className="iv-page">
           <button className="iv-back" onClick={()=>setView("hub")}>← DASHBOARD</button>
@@ -1175,7 +1138,7 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip">👤 {user.name}</div>
+          <div className="iv-chip">👤 {displayName}</div>
         </header>
         <div className="iv-lesson-view">
           <div className="iv-lesson-nav">
@@ -1215,7 +1178,7 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip">👤 {user.name}</div>
+          <div className="iv-chip">👤 {displayName}</div>
         </header>
         <div className="iv-quiz-view">
           <button className="iv-back" onClick={()=>setView("module")}>← MODULE</button>
@@ -1271,7 +1234,7 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip">👤 {user.name}</div>
+          <div className="iv-chip">👤 {displayName}</div>
         </header>
         <div className="iv-results">
           <span className="iv-results-icon">{passed?"🏆":"📖"}</span>

@@ -1,0 +1,19 @@
+import { SignUp } from "@clerk/nextjs"
+
+export default function SignUpPage() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4">
+      <SignUp
+        appearance={{
+          variables: {
+            colorPrimary: "#7B2FBE",
+          },
+          elements: {
+            card: "bg-[#0F0F0F] border border-white/10 shadow-none",
+            formButtonPrimary: "bg-[#AAFF00] text-black hover:bg-[#98e600]",
+          },
+        }}
+      />
+    </main>
+  )
+}
