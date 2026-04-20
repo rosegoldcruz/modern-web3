@@ -19,6 +19,12 @@ const Lightning: React.FC<LightningProps> = ({ hue = 230, xOffset = 0, speed = 1
     const canvas = canvasRef.current
     if (!canvas) return
 
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const isMobile = window.innerWidth < 768
+    if (prefersReducedMotion || isMobile) {
+      return
+    }
+
     const resizeCanvas = () => {
       canvas.width = canvas.clientWidth
       canvas.height = canvas.clientHeight
@@ -165,6 +171,7 @@ const Lightning: React.FC<LightningProps> = ({ hue = 230, xOffset = 0, speed = 1
     const uSizeLocation = gl.getUniformLocation(program, "uSize")
 
     const startTime = performance.now()
+    let raf = 0
     const render = () => {
       resizeCanvas()
       gl.viewport(0, 0, canvas.width, canvas.height)
@@ -177,11 +184,12 @@ const Lightning: React.FC<LightningProps> = ({ hue = 230, xOffset = 0, speed = 1
       gl.uniform1f(uIntensityLocation, intensity)
       gl.uniform1f(uSizeLocation, size)
       gl.drawArrays(gl.TRIANGLES, 0, 6)
-      requestAnimationFrame(render)
+      raf = requestAnimationFrame(render)
     }
-    requestAnimationFrame(render)
+    raf = requestAnimationFrame(render)
 
     return () => {
+      cancelAnimationFrame(raf)
       window.removeEventListener("resize", resizeCanvas)
     }
   }, [hue, xOffset, speed, intensity, size])

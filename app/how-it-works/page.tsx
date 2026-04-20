@@ -94,7 +94,7 @@ export default function HowItWorksPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ ...spring, delay: i * 0.04 }}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition-colors hover:border-lime-400/30 hover:bg-white/[0.06] sm:p-8"
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-6 transition-colors hover:border-lime-400/30 hover:bg-[rgba(255,255,255,0.08)] sm:p-8"
               >
                 <span
                   aria-hidden
@@ -140,7 +140,7 @@ export default function HowItWorksPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={spring}
-                  className={`flex flex-wrap items-center gap-5 rounded-2xl border p-5 backdrop-blur-sm transition-colors sm:gap-7 sm:p-6 ${
+                  className={`flex flex-wrap items-center gap-5 rounded-2xl border p-5 transition-colors sm:gap-7 sm:p-6 ${
                     tier.featured
                       ? "border-lime-400/30 bg-lime-400/[0.04]"
                       : "border-white/10 bg-white/[0.03] hover:border-lime-400/20"
@@ -197,7 +197,7 @@ export default function HowItWorksPage() {
               {whyItMatters.map((item) => (
                 <div
                   key={item.label}
-                  className={`rounded-2xl border p-6 backdrop-blur-sm sm:p-7 ${
+                  className={`rounded-2xl border p-6 sm:p-7 ${
                     item.accent
                       ? "border-lime-400/30 bg-lime-400/[0.04]"
                       : "border-white/10 bg-white/[0.03]"
@@ -229,7 +229,7 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)]">
               {realities.map((item, i) => (
                 <div
                   key={i}
@@ -244,7 +244,7 @@ export default function HowItWorksPage() {
             </div>
 
             {/* Bottom CTA — matches FAQ pattern */}
-            <div className="mt-10 rounded-2xl border border-lime-400/30 bg-white/[0.03] p-6 text-center backdrop-blur-sm sm:p-10">
+            <div className="mt-10 rounded-2xl border border-lime-400/30 bg-[rgba(255,255,255,0.04)] p-6 text-center sm:p-10">
               <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-lime-300">
                 Ready to actually understand this?
               </p>

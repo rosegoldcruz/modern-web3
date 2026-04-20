@@ -158,7 +158,7 @@ export default function FAQPage() {
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm sm:p-2">
+                <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] sm:p-2">
                   {section.items.map((item, ii) => {
                     const key = `${si}-${ii}`
                     const isOpen = openKey === key
@@ -209,7 +209,7 @@ export default function FAQPage() {
             ))}
 
             {/* Bottom CTA — matches IronVaultDifference card language */}
-            <div className="rounded-2xl border border-lime-400/30 bg-white/[0.03] p-6 text-center backdrop-blur-sm sm:p-10">
+            <div className="rounded-2xl border border-lime-400/30 bg-[rgba(255,255,255,0.04)] p-6 text-center sm:p-10">
               <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-lime-300">
                 Still have questions?
               </p>

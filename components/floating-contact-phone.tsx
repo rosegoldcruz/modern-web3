@@ -40,7 +40,7 @@ function MobileEarlyAccess() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.4 }}
         transition={spring}
-        className="rounded-3xl border border-white/10 bg-[rgba(10,12,20,0.78)] p-6 backdrop-blur-sm"
+        className="rounded-3xl border border-white/10 bg-[rgba(10,12,20,0.9)] p-6"
       >
         <div className="flex items-center gap-2">
           <Shield size={18} className="text-[#FFD700]" />
@@ -64,7 +64,7 @@ function MobileEarlyAccess() {
           </Drawer.Trigger>
 
           <Drawer.Portal>
-            <Drawer.Overlay className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm" />
+            <Drawer.Overlay className="fixed inset-0 z-[70] bg-black/70" />
             <Drawer.Content className="fixed inset-x-0 bottom-0 z-[80] flex max-h-[92vh] flex-col rounded-t-3xl border-t border-white/10 bg-[#0b0d16] outline-none">
               <Drawer.Title className="sr-only">Join Iron Vault Early Access</Drawer.Title>
               <div aria-hidden className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-white/20" />
@@ -140,7 +140,7 @@ function DesktopPhone({ reducedMotion }: { reducedMotion: boolean }) {
             <div aria-hidden className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[rgba(201,162,39,0.25)] blur-3xl" />
             <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-[rgba(26,86,232,0.18)] blur-3xl" />
 
-            <div className="relative z-10 flex h-full flex-col rounded-2xl border border-white/10 bg-[rgba(10,12,20,0.78)] p-4 backdrop-blur-sm">
+            <div className="relative z-10 flex h-full flex-col rounded-2xl border border-white/10 bg-[rgba(10,12,20,0.9)] p-4">
               <div className="flex items-center gap-2">
                 <Shield size={16} className="text-[#FFD700]" />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FFD700]">

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Renderer, Program, Mesh, Triangle } from "ogl"
 import "./Plasma.css"
 
@@ -59,7 +59,7 @@ void mainImage(out vec4 o, vec2 C) {
   float i, d, z, T = iTime * uSpeed * uDirection;
   vec3 O, p, S;
 
-  for (vec2 r = iResolution.xy, Q; ++i < 60.; O += o.w/d*o.xyz) {
+  for (vec2 r = iResolution.xy, Q; ++i < 36.; O += o.w/d*o.xyz) {
     p = z*normalize(vec3(C-.5*r,r.y)); 
     p.z -= 4.; 
     S = p;
@@ -106,9 +106,27 @@ export const Plasma: React.FC<PlasmaProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mousePos = useRef({ x: 0, y: 0 })
+  const [enabled, setEnabled] = useState(false)
 
   useEffect(() => {
-    if (!containerRef.current) return
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const updateEnabled = () => {
+      const isMobile = window.innerWidth < 768
+      setEnabled(!isMobile && !mediaQuery.matches)
+    }
+
+    updateEnabled()
+    window.addEventListener("resize", updateEnabled)
+    mediaQuery.addEventListener("change", updateEnabled)
+
+    return () => {
+      window.removeEventListener("resize", updateEnabled)
+      mediaQuery.removeEventListener("change", updateEnabled)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!containerRef.current || !enabled) return
 
     // --- Device detection ---
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -184,9 +202,15 @@ export const Plasma: React.FC<PlasmaProps> = ({
 
     // --- Animation loop ---
     let raf = 0
+    let stopped = false
     let lastTime = 0
     const t0 = performance.now()
     const loop = (t: number) => {
+      if (stopped || document.visibilityState === "hidden") {
+        raf = requestAnimationFrame(loop)
+        return
+      }
+
       const delta = t - lastTime
       if (!isIOS || delta > 33) {
         // 60fps desktop, ~30fps iOS
@@ -204,6 +228,7 @@ export const Plasma: React.FC<PlasmaProps> = ({
     raf = requestAnimationFrame(loop)
 
     return () => {
+      stopped = true
       cancelAnimationFrame(raf)
       ro.disconnect()
       if (!isIOS && mouseInteractive && containerRef.current) {
@@ -213,7 +238,11 @@ export const Plasma: React.FC<PlasmaProps> = ({
         containerRef.current?.removeChild(canvas)
       } catch {}
     }
-  }, [color, speed, direction, scale, opacity, mouseInteractive])
+  }, [color, speed, direction, scale, opacity, mouseInteractive, enabled])
+
+  if (!enabled) {
+    return null
+  }
 
   return <div ref={containerRef} className="plasma-container pointer-events-none will-change-transform" />
 }

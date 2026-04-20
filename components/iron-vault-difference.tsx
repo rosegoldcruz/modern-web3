@@ -68,7 +68,7 @@ export function IronVaultDifference() {
           return (
             <div
               key={card.title}
-              className={`${card.span} group rounded-2xl border ${card.border} bg-white/[0.03] p-6 backdrop-blur-sm transition-colors hover:bg-white/[0.06] sm:p-8`}
+              className={`${card.span} group rounded-2xl border ${card.border} bg-[rgba(255,255,255,0.04)] p-6 transition-colors hover:bg-[rgba(255,255,255,0.08)] sm:p-8`}
             >
               <div className={`mb-4 inline-flex rounded-xl ${card.iconBg} p-3`}>
                 <Icon className={`h-6 w-6 ${card.accentColor}`} />

@@ -81,7 +81,7 @@ export default function AboutPage() {
                 The mission
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm sm:p-8">
+            <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-6 sm:p-8">
               <h2 className="mb-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 Education first. Always.
               </h2>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                 What we stand for
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)]">
               {values.map((v, i) => (
                 <div
                   key={v.label}
@@ -148,7 +148,7 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ ...spring, delay: i * 0.05 }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition-colors hover:border-lime-400/30 hover:bg-white/[0.06] sm:p-7"
+                  className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-6 transition-colors hover:border-lime-400/30 hover:bg-[rgba(255,255,255,0.08)] sm:p-7"
                 >
                   <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border border-lime-400/30 bg-lime-400/10 text-sm font-semibold text-lime-300">
                     {member.initials}
@@ -176,7 +176,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
+            <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)]">
               <EntityRow label="Legal entity" value="Commonwealth Ventures LLC" />
               <EntityRow label="Entity ID" value={<span className="font-mono text-xs">23883142</span>} />
               <EntityRow label="State" value="Arizona, USA" />

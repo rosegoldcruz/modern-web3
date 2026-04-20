@@ -21,12 +21,12 @@ export function BottomNav() {
   return (
     <motion.nav
       aria-label="Primary"
-      initial={{ y: 64, opacity: 0 }}
+      initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ ...spring, delay: 0.15 }}
       className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 lg:hidden"
     >
-      <div className="mx-auto flex max-w-md items-stretch justify-between rounded-2xl border border-white/10 bg-[rgba(10,12,20,0.85)] p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-md items-stretch justify-between rounded-2xl border border-white/10 bg-[rgba(10,12,20,0.9)] p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.55)]">
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || (href !== "/" && pathname?.startsWith(href))
           return (

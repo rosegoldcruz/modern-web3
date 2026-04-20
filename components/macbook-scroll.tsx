@@ -1,7 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, type ReactNode } from "react"
-import { MotionValue, motion, useScroll, useTransform } from "motion/react"
+import { type ReactNode } from "react"
 import {
   IconBrightnessDown,
   IconBrightnessUp,
@@ -36,47 +35,17 @@ export function MacbookScroll({
   title?: string | ReactNode
   badge?: ReactNode
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  })
-
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    if (window.innerWidth < 768) {
-      setIsMobile(true)
-    }
-  }, [])
-
-  const scaleX = useTransform(scrollYProgress, [0, 0.3], [1.2, isMobile ? 1 : 1.5])
-  const scaleY = useTransform(scrollYProgress, [0, 0.3], [0.6, isMobile ? 1 : 1.5])
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500])
-  const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0])
-  const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100])
-  const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
-
   return (
-    <div
-      ref={ref}
-      className="flex min-h-[200vh] shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-100 md:py-80"
-    >
-      <motion.h2
-        style={{
-          translateY: textTransform,
-          opacity: textOpacity,
-        }}
-        className="mb-20 text-center text-3xl font-bold text-neutral-100"
-      >
+    <div className="flex shrink-0 scale-[0.35] transform flex-col items-center justify-start py-8 [perspective:800px] sm:scale-50 md:scale-100 md:py-24">
+      <h2 className="mb-14 text-center text-3xl font-bold text-neutral-100">
         {title || (
           <span>
             Education portal is in development. <br /> Coming soon.
           </span>
         )}
-      </motion.h2>
+      </h2>
 
-      <Lid src={src} scaleX={scaleX} scaleY={scaleY} rotate={rotate} translate={translate} />
+      <Lid src={src} />
 
       <div className="relative -z-10 h-[22rem] w-[32rem] overflow-hidden rounded-2xl bg-gray-200 dark:bg-[#272729]">
         <div className="relative h-10 w-full">
@@ -105,16 +74,8 @@ export function MacbookScroll({
 }
 
 function Lid({
-  scaleX,
-  scaleY,
-  rotate,
-  translate,
   src,
 }: {
-  scaleX: MotionValue<number>
-  scaleY: MotionValue<number>
-  rotate: MotionValue<number>
-  translate: MotionValue<number>
   src?: string
 }) {
   return (
@@ -138,12 +99,9 @@ function Lid({
           </span>
         </div>
       </div>
-      <motion.div
+      <div
         style={{
-          scaleX,
-          scaleY,
-          rotateX: rotate,
-          translateY: translate,
+          transform: "translateY(8px)",
           transformStyle: "preserve-3d",
           transformOrigin: "top",
         }}
@@ -157,7 +115,7 @@ function Lid({
             className="absolute inset-0 h-full w-full rounded-lg object-cover object-left-top"
           />
         ) : null}
-      </motion.div>
+      </div>
     </div>
   )
 }

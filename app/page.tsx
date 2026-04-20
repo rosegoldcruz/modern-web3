@@ -6,6 +6,7 @@ import { IronVaultCTA } from "@/components/iron-vault-cta"
 import OrbitingImages from "@/components/orbiting-images"
 import { AppverseFooter } from "@/components/appverse-footer"
 import { IronVaultShowcase } from "@/components/iron-vault-showcase"
+import { LandingPlasmaBackground } from "@/components/landing-plasma-background"
 import Script from "next/script"
 
 // Force static generation for low TTFB
@@ -30,6 +31,7 @@ export default function Page() {
 
   return (
     <>
+      <LandingPlasmaBackground />
       <main className="min-h-[100dvh] pb-[calc(env(safe-area-inset-bottom)+88px)] text-white lg:pb-0">
         <SiteHeader />
         <Hero />

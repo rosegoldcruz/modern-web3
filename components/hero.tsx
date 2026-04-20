@@ -85,7 +85,7 @@ export function Hero() {
 
           <Link
             href="#difference"
-            className="inline-flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-2xl border border-yellow-500/60 bg-black/60 px-6 text-base font-semibold text-yellow-400 backdrop-blur-sm active:scale-[0.98] transition-transform"
+            className="inline-flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-2xl border border-yellow-500/60 bg-black/70 px-6 text-base font-semibold text-yellow-400 active:scale-[0.98] transition-transform"
           >
             <Rocket className="h-5 w-5" aria-hidden />
             Get Early Access

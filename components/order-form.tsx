@@ -230,7 +230,7 @@ export function OrderForm({ isOpen, onClose, selectedPackage }: OrderFormProps) 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
       <div className="bg-[#0f0f0f] glass-border-enhanced rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-neutral-800">

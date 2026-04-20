@@ -1,11 +1,29 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 
 export function LogoMarquee() {
   const [pausedRow, setPausedRow] = useState<string | null>(null)
+  const [isInView, setIsInView] = useState(true)
+  const sectionRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (!sectionRef.current) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting)
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   // Logo data with colors and content
   const logos = [
@@ -36,7 +54,7 @@ export function LogoMarquee() {
       onMouseEnter={() => setPausedRow(rowId)}
       onMouseLeave={() => setPausedRow(null)}
     >
-      <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl flex items-center justify-center">
+      <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.06)] flex items-center justify-center">
         {logo.image ? (
           <div className="relative w-16 h-8 sm:w-20 sm:h-10 lg:w-24 lg:h-12">
             <Image
@@ -59,7 +77,7 @@ export function LogoMarquee() {
   )
 
   return (
-    <section className="text-white py-16 sm:py-20 overflow-hidden">
+    <section ref={sectionRef} className="text-white py-16 sm:py-20 overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex flex-col items-center justify-between mb-12 sm:flex-row sm:items-center">
@@ -80,8 +98,9 @@ export function LogoMarquee() {
             <div
               className={`flex animate-scroll-right whitespace-nowrap ${pausedRow === "first" ? "animation-play-state-paused" : ""}`}
               style={{
-                animationPlayState: pausedRow === "first" ? "paused" : "running",
+                animationPlayState: pausedRow === "first" || !isInView ? "paused" : "running",
                 width: "max-content",
+                transform: "translateZ(0)",
               }}
             >
               {/* Triple the logos for seamless loop */}
@@ -96,8 +115,9 @@ export function LogoMarquee() {
             <div
               className={`flex animate-scroll-left whitespace-nowrap ${pausedRow === "second" ? "animation-play-state-paused" : ""}`}
               style={{
-                animationPlayState: pausedRow === "second" ? "paused" : "running",
+                animationPlayState: pausedRow === "second" || !isInView ? "paused" : "running",
                 width: "max-content",
+                transform: "translateZ(0)",
               }}
             >
               {/* Triple the logos for seamless loop */}

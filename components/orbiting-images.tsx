@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import { animate, motion, useMotionValue, useTransform, type MotionValue } from "motion/react"
 
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import styles from "./orbiting-images.module.css"
 
 type OrbitShape =
@@ -201,6 +202,8 @@ export default function OrbitingImages({
 }: OrbitingImagesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  const [isInView, setIsInView] = useState(true)
+  const prefersReducedMotion = useReducedMotion()
 
   const designHeight = useMemo(() => getDesignHeight(shape, radiusX, radiusY, radius, itemSize), [shape, radiusX, radiusY, radius, itemSize])
   const designCenterX = baseWidth / 2
@@ -254,10 +257,26 @@ export default function OrbitingImages({
     return () => observer.disconnect()
   }, [responsive, baseWidth])
 
+  useEffect(() => {
+    if (!containerRef.current) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting)
+      },
+      { threshold: 0.1 },
+    )
+
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
+
   const progress = useMotionValue(0)
 
   useEffect(() => {
-    if (paused) {
+    if (paused || prefersReducedMotion || !isInView) {
       return
     }
 
@@ -269,7 +288,7 @@ export default function OrbitingImages({
     })
 
     return () => controls.stop()
-  }, [progress, duration, easing, direction, paused])
+  }, [progress, duration, easing, direction, paused, prefersReducedMotion, isInView])
 
   const containerWidth = responsive ? "100%" : typeof width === "number" ? width : width
   const containerHeight = responsive ? "auto" : typeof height === "number" ? height : height
