@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useClerk, useUser } from "@clerk/nextjs";
+import Link from "next/link";
+import { usePrivy } from "@privy-io/react-auth";
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`;
 
@@ -915,10 +916,9 @@ function ContentBlock({b}){
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────
 export default function IronVaultAcademy(){
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
-  const displayName = user?.fullName || user?.firstName || "Student";
-  const displayEmail = user?.primaryEmailAddress?.emailAddress || "";
+  const { ready, authenticated, user, login, logout } = usePrivy();
+  const displayName = user?.email?.address || user?.phone?.number || "Student";
+  const displayEmail = user?.email?.address || user?.phone?.number || "";
 
   // Navigation
   const [view, setView] = useState("hub");
@@ -996,8 +996,27 @@ export default function IronVaultAcademy(){
 
   const letters=["A","B","C","D"];
 
-  if(!isLoaded) return null;
-  if(!isSignedIn) return null;
+  if(!ready) return null;
+  if(!authenticated) {
+    return(
+      <div className="iv">
+        <style>{CSS}</style>
+        <div className="iv-wrap" style={{minHeight:"100vh",display:"grid",placeItems:"center",padding:"40px 20px"}}>
+          <div className="iv-stat" style={{maxWidth:560,width:"100%",textAlign:"center",padding:"32px"}}>
+            <div className="iv-eyebrow" style={{justifyContent:"center"}}>▸ MEMBER ACCESS</div>
+            <h1 className="iv-h1" style={{marginBottom:16}}>Unlock the Vault</h1>
+            <p className="iv-sub" style={{margin:"0 auto 24px",maxWidth:420}}>
+              Sign in with email or SMS to access the academy and create your embedded wallet on first login.
+            </p>
+            <div style={{display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
+              <button className="iv-btn primary" onClick={login}>Continue with Privy</button>
+              <Link href="/" className="iv-btn">Back Home</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── HUB ──
   if(view==="hub"){
@@ -1011,7 +1030,7 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip" onClick={async()=>{ await signOut(); setProgress(MODULES.map(()=>({done:new Set(),score:null,passed:false}))); }}>
+          <div className="iv-chip" onClick={async()=>{ await logout(); setProgress(MODULES.map(()=>({done:new Set(),score:null,passed:false}))); }}>
             👤 {displayName}{displayEmail ? ` · ${displayEmail}` : ""} · Sign Out
           </div>
         </header>
