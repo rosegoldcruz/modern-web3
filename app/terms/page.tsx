@@ -10,7 +10,7 @@ const sections = [
     body: [
       "These Terms of Service govern your access to and use of the Iron Vault website, educational platform, related content, token allocation mechanics, communications, and services made available by Commonwealth Ventures LLC. By visiting the site, enrolling in coursework, accessing gated materials, creating an account, connecting a wallet, or otherwise interacting with the platform, you acknowledge that you have read, understood, and agreed to be bound by these Terms and any policies referenced within them.",
       "If you do not agree with these Terms, do not use the platform. Your continued use of Iron Vault after any update to these Terms constitutes your acceptance of the revised version. You are responsible for reviewing these Terms periodically to understand your current rights, obligations, and restrictions.",
-      "You represent that you are legally capable of entering into a binding agreement under the laws applicable to you. If you are using Iron Vault on behalf of a company, organization, or other entity, you represent that you have authority to bind that entity to these Terms, and references to "you" include that entity as well.",
+      "You represent that you are legally capable of entering into a binding agreement under the laws applicable to you. If you are using Iron Vault on behalf of a company, organization, or other entity, you represent that you have authority to bind that entity to these Terms, and references to \"you\" include that entity as well.",
     ],
   },
   {
