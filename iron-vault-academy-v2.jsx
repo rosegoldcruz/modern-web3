@@ -99,7 +99,126 @@ const MODULES = [
     ]
   },
   {
-    id: 2, title: "Traditional Finance Systems", subtitle: "Know the game before you play it",
+    id: 2, title: "How the Economy Actually Works", subtitle: "The 10 concepts they never taught you in school",
+    icon: "⚙️", tag: "ECONOMICS", duration: "50–65 min", xpReward: 500,
+    lessons: [
+      {
+        title: "The Velocity of Money",
+        content: [
+          { type: "heading", text: "The same dollar can create vastly different economic impact depending on how fast it moves" },
+          { type: "body", text: "A dollar spent at a local business circulates more times than a dollar spent at a large corporation. Economic energy is not just about amount — it's about speed. This is why communities with high local spending build wealth faster than those that export every dollar to distant corporations." },
+          { type: "callout", text: "When the Fed injects money into the economy through large banks, velocity drops — because institutions hold capital rather than circulate it. When money reaches individuals who spend locally, velocity spikes. Same dollar. Completely different economic outcome." },
+          { type: "vault", title: "VAULT SECRET: Why Local Business Ownership Compounds", text: "A business owner who spends locally, hires locally, and reinvests locally creates a multiplier effect on their own community. Every dollar they circulate comes back to them in some form — through customers, partnerships, and property values. This is not charity. This is systems thinking." },
+          { type: "action", text: "Track where your last 10 purchases went. Local business or national chain? Calculate how much of your spending stays in your community versus leaves it." }
+        ]
+      },
+      {
+        title: "Asymmetric Information",
+        content: [
+          { type: "heading", text: "One party knows more than the other — and the side with less information always pays the tax" },
+          { type: "body", text: "Insurance companies know more about risk than you do. Car dealerships know more about vehicle value than you do. Lenders know more about loan terms than most borrowers. This information gap is not accidental — it is the structural advantage that allows these industries to extract value from every transaction." },
+          { type: "callout", text: "This is the root of 'the house always wins.' The house does not win because of luck. It wins because it has more information, better models, and longer time horizons than the average participant." },
+          { type: "vault", title: "VAULT SECRET: How to Close the Gap", text: "Every hour you spend learning an industry's mechanics reduces the tax you pay to participate in it. The investor who understands cap rates, NOI, and debt coverage ratios negotiates better deals than one who doesn't. Education is not self-improvement. It is arbitrage against the information gap." },
+          { type: "action", text: "Pick one financial product you currently use — insurance, mortgage, credit card. Spend one hour learning exactly how the provider makes money from you. Write what you find." }
+        ]
+      },
+      {
+        title: "Arbitrage",
+        content: [
+          { type: "heading", text: "Buy where it's cheap, sell where it's expensive — but the deeper lesson goes further" },
+          { type: "body", text: "Markets are never perfectly efficient. Gaps always exist — in price, in information, in timing, in geography. The people who spot those gaps and act on them extract the value that others leave behind. This applies to money, attention, real estate, talent, and time." },
+          { type: "callout", text: "Geographic arbitrage: earning income from a high-cost market while living in a low-cost one. Labor arbitrage: hiring skilled workers in markets where compensation is lower. Time arbitrage: building assets today that pay in a future where your time is more scarce. All of these are arbitrage. None require being the smartest person in the room." },
+          { type: "vault", title: "VAULT SECRET: Attention Arbitrage", text: "Right now, certain platforms and asset classes are underpriced in terms of attention. The people who build audiences, brands, and positions on these platforms before they become crowded will extract the same value early internet adopters did. Information asymmetry plus early positioning equals outsized returns." },
+          { type: "action", text: "Identify one market, skill, or platform where you have more knowledge than average. Write how you could monetize that gap in the next 90 days." }
+        ]
+      },
+      {
+        title: "Opportunity Cost",
+        content: [
+          { type: "heading", text: "Every choice has a hidden price — the value of the next best alternative" },
+          { type: "body", text: "Most people only calculate the cost of action. Almost nobody calculates the cost of inaction. Keeping money in a savings account earning 0.5% when inflation runs 4% has a real cost — you are losing 3.5% of purchasing power annually. That cost is invisible because nothing appears to happen. But the compounding loss is as real as any fee." },
+          { type: "callout", text: "This is why procrastination is the most expensive habit on earth. Not because of the time lost — because of the compounding returns never started. Every year you delay building an income-producing asset is a year of compounding that never happens." },
+          { type: "vault", title: "VAULT SECRET: The Opportunity Cost of Employment", text: "A $75,000 salary feels different when you calculate its opportunity cost. The same 40 hours per week directed toward building a scalable asset — a business, a real estate portfolio, a digital product — has a fundamentally different ceiling. Employment trades time for money linearly. Ownership compounds." },
+          { type: "action", text: "Calculate the opportunity cost of your current largest financial decision. What is the next best use of that money or time? What are you giving up by not doing that instead?" }
+        ]
+      },
+      {
+        title: "Elasticity of Demand",
+        content: [
+          { type: "heading", text: "Some prices can rise without killing demand. Some collapse instantly." },
+          { type: "body", text: "Gas, rent, and medication are inelastic — demand holds even as price rises because people have no immediate alternative. Luxury goods, entertainment, and discretionary spending are elastic — demand drops quickly when price moves. Understanding this determines where pricing power lives." },
+          { type: "callout", text: "The most durable businesses in history sell inelastic products or services. Landlords hold pricing power because people cannot opt out of shelter. Pharmaceutical companies hold pricing power because patients cannot opt out of treatment. This is not a moral observation. It is a structural one." },
+          { type: "vault", title: "VAULT SECRET: Build Inelastic Income", text: "The goal of any sophisticated wealth strategy is to build income streams that are inelastic — where your customers have no easy alternative to paying you. Rental income, proprietary software, essential services, specialized expertise. If your income depends on people choosing you over an easy substitute, it is always at risk." },
+          { type: "action", text: "List your current income sources. For each one, ask: how easy is it for the payer to replace me? The harder the answer, the more inelastic your position." }
+        ]
+      },
+      {
+        title: "The Principal-Agent Problem",
+        content: [
+          { type: "heading", text: "The person making decisions is not the person who bears the consequences" },
+          { type: "body", text: "Employees versus owners. Politicians versus citizens. Financial advisors versus clients. Fund managers versus investors. In every case, the agent makes decisions with other people's money, time, or outcomes — and their incentives are rarely perfectly aligned with the principal they serve." },
+          { type: "callout", text: "A financial advisor paid on commission recommends products that pay the highest commission. A fund manager paid on assets under management grows the fund even when returns are poor. A politician seeking reelection makes decisions on a 2-4 year horizon regardless of the 20-year consequences. Misaligned incentives explain 90% of organizational dysfunction." },
+          { type: "vault", title: "VAULT SECRET: Align Incentives or Exit", text: "The solution to the principal-agent problem is either aligning incentives — equity, performance-based compensation, skin in the game — or removing the agent entirely. Self-directed investing removes the advisor. Business ownership removes the employer. Blockchain smart contracts remove the intermediary. Every time you eliminate a misaligned agent, you capture more of your own upside." },
+          { type: "action", text: "Identify every agent currently making decisions that affect your financial life. For each one, write their actual incentive. Is it aligned with yours?" }
+        ]
+      },
+      {
+        title: "Animal Spirits",
+        content: [
+          { type: "quote", text: "The market can remain irrational longer than you can remain solvent.", author: "John Maynard Keynes" },
+          { type: "heading", text: "Human emotion drives markets more than math" },
+          { type: "body", text: "Keynes called it animal spirits — the idea that confidence, fear, and euphoria move capital faster and further than any spreadsheet. This is not a flaw in markets. It is the defining characteristic of them. Fear and euphoria move trillions of dollars — often faster than fundamentals justify in either direction." },
+          { type: "callout", text: "This is why narratives matter more than spreadsheets. Bitcoin did not rise to $60,000 because of a discounted cash flow model. It rose because millions of people believed it would. That belief — collective animal spirit — was itself the fundamental. Understanding this protects you from being swept up in it." },
+          { type: "vault", title: "VAULT SECRET: Use Sentiment as a Signal", text: "When everyone is euphoric, risk is highest. When everyone is panicking, opportunity is greatest. The investors who built generational wealth in 2008, in March 2020, and in crypto winters did so by moving opposite to the dominant emotional current. Not because they were braver — because they understood that price and value diverge most at emotional extremes." },
+          { type: "action", text: "Find an asset class currently experiencing extreme fear or extreme euphoria. Write the rational case for why the emotional extreme may be creating a mispricing." }
+        ]
+      },
+      {
+        title: "Marginal Analysis",
+        content: [
+          { type: "heading", text: "The next unit of effort, cost, or output matters more than the total" },
+          { type: "body", text: "Businesses live or die on the margin — not the average. The question is never 'what did this cost in total?' The question is 'what does one more unit cost, and what does it produce?' This is the backbone of pricing, scaling, and resource allocation." },
+          { type: "callout", text: "A rental property generating $500 per month net is attractive. The question marginal analysis asks: what does acquiring one more property cost — in time, capital, and management burden — and does that next property generate more or less than the last? The answer determines whether to scale or consolidate." },
+          { type: "vault", title: "VAULT SECRET: Your Marginal Hour", text: "The marginal value of your time changes as your income grows. The first hour of work pays one rate. The hour that pushes you into a higher tax bracket pays significantly less after taxes. The hour spent building a system that runs without you pays compounding returns indefinitely. Think in marginal hours, not average hours." },
+          { type: "action", text: "Calculate the marginal return on your last three major decisions — the next dollar invested, the next hour worked, the next employee hired. Was the margin improving or declining?" }
+        ]
+      },
+      {
+        title: "The Accelerator Effect",
+        content: [
+          { type: "heading", text: "When the economy grows, investment accelerates — not linearly, but exponentially" },
+          { type: "body", text: "Small increases in consumer demand trigger disproportionately large increases in business investment. This is why booms feel like rocket fuel and recessions feel like gravity. A 10% increase in demand might trigger a 30% increase in capital expenditure as businesses race to capture the growing market." },
+          { type: "callout", text: "This same principle applies to your personal financial trajectory. Small improvements in income, savings rate, and investment return compound into exponentially different outcomes over a decade. The accelerator effect works for individuals just as it does for economies — but only if you are already in motion." },
+          { type: "vault", title: "VAULT SECRET: Position Before the Acceleration", text: "Every major technology cycle — internet, mobile, social, crypto, AI — has an acceleration phase where early participants benefit disproportionately. The window to position before acceleration is always shorter than it looks in hindsight and longer than it feels in the moment. The people who built wealth in each cycle did not time the top — they positioned early and held through the volatility." },
+          { type: "action", text: "Identify one technology or market currently in early adoption. Write the case for why acceleration may be coming — and what a rational early position would look like." }
+        ]
+      },
+      {
+        title: "The Circular Flow of Money",
+        content: [
+          { type: "heading", text: "Households → businesses → government → banks → back to households" },
+          { type: "body", text: "This loop is the blueprint of the entire economy. Understanding it shows where value leaks, where it accumulates, and where power concentrates. Every dollar you earn enters this loop. The question is how many times it circulates before leaving your control — and whether you have positioned yourself at a point in the loop where money flows toward you." },
+          { type: "callout", text: "Banks sit at the center of this loop by design. Every transaction, every loan, every investment passes through the banking system — which extracts a fee at each point. The entities that have replicated bank-like positioning — holding assets that others pay to use — are the ones that accumulate wealth across every economic cycle." },
+          { type: "vault", title: "VAULT SECRET: Position Yourself in the Flow", text: "The goal of sophisticated wealth building is to insert yourself into the circular flow as a recipient rather than just a participant. Rental income. Royalties. Interest. Dividends. Token distributions from real asset revenue. Each of these is a position inside the flow that pays you while money moves through the system. Build enough of these positions and the economy works for you regardless of where you sit in it." },
+          { type: "action", text: "Draw your personal circular flow. Where does money enter your life? Where does it exit? Where are you losing it to intermediaries? Where could you insert an income position?" }
+        ]
+      }
+    ],
+    quiz: [
+      { q: "The velocity of money refers to:", options: ["How fast you can withdraw from a bank", "How many times a dollar circulates through the economy", "The speed of wire transfers", "How quickly prices rise"], correct: 1 },
+      { q: "Asymmetric information means:", options: ["Both parties know the same amount", "One party has more information and benefits from the gap", "Information spreads equally in free markets", "News travels faster online"], correct: 1 },
+      { q: "Arbitrage is best described as:", options: ["Gambling on price movements", "Exploiting price or information gaps between markets", "Buying and holding long term", "Diversifying across asset classes"], correct: 1 },
+      { q: "Opportunity cost is:", options: ["The fee charged for an investment", "The tax on capital gains", "The value of the next best alternative you gave up", "The total cost of ownership"], correct: 2 },
+      { q: "An inelastic product or service is one where:", options: ["Demand disappears when price rises", "Demand holds steady even as price rises", "Supply increases when price rises", "Competition eliminates pricing power"], correct: 1 },
+      { q: "The principal-agent problem occurs when:", options: ["Two businesses compete for the same customer", "The decision maker's incentives differ from those bearing the consequences", "A government regulates a private company", "An investor diversifies across asset classes"], correct: 1 },
+      { q: "Animal spirits in economics refers to:", options: ["Commodity markets for livestock", "Human emotion and confidence driving market behavior", "Algorithmic trading systems", "Natural resource pricing"], correct: 1 },
+      { q: "Marginal analysis focuses on:", options: ["The total cost of all past decisions", "The average return across a portfolio", "The cost and benefit of one additional unit", "Historical performance trends"], correct: 2 },
+      { q: "The accelerator effect describes:", options: ["How inflation compounds over time", "How small demand increases trigger disproportionately large investment increases", "How interest rates affect bond prices", "How tax cuts stimulate consumer spending"], correct: 1 },
+      { q: "The circular flow of money shows:", options: ["How cash is printed and distributed", "How value moves between households, businesses, government, and banks", "Why stock markets go up over time", "How trade deficits are calculated"], correct: 1 }
+    ]
+  },
+  {
+    id: 3, title: "Traditional Finance Systems", subtitle: "Know the game before you play it",
     icon: "🏦", tag: "SYSTEMS", duration: "50–65 min", xpReward: 500,
     lessons: [
       {
@@ -181,7 +300,7 @@ const MODULES = [
     ]
   },
   {
-    id: 3, title: "Introduction to Crypto & Blockchain", subtitle: "The technology they couldn't contain",
+    id: 4, title: "Introduction to Crypto & Blockchain", subtitle: "The technology they couldn't contain",
     icon: "⛓", tag: "CRYPTO", duration: "55–70 min", xpReward: 500,
     lessons: [
       {
@@ -262,7 +381,7 @@ const MODULES = [
     ]
   },
   {
-    id: 4, title: "Digital Assets & Modern Wealth", subtitle: "The strategies they keep to themselves",
+    id: 5, title: "Digital Assets & Modern Wealth", subtitle: "The strategies they keep to themselves",
     icon: "⚡", tag: "STRATEGY", duration: "50–65 min", xpReward: 500,
     lessons: [
       {
@@ -344,7 +463,7 @@ const MODULES = [
     ]
   },
   {
-    id: 5, title: "The Iron Vault System", subtitle: "Why we built this. What comes next.",
+    id: 6, title: "The Iron Vault System", subtitle: "Why we built this. What comes next.",
     icon: "🛡", tag: "IRON VAULT", duration: "45–60 min", xpReward: 500,
     lessons: [
       {

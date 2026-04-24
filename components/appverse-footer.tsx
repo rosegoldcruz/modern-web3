@@ -59,11 +59,29 @@ export function AppverseFooter() {
             <div>
               <p className="mb-2 text-[11px] tracking-widest text-lime-300">POSITION BEFORE THE NARRATIVE SPREADS</p>
               <h3 className="text-2xl font-bold leading-tight text-white sm:text-3xl">
-                The people who understand systems early accumulate before demand spikes.
+                THIS IS THE EDUCATION THEY NEVER GAVE YOU.
               </h3>
-              <p className="mt-2 max-w-prose text-sm text-neutral-400">
-                Early participants shape the direction of the ecosystem. Understand the system. Join the community. Be first to access each phase.
+              <p className="mt-3 max-w-prose text-sm text-white/85 sm:text-base">
+                Real estate fundamentals. Digital assets explained simply. Tax structures used by business owners. How modern money moves. Elasticity of demand. Animal spirits. How blockchain is reshaping ownership, payments, and access.
               </p>
+              <p className="mt-3 max-w-prose text-sm text-white/85 sm:text-base">
+                No jargon. No confusion. No gatekeeping. Let&apos;s learn together.
+              </p>
+              <p className="mt-3 max-w-prose text-sm text-white/85 sm:text-base">
+                Everything is taught in clear language for everyday people who want to understand the next shift before it becomes mainstream.
+              </p>
+              <p className="mt-4 max-w-prose text-sm font-bold text-white sm:text-base">
+                $100 gets you in. $1,000 places you at the founder level. Complete the coursework and receive your founding IV-SOL allocation automatically.
+              </p>
+              <p className="mt-3 max-w-prose text-sm text-white/85 sm:text-base">
+                Learn first. Position early. Participate intelligently.
+              </p>
+              <Button
+                asChild
+                className="mt-5 rounded-full bg-[#AAFF00] px-6 py-2 text-sm font-medium text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] hover:bg-lime-300"
+              >
+                <Link href="/learn">Start Learning Now →</Link>
+              </Button>
             </div>
 
             {/* Right mockup */}
