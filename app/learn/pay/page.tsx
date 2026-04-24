@@ -1,7 +1,6 @@
 'use client'
 
-import { usePrivy } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'
+import { useFundWallet, usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
