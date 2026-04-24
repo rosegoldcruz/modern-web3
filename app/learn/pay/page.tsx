@@ -1,6 +1,7 @@
 'use client'
 
 import { usePrivy } from '@privy-io/react-auth'
+import { useFundWallet } from '@privy-io/react-auth/solana'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -28,7 +29,8 @@ function isSolanaWalletAccount(account: unknown): account is SolanaWalletAccount
 }
 
 export default function PayPage() {
-  const { user, authenticated, ready, fundWallet } = usePrivy()
+  const { user, authenticated, ready } = usePrivy()
+  const { fundWallet } = useFundWallet()
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [funding, setFunding] = useState(false)
@@ -61,7 +63,7 @@ export default function PayPage() {
     setFunding(true)
 
     try {
-      const wallet = user?.linkedAccounts?.find(isSolanaWalletAccount)
+      const wallet = user?.linkedAccounts?.find((account) => isSolanaWalletAccount(account)) as SolanaWalletAccount | undefined
 
       if (!wallet) {
         window.alert('No wallet found. Please log out and log back in.')
@@ -69,10 +71,13 @@ export default function PayPage() {
         return
       }
 
-      await fundWallet(wallet.address, {
-        chain: { id: 'solana' } as never,
-        amount: String(tier.price),
-        asset: 'USDC',
+      await fundWallet({
+        address: wallet.address,
+        options: {
+          chain: { id: 'solana' } as never,
+          amount: String(tier.price),
+          asset: 'USDC',
+        },
       })
     } catch (error) {
       console.error(error)

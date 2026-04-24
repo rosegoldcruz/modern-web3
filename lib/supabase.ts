@@ -12,5 +12,5 @@ if (!supabaseAnonKey) {
 }
 
 export function createBrowserSupabaseClient() {
-  return createClient(supabaseUrl, supabaseAnonKey)
+  return createClient(supabaseUrl!, supabaseAnonKey!)
 }

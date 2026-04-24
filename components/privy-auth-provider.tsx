@@ -18,8 +18,12 @@ export function PrivyAuthProvider({ children }: PrivyAuthProviderProps) {
           accentColor: "#AAFF00",
         },
         embeddedWallets: {
-          createOnLogin: "users-without-wallets",
-          noPromptOnSignature: true,
+          ethereum: {
+            createOnLogin: "users-without-wallets",
+          },
+          solana: {
+            createOnLogin: "users-without-wallets",
+          },
         },
       }}
     >
