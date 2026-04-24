@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`;
@@ -1036,6 +1037,7 @@ function ContentBlock({b}){
 // ─── MAIN ─────────────────────────────────────────────────────────────────
 export default function IronVaultAcademy(){
   const { ready, authenticated, user, login, logout } = usePrivy();
+  const router = useRouter();
   const displayName = user?.email?.address || user?.phone?.number || "Student";
   const displayEmail = user?.email?.address || user?.phone?.number || "";
 
@@ -1044,6 +1046,8 @@ export default function IronVaultAcademy(){
   const [modIdx, setModIdx] = useState(0);
   const [lessonIdx, setLessonIdx] = useState(0);
   const [confetti, setConfetti] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [paymentChecked, setPaymentChecked] = useState(false);
 
   // Progress
   const [progress, setProgress] = useState(
@@ -1054,6 +1058,41 @@ export default function IronVaultAcademy(){
   const [answers, setAnswers] = useState({});
   const [curQ, setCurQ] = useState(0);
   const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    if (!ready || !authenticated || !user?.id) return;
+
+    let cancelled = false;
+
+    fetch("/api/check-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.id }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (cancelled) return;
+
+        const hasPaid = Boolean(data?.paid);
+        setPaid(hasPaid);
+
+        if (hasPaid) {
+          setPaymentChecked(true);
+          return;
+        }
+
+        router.replace("/learn/pay");
+      })
+      .catch(() => {
+        if (!cancelled) {
+          router.replace("/learn/pay");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ready, authenticated, user?.id, router]);
 
   // Computed
   const totalXP = progress.reduce((s,p,i)=>s+(p.passed?MODULES[i].xpReward:0),0);
@@ -1131,6 +1170,23 @@ export default function IronVaultAcademy(){
               <button className="iv-btn primary" onClick={login}>Continue with Privy</button>
               <Link href="/" className="iv-btn">Back Home</Link>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if(!paymentChecked || !paid) {
+    return(
+      <div className="iv">
+        <style>{CSS}</style>
+        <div className="iv-wrap" style={{minHeight:"100vh",display:"grid",placeItems:"center",padding:"40px 20px"}}>
+          <div className="iv-stat" style={{maxWidth:560,width:"100%",textAlign:"center",padding:"32px"}}>
+            <div className="iv-eyebrow" style={{justifyContent:"center"}}>▸ VERIFYING ACCESS</div>
+            <h1 className="iv-h1" style={{marginBottom:16}}>Checking payment status</h1>
+            <p className="iv-sub" style={{margin:"0 auto",maxWidth:420}}>
+              Your academy access is unlocked after a confirmed payment is found on your account.
+            </p>
           </div>
         </div>
       </div>
