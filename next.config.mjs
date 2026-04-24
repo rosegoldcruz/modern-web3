@@ -16,22 +16,22 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: `
-              default-src 'self';
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://telegram.org https://oauth.telegram.org https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://*.leadconnectorhq.com;
-              style-src 'self' 'unsafe-inline';
-              img-src 'self' data: blob: https://*.privy.io https://*.leadconnectorhq.com;
-              font-src 'self';
-              object-src 'none';
-              base-uri 'self';
-              form-action 'self';
-              frame-ancestors 'none';
-              child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org;
-              frame-src 'self' https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org https://*.privy.io https://*.walletconnect.com https://*.walletconnect.org https://*.leadconnectorhq.com;
-              connect-src 'self' https://auth.privy.io https://*.privy.io wss://*.privy.io https://*.rpc.privy.systems https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.com wss://*.walletconnect.org wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://explorer-api.walletconnect.com https://api.mainnet-beta.solana.com wss://api.mainnet-beta.solana.com https://api.relay.link https://*.leadconnectorhq.com;
-              worker-src 'self' blob:;
-              manifest-src 'self'
-            `.replace(/\s+/g, ' ').trim(),
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://telegram.org https://www.googletagmanager.com https://*.privy.io",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' data: blob: https:",
+              "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "child-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org",
+              "frame-src https://auth.privy.io https://verify.walletconnect.com https://verify.walletconnect.org https://challenges.cloudflare.com https://oauth.telegram.org",
+              "connect-src 'self' https://auth.privy.io https://*.privy.io wss://relay.walletconnect.com wss://relay.walletconnect.org wss://www.walletlink.org https://*.rpc.privy.systems https://explorer-api.walletconnect.com https://api.mainnet-beta.solana.com https://api.relay.link",
+              "worker-src 'self'",
+              "manifest-src 'self'",
+            ].join('; '),
           },
           {
             key: 'X-Frame-Options',
