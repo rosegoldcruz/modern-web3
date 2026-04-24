@@ -1,7 +1,6 @@
 import Link from "next/link"
 
 import IronVaultAcademy from "@/iron-vault-academy-v2"
-import { PrivyAuthProvider } from "@/components/privy-auth-provider"
 
 export default function LearnPage() {
   if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
@@ -22,8 +21,6 @@ export default function LearnPage() {
   }
 
   return (
-    <PrivyAuthProvider>
-      <IronVaultAcademy />
-    </PrivyAuthProvider>
+    <IronVaultAcademy />
   )
 }
