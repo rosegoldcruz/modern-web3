@@ -28,7 +28,7 @@ function isSolanaWalletAccount(account: unknown): account is SolanaWalletAccount
 }
 
 export default function PayPage() {
-  const { user, authenticated, ready } = usePrivy()
+  const { user, authenticated, ready, login } = usePrivy()
   const { fundWallet } = useFundWallet()
   const router = useRouter()
   const [checking, setChecking] = useState(true)
@@ -37,7 +37,7 @@ export default function PayPage() {
   useEffect(() => {
     if (!ready) return
     if (!authenticated) {
-      router.replace('/learn')
+      login()
       return
     }
 
@@ -56,7 +56,7 @@ export default function PayPage() {
         setChecking(false)
       })
       .catch(() => setChecking(false))
-  }, [ready, authenticated, user?.id, router])
+  }, [ready, authenticated, user?.id, router, login])
 
   const handleFund = async (tier: Tier) => {
     setFunding(true)
