@@ -20,7 +20,6 @@ export default function PayPage() {
   const [funding, setFunding] = useState(false)
   const [linkingPhantom, setLinkingPhantom] = useState(false)
 
-  // Phantom first, fallback to embedded Privy wallet
   const phantomWallet = wallets.find(w => w.walletClientType === 'phantom')
   const embeddedWallet = wallets.find(w => w.walletClientType === 'privy' && (w as any).chainType === 'solana')
   const activeWallet = phantomWallet ?? embeddedWallet
@@ -50,14 +49,25 @@ export default function PayPage() {
 
   const handleFund = async (tier: typeof TIERS[0]) => {
     if (!authenticated) { login(); return }
-    if (!activeWallet?.address) {
+
+    let address = activeWallet?.address
+
+    if (!address) {
+      const embedded = user?.linkedAccounts?.find(
+        (a: any) => a.type === 'wallet' && a.chainType === 'solana'
+      ) as any
+      address = embedded?.address
+    }
+
+    if (!address) {
       alert('No Solana wallet found. Connect Phantom or sign out and back in.')
       return
     }
+
     setFunding(true)
     try {
       await fundWallet({
-        address: activeWallet.address,
+        address: address as string,
         options: { amount: tier.usdcAmount }
       })
     } catch (e) {
@@ -87,7 +97,6 @@ export default function PayPage() {
         Complete the coursework. Receive your IV-SOL allocation automatically. No agent. No manual process. The certificate triggers delivery.
       </p>
 
-      {/* Phantom connect strip */}
       {authenticated && (
         <div style={{ marginBottom: 36, display: 'flex', alignItems: 'center', gap: 12 }}>
           {phantomWallet ? (
