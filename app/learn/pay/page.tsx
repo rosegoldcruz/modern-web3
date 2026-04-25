@@ -1,6 +1,6 @@
 'use client'
 
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet } from '@privy-io/react-auth/solana'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -12,45 +12,52 @@ const TIERS = [
 ]
 
 export default function PayPage() {
-  const { user, authenticated, ready, login } = usePrivy()
+  const { user, authenticated, ready, login, linkWallet } = usePrivy()
+  const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [funding, setFunding] = useState(false)
+  const [linkingPhantom, setLinkingPhantom] = useState(false)
+
+  // Phantom first, fallback to embedded Privy wallet
+  const phantomWallet = wallets.find(w => w.walletClientType === 'phantom')
+  const embeddedWallet = wallets.find(w => w.walletClientType === 'privy' && (w as any).chainType === 'solana')
+  const activeWallet = phantomWallet ?? embeddedWallet
 
   useEffect(() => {
     if (!ready) return
-    if (!authenticated) {
-      setChecking(false)
-      return
-    }
+    if (!authenticated) { setChecking(false); return }
     fetch('/api/check-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: user?.id })
     })
       .then(r => r.json())
-      .then(d => {
-        if (d.paid) router.replace('/learn')
-        else setChecking(false)
-      })
+      .then(d => { if (d.paid) router.replace('/learn'); else setChecking(false) })
       .catch(() => setChecking(false))
   }, [ready, authenticated, user, router])
 
+  const handleConnectPhantom = async () => {
+    setLinkingPhantom(true)
+    try {
+      await linkWallet()
+    } catch (e) {
+      console.error('Phantom link failed:', e)
+    }
+    setLinkingPhantom(false)
+  }
+
   const handleFund = async (tier: typeof TIERS[0]) => {
     if (!authenticated) { login(); return }
+    if (!activeWallet?.address) {
+      alert('No Solana wallet found. Connect Phantom or sign out and back in.')
+      return
+    }
     setFunding(true)
     try {
-      const solanaWallet = user?.linkedAccounts?.find(
-        (a: any) => a.type === 'wallet' && a.chainType === 'solana'
-      ) as any
-      if (!solanaWallet?.address) {
-        alert('No Solana wallet found. Please sign out and sign back in.')
-        setFunding(false)
-        return
-      }
       await fundWallet({
-        address: solanaWallet.address as string,
+        address: activeWallet.address,
         options: { amount: tier.usdcAmount }
       })
     } catch (e) {
@@ -67,18 +74,41 @@ export default function PayPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #000 0%, #0a0f1e 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', fontFamily: 'monospace' }}>
-      
+
       <div style={{ color: '#AAFF00', fontSize: '0.7rem', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: 16 }}>
         Founding Member Access
       </div>
-      
+
       <h1 style={{ color: '#fff', fontSize: 'clamp(1.8rem, 4vw, 3rem)', fontWeight: 700, textAlign: 'center', margin: '0 0 12px', letterSpacing: '0.04em' }}>
         Choose Your Track
       </h1>
-      
-      <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', maxWidth: 480, marginBottom: 48, lineHeight: 1.6, fontSize: '0.9rem' }}>
+
+      <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', maxWidth: 480, marginBottom: 24, lineHeight: 1.6, fontSize: '0.9rem' }}>
         Complete the coursework. Receive your IV-SOL allocation automatically. No agent. No manual process. The certificate triggers delivery.
       </p>
+
+      {/* Phantom connect strip */}
+      {authenticated && (
+        <div style={{ marginBottom: 36, display: 'flex', alignItems: 'center', gap: 12 }}>
+          {phantomWallet ? (
+            <div style={{ color: '#AAFF00', fontSize: '0.7rem', letterSpacing: '0.15em', border: '1px solid #AAFF00', padding: '6px 16px' }}>
+              ✓ PHANTOM CONNECTED — {phantomWallet.address.slice(0, 4)}...{phantomWallet.address.slice(-4)}
+            </div>
+          ) : (
+            <button
+              onClick={handleConnectPhantom}
+              disabled={linkingPhantom}
+              style={{
+                background: 'transparent', border: '1px solid rgba(170,255,0,0.4)',
+                color: '#AAFF00', fontSize: '0.7rem', letterSpacing: '0.15em',
+                padding: '8px 20px', cursor: 'pointer', opacity: linkingPhantom ? 0.6 : 1
+              }}
+            >
+              {linkingPhantom ? 'CONNECTING...' : '+ CONNECT PHANTOM WALLET'}
+            </button>
+          )}
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, width: '100%', maxWidth: 900, marginBottom: 48 }}>
         {TIERS.map((tier, i) => (
