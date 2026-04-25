@@ -43,17 +43,15 @@ export default function PayPage() {
     try {
       const solanaWallet = user?.linkedAccounts?.find(
         (a: any) => a.type === 'wallet' && a.chainType === 'solana'
-      )
-      if (!solanaWallet) {
+      ) as any
+      if (!solanaWallet?.address) {
         alert('No Solana wallet found. Please sign out and sign back in.')
         setFunding(false)
         return
       }
       await fundWallet({
-        address: solanaWallet.address,
-        options: {
-          amount: tier.usdcAmount,
-        }
+        address: solanaWallet.address as string,
+        options: { amount: tier.usdcAmount }
       })
     } catch (e) {
       console.error(e)
