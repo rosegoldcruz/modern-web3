@@ -7,11 +7,12 @@ const RPC = 'https://api.mainnet-beta.solana.com'
 const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 const TIERS = {
-  TEST: { amount: 1, usdcRaw: '1000000', tokenAmount: '1000' },
+  MODULE: { amount: 25, usdcRaw: '25000000', tokenAmount: '25000' },
   STARTER: { amount: 100, usdcRaw: '100000000', tokenAmount: '100000' },
   BUILDER: { amount: 500, usdcRaw: '500000000', tokenAmount: '500000' },
   FOUNDER: { amount: 1000, usdcRaw: '1000000000', tokenAmount: '1000000' },
 } as const
+const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6']
 
 function getSupabase() {
   return createClient(
@@ -20,14 +21,26 @@ function getSupabase() {
   )
 }
 
+function modulesForPurchase(tier: keyof typeof TIERS, selectedModule?: number) {
+  if (tier === 'STARTER' || tier === 'BUILDER' || tier === 'FOUNDER') {
+    return ALL_MODULES
+  }
+
+  const moduleNumber = typeof selectedModule === 'number' && Number.isInteger(selectedModule) ? selectedModule : 1
+  const boundedModule = Math.min(Math.max(moduleNumber, 1), ALL_MODULES.length)
+
+  return [`module_${boundedModule}`]
+}
+
 export async function POST(req: NextRequest) {
-  const { userId, walletAddress, txSignature, tier, amount } = await req.json()
+  const { userId, walletAddress, txSignature, tier, amount, selectedModule } = await req.json()
 
   if (!userId || !walletAddress || !txSignature || !tier) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const selectedTier = TIERS[tier as keyof typeof TIERS]
+  const tierName = tier as keyof typeof TIERS
+  const selectedTier = TIERS[tierName]
   if (!selectedTier || selectedTier.amount !== amount) {
     return NextResponse.json({ error: 'Invalid payment tier' }, { status: 400 })
   }
@@ -78,13 +91,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transaction does not match expected USDC payment' }, { status: 400 })
     }
 
+    const modulesUnlocked = modulesForPurchase(tierName, Number(selectedModule))
+
     // Write to Supabase using the actual iv_payments schema.
     const { error } = await getSupabase().from('iv_payments').insert({
       privy_user_id: userId,
       wallet_address: walletAddress,
+      tx_signature: txSignature,
       tier,
       amount_usd: amount,
       token_amount: Number(selectedTier.tokenAmount),
+      modules_unlocked: modulesUnlocked,
       status: 'confirmed',
       confirmed_at: new Date().toISOString(),
       created_at: new Date().toISOString()

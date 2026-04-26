@@ -1047,6 +1047,7 @@ export default function IronVaultAcademy(){
   const [lessonIdx, setLessonIdx] = useState(0);
   const [confetti, setConfetti] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [modulesUnlocked, setModulesUnlocked] = useState([]);
   const [paymentChecked, setPaymentChecked] = useState(false);
 
   // Progress
@@ -1074,7 +1075,9 @@ export default function IronVaultAcademy(){
         if (cancelled) return;
 
         const hasPaid = Boolean(data?.paid);
+        const unlocked = Array.isArray(data?.modulesUnlocked) ? data.modulesUnlocked : [];
         setPaid(hasPaid);
+        setModulesUnlocked(unlocked);
 
         if (hasPaid) {
           setPaymentChecked(true);
@@ -1099,14 +1102,16 @@ export default function IronVaultAcademy(){
   const modsDone = progress.filter(p=>p.passed).length;
   const lessonsDone = progress.reduce((s,p)=>s+p.done.size,0);
   const totalLessons = MODULES.reduce((s,m)=>s+m.lessons.length,0);
+  const isModuleUnlocked = (i) => modulesUnlocked.includes(`module_${i+1}`);
 
   function modStatus(i){
+    if(!isModuleUnlocked(i)) return "locked";
+    if(i>0 && !progress[i-1].passed) return "locked";
     if(i===0){
       if(progress[0].passed) return "passed";
       if(progress[0].done.size>0) return "progress";
       return "available";
     }
-    if(!progress[i-1].passed) return "locked";
     if(progress[i].passed) return "passed";
     if(progress[i].done.size>0) return "progress";
     return "available";
@@ -1226,6 +1231,7 @@ export default function IronVaultAcademy(){
             <div className="iv-grid">
               {MODULES.map((mod,i)=>{
                 const st=modStatus(i);
+                const unlocked=isModuleUnlocked(i);
                 const pct=(progress[i].done.size/mod.lessons.length)*100;
                 return(
                   <div key={mod.id} className={`iv-card ${st==="locked"?"locked":""} ${st==="passed"?"passed":""}`}
@@ -1234,7 +1240,7 @@ export default function IronVaultAcademy(){
                     <div className="iv-card-hd">
                       <div className="iv-icon">{mod.icon}</div>
                       <div className={`iv-badge ${st==="locked"?"b-lock":st==="passed"?"b-pass":st==="progress"?"b-prog":"b-avail"}`}>
-                        {st==="locked"?"🔒 LOCKED":st==="passed"?"✓ PASSED":st==="progress"?"● IN PROGRESS":"▶ AVAILABLE"}
+                        {st==="locked"?(unlocked?"🔒 COMPLETE PREVIOUS":"🔒 LOCKED"):st==="passed"?"✓ PASSED":st==="progress"?"● IN PROGRESS":"▶ AVAILABLE"}
                       </div>
                     </div>
                     <div className="iv-prog-bar">
@@ -1249,6 +1255,16 @@ export default function IronVaultAcademy(){
                       <div className="iv-meta">⚡ <span style={{color:"#AAFF00"}}>{mod.xpReward}xp</span></div>
                       {progress[i].score!==null&&<div className="iv-meta" style={{color:progress[i].passed?"#AAFF00":"#EF4444"}}>Quiz:{progress[i].score}/10</div>}
                     </div>
+                    {!unlocked&&(
+                      <Link
+                        href={`/learn/pay?module=${i+1}`}
+                        className="iv-btn iv-btn-lime"
+                        style={{marginTop:16,textAlign:"center",textDecoration:"none"}}
+                        onClick={(event)=>event.stopPropagation()}
+                      >
+                        UNLOCK THIS MODULE — $25
+                      </Link>
+                    )}
                   </div>
                 );
               })}
@@ -1417,6 +1433,8 @@ export default function IronVaultAcademy(){
     const passed=progress[modIdx].passed;
     const mod=MODULES[modIdx];
     const hasNext=modIdx+1<MODULES.length;
+    const nextModuleUnlocked=hasNext && isModuleUnlocked(modIdx+1);
+    const shouldOfferNextModule=passed && hasNext && !nextModuleUnlocked;
     return(
       <div className="iv">
         <style>{CSS}</style>
@@ -1440,13 +1458,23 @@ export default function IronVaultAcademy(){
               : `${score}/10 — we need ${PASS_SCORE} to pass. Review the lessons. The knowledge will stick harder the second time.`}
           </p>
           {passed&&<div className="iv-results-xp">⚡ +{mod.xpReward} XP EARNED</div>}
+          {shouldOfferNextModule&&(
+            <div className="iv-stat" style={{margin:"0 auto 24px",maxWidth:420,textAlign:"left"}}>
+              <div className="iv-stat-l">NEXT MODULE</div>
+              <div className="iv-stat-v" style={{fontSize:28}}>Ready for Module {modIdx+2}?</div>
+              <div className="iv-stat-u" style={{marginBottom:16}}>Unlock it for $25 and keep going.</div>
+              <Link href={`/learn/pay?module=${modIdx+2}`} className="iv-btn iv-btn-lime" style={{textAlign:"center",textDecoration:"none"}}>
+                UNLOCK MODULE {modIdx+2}
+              </Link>
+            </div>
+          )}
           <div className="iv-results-btns">
             <button className="iv-btn-ghost" onClick={startQuiz}>{passed?"RETAKE":"TRY AGAIN →"}</button>
             <button className="iv-btn iv-btn-lime" style={{width:"auto",padding:"14px 28px"}} onClick={()=>{
-              if(passed&&hasNext){setModIdx(m=>m+1);setView("module");}
+              if(passed&&hasNext&&nextModuleUnlocked){setModIdx(m=>m+1);setView("module");}
               else setView("hub");
             }}>
-              {passed&&hasNext?`NEXT: ${MODULES[modIdx+1].tag} →`:"BACK TO DASHBOARD"}
+              {passed&&hasNext&&nextModuleUnlocked?`NEXT: ${MODULES[modIdx+1].tag} →`:"BACK TO DASHBOARD"}
             </button>
           </div>
         </div>

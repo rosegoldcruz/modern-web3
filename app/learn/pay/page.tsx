@@ -2,8 +2,8 @@
 
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet } from '@privy-io/react-auth/solana'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
@@ -158,21 +158,26 @@ const CSS = `
 `
 
 const TIERS = [
-  { name: 'TEST', tag: 'SANDBOX', price: 1, tokens: '1,000', label: '$1', usdcAmount: '1', usdcRaw: 1_000_000, description: 'End-to-end test access + 1,000 IV-SOL allocation' },
-  { name: 'STARTER', tag: 'FOUNDATION', price: 100, tokens: '100,000', label: '$100', usdcAmount: '100', usdcRaw: 100_000_000, description: 'Full course access + 100,000 IV-SOL allocation' },
-  { name: 'BUILDER', tag: 'ACCELERATOR', price: 500, tokens: '500,000', label: '$500', usdcAmount: '500', usdcRaw: 500_000_000, description: 'Full course access + 500,000 IV-SOL allocation' },
-  { name: 'FOUNDER', tag: 'ELITE', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', usdcRaw: 1_000_000_000, description: 'Full course access + 1,000,000 IV-SOL allocation' },
+  { name: 'MODULE', tag: 'SINGLE MODULE', price: 25, tokens: '25,000', label: '$25', usdcAmount: '25', usdcRaw: 25_000_000, description: 'Module 1 access + 25,000 IV-SOL — buy more modules anytime' },
+  { name: 'STARTER', tag: 'FOUNDATION', price: 100, tokens: '100,000', label: '$100', usdcAmount: '100', usdcRaw: 100_000_000, description: 'All 6 modules + 100,000 IV-SOL — save $50 vs buying individually' },
+  { name: 'BUILDER', tag: 'ACCELERATOR', price: 500, tokens: '500,000', label: '$500', usdcAmount: '500', usdcRaw: 500_000_000, description: 'All 6 modules + 500,000 IV-SOL allocation' },
+  { name: 'FOUNDER', tag: 'ELITE', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', usdcRaw: 1_000_000_000, description: 'All 6 modules + 1,000,000 IV-SOL allocation' },
 ]
 
 const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 const RPC = process.env.NEXT_PUBLIC_SOLANA_RPC!
 
-export default function PayPage() {
+function PayPageContent() {
   const { user, authenticated, ready, login, linkWallet } = usePrivy()
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const requestedModule = Number(searchParams.get('module'))
+  const selectedModule = Number.isInteger(requestedModule)
+    ? Math.min(Math.max(requestedModule, 1), 6)
+    : 1
   const [checking, setChecking] = useState(true)
   const [funding, setFunding] = useState(false)
   const [status, setStatus] = useState('')
@@ -191,9 +196,16 @@ export default function PayPage() {
       body: JSON.stringify({ userId: user?.id })
     })
       .then(r => r.json())
-      .then(d => { if (d.paid) router.replace('/learn'); else setChecking(false) })
+      .then(d => {
+        const targetModule = `module_${selectedModule}`
+        const alreadyUnlocked = d.modulesUnlocked?.includes(targetModule)
+        const isTargetedModulePurchase = searchParams.has('module')
+
+        if (d.paid && (!isTargetedModulePurchase || alreadyUnlocked)) router.replace('/learn')
+        else setChecking(false)
+      })
       .catch(() => setChecking(false))
-  }, [ready, authenticated, user, router])
+  }, [ready, authenticated, user, router, searchParams, selectedModule])
 
   const handleConnectPhantom = async () => {
     setLinkingPhantom(true)
@@ -255,7 +267,8 @@ export default function PayPage() {
           walletAddress: address,
           txSignature: signedTx,
           tier: tier.name,
-          amount: tier.price
+          amount: tier.price,
+          selectedModule,
         })
       })
 
@@ -311,19 +324,23 @@ export default function PayPage() {
 
         <div className="pv-grid">
           {TIERS.map((tier, i) => {
-            const featured = tier.name === 'FOUNDER'
+            const isRequestedModuleTier = tier.name === 'MODULE' && searchParams.has('module')
+            const featured = tier.name === 'FOUNDER' || isRequestedModuleTier
+            const description = isRequestedModuleTier
+              ? `Unlock Module ${selectedModule} + 25,000 IV-SOL — buy more modules anytime`
+              : tier.description
             return (
               <div
                 key={tier.name}
                 className={`pv-card ${featured ? 'featured' : ''}`}
                 style={{ animationDelay: `${i * 0.07}s`, paddingTop: featured ? '36px' : '28px' }}
               >
-                {featured && <div className="pv-featured-badge">FOUNDER</div>}
+                {featured && <div className="pv-featured-badge">{isRequestedModuleTier ? `MODULE ${selectedModule}` : 'FOUNDER'}</div>}
                 <div className="pv-tag">▸ {tier.tag}</div>
                 <div className="pv-price">{tier.label}</div>
                 <div className="pv-price-label">IN COURSEWORK</div>
                 <div className="pv-allocation">→ {tier.tokens} IV-SOL</div>
-                <div className="pv-desc">{tier.description}</div>
+                <div className="pv-desc">{description}</div>
                 <div className="pv-divider" />
                 <button
                   onClick={() => handleFund(tier)}
@@ -354,5 +371,18 @@ export default function PayPage() {
 
       </div>
     </div>
+  )
+}
+
+export default function PayPage() {
+  return (
+    <Suspense fallback={
+      <div className="pv-loading">
+        <style>{CSS}</style>
+        ▸ VERIFYING ACCESS...
+      </div>
+    }>
+      <PayPageContent />
+    </Suspense>
   )
 }
