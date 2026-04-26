@@ -1,28 +1,37 @@
 'use client'
 
 import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'
+import { useFundWallet, useWallets as useSolanaWallets } from '@privy-io/react-auth/solana'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { Connection, PublicKey, Transaction } from '@solana/web3.js'
+import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 const TIERS = [
-  { name: 'STARTER', price: 100, tokens: '100,000', label: '$100', usdcAmount: '100', description: 'Full course access + 100,000 IV-SOL' },
-  { name: 'BUILDER', price: 500, tokens: '500,000', label: '$500', usdcAmount: '500', description: 'Full course access + 500,000 IV-SOL' },
-  { name: 'FOUNDER', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', description: 'Full course access + 1,000,000 IV-SOL' },
+  { name: 'STARTER', price: 100, tokens: '100,000', label: '$100', usdcAmount: '100', usdcRaw: 100_000_000, description: 'Full course access + 100,000 IV-SOL' },
+  { name: 'BUILDER', price: 500, tokens: '500,000', label: '$500', usdcAmount: '500', usdcRaw: 500_000_000, description: 'Full course access + 500,000 IV-SOL' },
+  { name: 'FOUNDER', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', usdcRaw: 1_000_000_000, description: 'Full course access + 1,000,000 IV-SOL' },
 ]
+
+const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
+const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+const RPC = 'https://api.mainnet-beta.solana.com'
 
 export default function PayPage() {
   const { user, authenticated, ready, login, linkWallet } = usePrivy()
   const { wallets } = useWallets()
+  const { wallets: solanaWallets } = useSolanaWallets()
   const { fundWallet } = useFundWallet()
   const router = useRouter()
   const [checking, setChecking] = useState(true)
   const [funding, setFunding] = useState(false)
+  const [status, setStatus] = useState('')
   const [linkingPhantom, setLinkingPhantom] = useState(false)
 
   const phantomWallet = wallets.find(w => w.walletClientType === 'phantom')
-  const embeddedWallet = wallets.find(w => w.walletClientType === 'privy' && (w as any).chainType === 'solana')
-  const activeWallet = phantomWallet ?? embeddedWallet
+  const phantomSolanaWallet = solanaWallets.find(w => w.standardWallet.name.toLowerCase().includes('phantom'))
+  const embeddedSolanaWallet = solanaWallets.find(w => w.standardWallet.name.toLowerCase().includes('privy'))
+  const activeWallet = phantomSolanaWallet ?? embeddedSolanaWallet ?? solanaWallets[0]
 
   useEffect(() => {
     if (!ready) return
@@ -39,11 +48,7 @@ export default function PayPage() {
 
   const handleConnectPhantom = async () => {
     setLinkingPhantom(true)
-    try {
-      await linkWallet()
-    } catch (e) {
-      console.error('Phantom link failed:', e)
-    }
+    try { await linkWallet() } catch (e) { console.error(e) }
     setLinkingPhantom(false)
   }
 
@@ -51,28 +56,85 @@ export default function PayPage() {
     if (!authenticated) { login(); return }
 
     let address = activeWallet?.address
-
     if (!address) {
-      const embedded = user?.linkedAccounts?.find(
+      const fallback = user?.linkedAccounts?.find(
         (a: any) => a.type === 'wallet' && a.chainType === 'solana'
       ) as any
-      address = embedded?.address
+      address = fallback?.address
     }
-
     if (!address) {
       alert('No Solana wallet found. Connect Phantom or sign out and back in.')
       return
     }
 
     setFunding(true)
+    setStatus('Opening payment...')
+
     try {
+      // Step 1: Fund the user's wallet via Coinbase onramp
       await fundWallet({
-        address: address as string,
+        address,
         options: { amount: tier.usdcAmount }
       })
+
+      // Step 2: Transfer USDC from user wallet to treasury
+      setStatus('Confirming payment...')
+      const connection = new Connection(RPC, 'confirmed')
+
+      const senderPubkey = new PublicKey(address)
+      const treasuryPubkey = new PublicKey(TREASURY)
+
+      const senderATA = await getAssociatedTokenAddress(USDC_MINT, senderPubkey)
+      const treasuryATA = await getAssociatedTokenAddress(USDC_MINT, treasuryPubkey)
+
+      const transferIx = createTransferInstruction(
+        senderATA,
+        treasuryATA,
+        senderPubkey,
+        tier.usdcRaw,
+        [],
+        TOKEN_PROGRAM_ID
+      )
+
+      const tx = new Transaction().add(transferIx)
+      const { blockhash } = await connection.getLatestBlockhash()
+      tx.recentBlockhash = blockhash
+      tx.feePayer = senderPubkey
+
+      // Use the active wallet to sign and send
+      const walletToUse = phantomSolanaWallet ?? embeddedSolanaWallet ?? solanaWallets[0]
+      if (!walletToUse) throw new Error('No wallet available to sign')
+
+      const { signedTransaction } = await walletToUse.signTransaction({
+        transaction: tx.serialize({ requireAllSignatures: false, verifySignatures: false }),
+        chain: 'solana:mainnet'
+      })
+      const txSignature = await connection.sendRawTransaction(signedTransaction)
+
+      // Step 3: Confirm on-chain then write to Supabase
+      setStatus('Recording payment...')
+      await connection.confirmTransaction(txSignature, 'confirmed')
+
+      await fetch('/api/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          walletAddress: address,
+          txSignature,
+          tier: tier.name,
+          amount: tier.price
+        })
+      })
+
+      router.replace('/learn')
+
     } catch (e) {
       console.error(e)
+      setStatus('')
+      alert(e instanceof Error ? e.message : 'Payment failed. Please try again.')
     }
+
     setFunding(false)
   }
 
@@ -150,7 +212,7 @@ export default function PayPage() {
                 opacity: funding ? 0.6 : 1,
               }}
             >
-              {!authenticated ? 'Sign In to Enroll' : funding ? 'Opening Payment...' : 'Start Learning Now'}
+              {!authenticated ? 'Sign In to Enroll' : funding ? status || 'Processing...' : 'Start Learning Now'}
             </button>
           </div>
         ))}
