@@ -15,7 +15,7 @@ const TIERS = [
 
 const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-const RPC = 'https://api.mainnet-beta.solana.com'
+const RPC = process.env.NEXT_PUBLIC_SOLANA_RPC!
 
 export default function PayPage() {
   const { user, authenticated, ready, login, linkWallet } = usePrivy()
