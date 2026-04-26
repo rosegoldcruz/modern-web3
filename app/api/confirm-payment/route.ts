@@ -7,9 +7,10 @@ const RPC = 'https://api.mainnet-beta.solana.com'
 const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 const TIERS = {
-  STARTER: { amount: 100, usdcRaw: '100000000' },
-  BUILDER: { amount: 500, usdcRaw: '500000000' },
-  FOUNDER: { amount: 1000, usdcRaw: '1000000000' },
+  TEST: { amount: 1, usdcRaw: '1000000', tokenAmount: '1000' },
+  STARTER: { amount: 100, usdcRaw: '100000000', tokenAmount: '100000' },
+  BUILDER: { amount: 500, usdcRaw: '500000000', tokenAmount: '500000' },
+  FOUNDER: { amount: 1000, usdcRaw: '1000000000', tokenAmount: '1000000' },
 } as const
 
 function getSupabase() {
@@ -77,14 +78,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transaction does not match expected USDC payment' }, { status: 400 })
     }
 
-    // Write to Supabase
+    // Write to Supabase using the actual iv_payments schema.
     const { error } = await getSupabase().from('iv_payments').insert({
-      user_id: userId,
+      privy_user_id: userId,
       wallet_address: walletAddress,
-      tx_signature: txSignature,
       tier,
-      amount,
-      paid: true,
+      amount_usd: amount,
+      token_amount: Number(selectedTier.tokenAmount),
+      status: 'confirmed',
+      confirmed_at: new Date().toISOString(),
       created_at: new Date().toISOString()
     })
 

@@ -8,6 +8,7 @@ import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 const TIERS = [
+  { name: 'TEST', price: 1, tokens: '1,000', label: '$1', usdcAmount: '1', usdcRaw: 1_000_000, description: 'Test access + 1,000 IV-SOL' },
   { name: 'STARTER', price: 100, tokens: '100,000', label: '$100', usdcAmount: '100', usdcRaw: 100_000_000, description: 'Full course access + 100,000 IV-SOL' },
   { name: 'BUILDER', price: 500, tokens: '500,000', label: '$500', usdcAmount: '500', usdcRaw: 500_000_000, description: 'Full course access + 500,000 IV-SOL' },
   { name: 'FOUNDER', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', usdcRaw: 1_000_000_000, description: 'Full course access + 1,000,000 IV-SOL' },
@@ -28,9 +29,8 @@ export default function PayPage() {
   const [linkingPhantom, setLinkingPhantom] = useState(false)
 
   const phantomWallet = wallets.find(w => w.walletClientType === 'phantom')
-  const phantomSolanaWallet = wallets.find(w => (w as any).chainType === 'solana' && w.walletClientType === 'phantom')
   const embeddedSolanaWallet = wallets.find(w => (w as any).chainType === 'solana' && w.walletClientType === 'privy')
-  const activeWallet = phantomSolanaWallet ?? embeddedSolanaWallet ?? wallets.find(w => (w as any).chainType === 'solana')
+  const activeWallet = phantomWallet ?? embeddedSolanaWallet
 
   useEffect(() => {
     if (!ready) return
@@ -70,19 +70,15 @@ export default function PayPage() {
     setStatus('Opening payment...')
 
     try {
-      // Step 1: Fund the user's wallet via Coinbase onramp
       await fundWallet({
         address,
         options: { amount: tier.usdcAmount }
       })
 
-      // Step 2: Transfer USDC from user wallet to treasury
       setStatus('Confirming payment...')
       const connection = new Connection(RPC, 'confirmed')
-
       const senderPubkey = new PublicKey(address)
       const treasuryPubkey = new PublicKey(TREASURY)
-
       const senderATA = await getAssociatedTokenAddress(USDC_MINT, senderPubkey)
       const treasuryATA = await getAssociatedTokenAddress(USDC_MINT, treasuryPubkey)
 
@@ -100,17 +96,11 @@ export default function PayPage() {
       tx.recentBlockhash = blockhash
       tx.feePayer = senderPubkey
 
-      // Use the active wallet to sign and send
-      const walletToUse = phantomSolanaWallet ?? embeddedSolanaWallet ?? wallets.find(w => (w as any).chainType === 'solana')
+      const walletToUse = phantomWallet ?? embeddedSolanaWallet
       if (!walletToUse) throw new Error('No wallet available to sign')
 
-      const { signedTransaction } = await (walletToUse as any).signTransaction({
-        transaction: tx.serialize({ requireAllSignatures: false, verifySignatures: false }),
-        chain: 'solana:mainnet'
-      })
-      const txSignature = await connection.sendRawTransaction(signedTransaction)
+      const txSignature = await (walletToUse as any).sendTransaction(tx, connection)
 
-      // Step 3: Confirm on-chain then write to Supabase
       setStatus('Recording payment...')
       await connection.confirmTransaction(txSignature, 'confirmed')
 
@@ -128,10 +118,10 @@ export default function PayPage() {
 
       router.replace('/learn')
 
-    } catch (e) {
+    } catch (e: any) {
       console.error(e)
       setStatus('')
-      alert(e instanceof Error ? e.message : 'Payment failed. Please try again.')
+      alert(e?.message ?? 'Payment failed. Please try again.')
     }
 
     setFunding(false)
@@ -183,11 +173,11 @@ export default function PayPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, width: '100%', maxWidth: 900, marginBottom: 48 }}>
         {TIERS.map((tier, i) => (
           <div key={tier.name} style={{
-            border: i === 2 ? '1px solid #AAFF00' : '1px solid rgba(255,255,255,0.12)',
-            background: i === 2 ? 'rgba(170,255,0,0.04)' : 'rgba(255,255,255,0.02)',
+            border: i === 3 ? '1px solid #AAFF00' : '1px solid rgba(255,255,255,0.12)',
+            background: i === 3 ? 'rgba(170,255,0,0.04)' : 'rgba(255,255,255,0.02)',
             padding: '32px 24px', position: 'relative',
           }}>
-            {i === 2 && (
+            {i === 3 && (
               <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#AAFF00', color: '#000', fontSize: '0.6rem', letterSpacing: '0.2em', padding: '4px 14px', fontWeight: 700 }}>
                 FOUNDER
               </div>
@@ -204,9 +194,9 @@ export default function PayPage() {
               disabled={funding}
               style={{
                 width: '100%', padding: '14px', cursor: 'pointer',
-                background: i === 2 ? '#AAFF00' : 'transparent',
-                border: i === 2 ? 'none' : '1px solid rgba(255,255,255,0.3)',
-                color: i === 2 ? '#000' : '#fff',
+                background: i === 3 ? '#AAFF00' : 'transparent',
+                border: i === 3 ? 'none' : '1px solid rgba(255,255,255,0.3)',
+                color: i === 3 ? '#000' : '#fff',
                 fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 700, textTransform: 'uppercase',
                 opacity: funding ? 0.6 : 1,
               }}
