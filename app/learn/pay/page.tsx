@@ -1,7 +1,7 @@
 'use client'
 
 import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet, useWallets as useSolanaWallets } from '@privy-io/react-auth/solana'
+import { useFundWallet } from '@privy-io/react-auth/solana'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
@@ -20,7 +20,6 @@ const RPC = process.env.NEXT_PUBLIC_SOLANA_RPC!
 export default function PayPage() {
   const { user, authenticated, ready, login, linkWallet } = usePrivy()
   const { wallets } = useWallets()
-  const { wallets: solanaWallets } = useSolanaWallets()
   const { fundWallet } = useFundWallet()
   const router = useRouter()
   const [checking, setChecking] = useState(true)
@@ -29,9 +28,9 @@ export default function PayPage() {
   const [linkingPhantom, setLinkingPhantom] = useState(false)
 
   const phantomWallet = wallets.find(w => w.walletClientType === 'phantom')
-  const phantomSolanaWallet = solanaWallets.find(w => w.standardWallet.name.toLowerCase().includes('phantom'))
-  const embeddedSolanaWallet = solanaWallets.find(w => w.standardWallet.name.toLowerCase().includes('privy'))
-  const activeWallet = phantomSolanaWallet ?? embeddedSolanaWallet ?? solanaWallets[0]
+  const phantomSolanaWallet = wallets.find(w => (w as any).chainType === 'solana' && w.walletClientType === 'phantom')
+  const embeddedSolanaWallet = wallets.find(w => (w as any).chainType === 'solana' && w.walletClientType === 'privy')
+  const activeWallet = phantomSolanaWallet ?? embeddedSolanaWallet ?? wallets.find(w => (w as any).chainType === 'solana')
 
   useEffect(() => {
     if (!ready) return
@@ -102,10 +101,10 @@ export default function PayPage() {
       tx.feePayer = senderPubkey
 
       // Use the active wallet to sign and send
-      const walletToUse = phantomSolanaWallet ?? embeddedSolanaWallet ?? solanaWallets[0]
+      const walletToUse = phantomSolanaWallet ?? embeddedSolanaWallet ?? wallets.find(w => (w as any).chainType === 'solana')
       if (!walletToUse) throw new Error('No wallet available to sign')
 
-      const { signedTransaction } = await walletToUse.signTransaction({
+      const { signedTransaction } = await (walletToUse as any).signTransaction({
         transaction: tx.serialize({ requireAllSignatures: false, verifySignatures: false }),
         chain: 'solana:mainnet'
       })
