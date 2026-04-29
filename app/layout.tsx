@@ -71,15 +71,6 @@ export default function RootLayout({
       <body>
         <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_80%_-10%,rgba(139,92,246,0.16),transparent_48%),linear-gradient(180deg,#050507_0%,#0a0a0d_100%)]" />
         <div className="relative z-10">{children}</div>
-        {/* ElevenLabs AI Chatbot Widget */}
-        <Script src="https://unpkg.com/@elevenlabs/convai-widget-embed" strategy="lazyOnload" />
-        <Script id="elevenlabs-convai-init" strategy="lazyOnload">
-          {`
-            var el = document.createElement('elevenlabs-convai');
-            el.setAttribute('agent-id', 'agent_8301kqbnag4vfedbswy07knkzyp0');
-            document.body.appendChild(el);
-          `}
-        </Script>
       </body>
     </html>
   )
