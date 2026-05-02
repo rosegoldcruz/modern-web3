@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], display: "swap" })
 export const metadata: Metadata = {
   title: "Iron Vault | Real Estate. Tokenized. Understood.",
   description:
-    "Iron Vault is an education-first entry point into understanding how real-world assets â€” specifically real estate â€” can be structured, represented, and integrated into decentralized financial systems.",
+    “Iron Vault is an education-first entry point into understanding how real-world assets — specifically real estate — can be structured, represented, and integrated into decentralized financial systems.”,
   generator: "Iron Vault Token",
   icons: {
     icon: [

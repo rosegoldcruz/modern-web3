@@ -120,6 +120,23 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+    font-size: 1.0625rem; /* 17px */
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.6;
+  }
+  h1 {
+    letter-spacing: -0.025em;
+    line-height: 1.08;
+  }
+  h2 {
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  h3 {
+    letter-spacing: -0.015em;
+    line-height: 1.2;
   }
 }
 
@@ -217,4 +234,59 @@
   .animate-scroll-left {
     animation: none !important;
   }
+}
+
+/* =============================================================
+   Apple Typography — Design System
+   Font stack: Inter → SF Pro → system-ui
+   Tight negative tracking is Apple's signature move.
+   ============================================================= */
+
+/* Display / Hero — 48px → 96px fluid */
+.type-display {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+/* H1 — 36px → 64px fluid */
+.type-h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+/* H2 — 28px → 48px fluid */
+.type-h2 {
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* H3 — 20px → 32px fluid */
+.type-h3 {
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+/* Body — 17px, max 65ch for readability */
+.type-body {
+  font-size: 1.0625rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.6;
+  max-width: 65ch;
+}
+
+/* Caption / Label — uppercase micro text */
+.type-caption {
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
