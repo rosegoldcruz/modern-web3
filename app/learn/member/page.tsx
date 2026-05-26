@@ -1,13 +1,13 @@
 import Link from "next/link"
 
-import IronVaultAcademyGated from "@/iron-vault-academy-gated"
+import IronVaultAcademyUnlocked from "@/iron-vault-academy-unlocked"
 
 /**
- * /learn — public-facing academy for new investors.
- * Checks /api/check-payment; redirects to /learn/pay if no modules are owned.
- * For founding members (already invested), see /learn/member.
+ * /learn/member — founding member / existing investor academy.
+ * No payment wall. All 6 modules unlocked immediately after Privy login.
+ * Sequential quiz lock still applies (must pass quiz to advance to next module).
  */
-export default function LearnPage() {
+export default function MemberLearnPage() {
   if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4">
@@ -26,6 +26,6 @@ export default function LearnPage() {
   }
 
   return (
-    <IronVaultAcademyGated />
+    <IronVaultAcademyUnlocked />
   )
 }
