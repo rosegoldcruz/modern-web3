@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { PrivyAuthProvider } from '@/components/privy-auth-provider'
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`
 
@@ -164,7 +165,15 @@ const TIERS = [
   { name: 'FOUNDER', tag: 'ELITE', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', usdcRaw: 1_000_000_000, description: 'All 6 modules + 1,000,000 IV-SOL allocation' },
 ]
 
-const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
+function getTreasuryWallet() {
+  const value = process.env.NEXT_PUBLIC_USDC_TREASURY_WALLET
+  if (!value) {
+    throw new Error('Missing required env var: NEXT_PUBLIC_USDC_TREASURY_WALLET')
+  }
+  return value
+}
+
+const TREASURY = getTreasuryWallet()
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 const RPC = process.env.NEXT_PUBLIC_SOLANA_RPC!
 
@@ -201,7 +210,7 @@ function PayPageContent() {
         const alreadyUnlocked = d.modulesUnlocked?.includes(targetModule)
         const isTargetedModulePurchase = searchParams.has('module')
 
-        if (d.paid && (!isTargetedModulePurchase || alreadyUnlocked)) router.replace('/learn')
+        if (d.paid && (!isTargetedModulePurchase || alreadyUnlocked)) router.replace('/learn/dashboard')
         else setChecking(false)
       })
       .catch(() => setChecking(false))
@@ -272,7 +281,7 @@ function PayPageContent() {
         })
       })
 
-      router.replace('/learn')
+      router.replace('/learn/dashboard')
 
     } catch (e: any) {
       console.error(e)
@@ -376,13 +385,15 @@ function PayPageContent() {
 
 export default function PayPage() {
   return (
-    <Suspense fallback={
-      <div className="pv-loading">
-        <style>{CSS}</style>
-        ▸ VERIFYING ACCESS...
-      </div>
-    }>
-      <PayPageContent />
-    </Suspense>
+    <PrivyAuthProvider>
+      <Suspense fallback={
+        <div className="pv-loading">
+          <style>{CSS}</style>
+          ▸ VERIFYING ACCESS...
+        </div>
+      }>
+        <PayPageContent />
+      </Suspense>
+    </PrivyAuthProvider>
   )
 }
