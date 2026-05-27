@@ -2,34 +2,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
+import { getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
 
-const RPC = 'https://api.mainnet-beta.solana.com'
-const TREASURY = '6qGsnyBmB78f9YUPQp9PLFfKjJu3rDwJYLWtbxSD7mSt'
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-const TIERS = {
-  MODULE: { amount: 25, usdcRaw: '25000000', tokenAmount: '25000' },
-  STARTER: { amount: 100, usdcRaw: '100000000', tokenAmount: '100000' },
-  BUILDER: { amount: 500, usdcRaw: '500000000', tokenAmount: '500000' },
-  FOUNDER: { amount: 1000, usdcRaw: '1000000000', tokenAmount: '1000000' },
-} as const
-const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6']
+
+function requireEnv(name: string) {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required env var: ${name}`)
+  }
+  return value
+}
 
 function getSupabase() {
   return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    requireEnv('NEXT_PUBLIC_SUPABASE_URL'),
+    requireEnv('SUPABASE_SERVICE_ROLE_KEY')
   )
 }
 
-function modulesForPurchase(tier: keyof typeof TIERS, selectedModule?: number) {
-  if (tier === 'STARTER' || tier === 'BUILDER' || tier === 'FOUNDER') {
-    return ALL_MODULES
-  }
-
-  const moduleNumber = typeof selectedModule === 'number' && Number.isInteger(selectedModule) ? selectedModule : 1
-  const boundedModule = Math.min(Math.max(moduleNumber, 1), ALL_MODULES.length)
-
-  return [`module_${boundedModule}`]
+function getTreasuryPublicKey() {
+  return new PublicKey(requireEnv('USDC_TREASURY_WALLET'))
 }
 
 export async function POST(req: NextRequest) {
@@ -39,15 +32,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const tierName = tier as keyof typeof TIERS
-  const selectedTier = TIERS[tierName]
-  if (!selectedTier || selectedTier.amount !== amount) {
+  const isTestPaymentEnabled = process.env.ENABLE_USDC_TEST_PAYMENT === 'true'
+  if (tier === 'TEST_MODULE' && !isTestPaymentEnabled) {
+    return NextResponse.json({ error: 'Test payment is disabled' }, { status: 403 })
+  }
+
+  const selectedTier = getPaymentTier(tier, isTestPaymentEnabled)
+  if (!selectedTier || selectedTier.price !== amount) {
     return NextResponse.json({ error: 'Invalid payment tier' }, { status: 400 })
   }
 
   try {
+    const supabase = getSupabase()
+    const { data: existingPayment } = await supabase
+      .from('iv_payments')
+      .select('modules_unlocked')
+      .eq('tx_signature', txSignature)
+      .eq('status', 'confirmed')
+      .maybeSingle()
+
+    if (existingPayment) {
+      return NextResponse.json({ success: true, modulesUnlocked: existingPayment.modules_unlocked ?? [] })
+    }
+
     // Verify transaction actually landed on-chain
-    const connection = new Connection(RPC, 'confirmed')
+    const connection = new Connection(requireEnv('NEXT_PUBLIC_SOLANA_RPC'), 'confirmed')
     const tx = await connection.getParsedTransaction(txSignature, {
       commitment: 'confirmed',
       maxSupportedTransactionVersion: 0
@@ -62,7 +71,7 @@ export async function POST(req: NextRequest) {
     }
 
     const senderPubkey = new PublicKey(walletAddress)
-    const treasuryPubkey = new PublicKey(TREASURY)
+  const treasuryPubkey = getTreasuryPublicKey()
     const senderATA = await getAssociatedTokenAddress(USDC_MINT, senderPubkey)
     const treasuryATA = await getAssociatedTokenAddress(USDC_MINT, treasuryPubkey)
     const hasExpectedTransfer = tx.transaction.message.instructions.some((instruction) => {
@@ -79,7 +88,7 @@ export async function POST(req: NextRequest) {
       const rawAmount = info.amount ?? info.tokenAmount?.amount
 
       return (
-        rawAmount === selectedTier.usdcRaw &&
+        rawAmount === String(selectedTier.usdcRaw) &&
         info.authority === walletAddress &&
         info.source === senderATA.toBase58() &&
         info.destination === treasuryATA.toBase58() &&
@@ -91,25 +100,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transaction does not match expected USDC payment' }, { status: 400 })
     }
 
-    const modulesUnlocked = modulesForPurchase(tierName, Number(selectedModule))
+    const modulesUnlocked = modulesForPurchase(selectedTier.name, Number(selectedModule))
+    const now = new Date().toISOString()
 
     // Write to Supabase using the actual iv_payments schema.
-    const { error } = await getSupabase().from('iv_payments').insert({
+    const { error } = await supabase.from('iv_payments').insert({
+      user_id: userId,
       privy_user_id: userId,
       wallet_address: walletAddress,
       tx_signature: txSignature,
       tier,
       amount_usd: amount,
-      token_amount: Number(selectedTier.tokenAmount),
+      amount,
+      token_amount: selectedTier.tokenAmount,
       modules_unlocked: modulesUnlocked,
+      paid: true,
       status: 'confirmed',
-      confirmed_at: new Date().toISOString(),
-      created_at: new Date().toISOString()
+      destination_wallet: treasuryPubkey.toBase58(),
+      provider: 'manual_wallet_transfer',
+      selected_module: Number(selectedModule) || null,
+      confirmed_at: now,
+      created_at: now,
+      updated_at: now,
     })
 
     if (error) throw error
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, modulesUnlocked })
   } catch (e: unknown) {
     console.error('confirm-payment error:', e)
     const message = e instanceof Error ? e.message : 'Failed to confirm payment'

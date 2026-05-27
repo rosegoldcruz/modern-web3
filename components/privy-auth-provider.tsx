@@ -11,10 +11,18 @@ type PrivyAuthProviderProps = {
   children: ReactNode
 }
 
+function getPrivyAppId() {
+  const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
+  if (!appId) {
+    throw new Error("Missing required env var: NEXT_PUBLIC_PRIVY_APP_ID")
+  }
+  return appId
+}
+
 export function PrivyAuthProvider({ children }: PrivyAuthProviderProps) {
   return (
     <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? ""}
+      appId={getPrivyAppId()}
       config={{
         loginMethods: ["email", "sms"],
         appearance: {

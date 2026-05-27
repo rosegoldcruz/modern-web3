@@ -1,12 +1,12 @@
 'use client'
 
-import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { usePrivy } from '@privy-io/react-auth'
 import { useFundWallet } from '@privy-io/react-auth/solana'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import { Connection, PublicKey, Transaction } from '@solana/web3.js'
-import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
 import { PrivyAuthProvider } from '@/components/privy-auth-provider'
+import { getPaymentTiers, type PaymentTier } from '@/lib/payment-tiers'
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`
 
@@ -85,7 +85,13 @@ const CSS = `
     background:linear-gradient(90deg,transparent,#7B2FBE,transparent);
   }
   .pv-card.featured{border-color:rgba(170,255,0,0.25);}
+  .pv-card.featured{padding-top:36px;}
   .pv-card.featured::before{background:linear-gradient(90deg,transparent,#AAFF00,transparent);}
+  .pv-card-delay-0{animation-delay:0s;}
+  .pv-card-delay-1{animation-delay:0.07s;}
+  .pv-card-delay-2{animation-delay:0.14s;}
+  .pv-card-delay-3{animation-delay:0.21s;}
+  .pv-card-delay-4{animation-delay:0.28s;}
   .pv-featured-badge{
     position:absolute;top:-1px;left:50%;transform:translateX(-50%);
     background:#AAFF00;color:#080808;
@@ -158,28 +164,19 @@ const CSS = `
   }
 `
 
-const TIERS = [
-  { name: 'MODULE', tag: 'SINGLE MODULE', price: 25, tokens: '25,000', label: '$25', usdcAmount: '25', usdcRaw: 25_000_000, description: 'Module 1 access + 25,000 IV-SOL — buy more modules anytime' },
-  { name: 'STARTER', tag: 'FOUNDATION', price: 100, tokens: '100,000', label: '$100', usdcAmount: '100', usdcRaw: 100_000_000, description: 'All 6 modules + 100,000 IV-SOL — save $50 vs buying individually' },
-  { name: 'BUILDER', tag: 'ACCELERATOR', price: 500, tokens: '500,000', label: '$500', usdcAmount: '500', usdcRaw: 500_000_000, description: 'All 6 modules + 500,000 IV-SOL allocation' },
-  { name: 'FOUNDER', tag: 'ELITE', price: 1000, tokens: '1,000,000', label: '$1,000', usdcAmount: '1000', usdcRaw: 1_000_000_000, description: 'All 6 modules + 1,000,000 IV-SOL allocation' },
-]
+const TIERS = getPaymentTiers(process.env.NEXT_PUBLIC_ENABLE_USDC_TEST_PAYMENT === 'true')
 
 function getTreasuryWallet() {
   const value = process.env.NEXT_PUBLIC_USDC_TREASURY_WALLET
   if (!value) {
     throw new Error('Missing required env var: NEXT_PUBLIC_USDC_TREASURY_WALLET')
   }
+  new PublicKey(value)
   return value
 }
 
-const TREASURY = getTreasuryWallet()
-const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
-const RPC = process.env.NEXT_PUBLIC_SOLANA_RPC!
-
 function PayPageContent() {
-  const { user, authenticated, ready, login, linkWallet } = usePrivy()
-  const { wallets } = useWallets()
+  const { user, authenticated, ready, login } = usePrivy()
   const { fundWallet } = useFundWallet()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -190,11 +187,6 @@ function PayPageContent() {
   const [checking, setChecking] = useState(true)
   const [funding, setFunding] = useState(false)
   const [status, setStatus] = useState('')
-  const [linkingPhantom, setLinkingPhantom] = useState(false)
-
-  const phantomWallet = wallets.find(w => w.walletClientType === 'phantom')
-  const embeddedSolanaWallet = wallets.find(w => (w as any).chainType === 'solana' && w.walletClientType === 'privy')
-  const activeWallet = phantomWallet ?? embeddedSolanaWallet
 
   useEffect(() => {
     if (!ready) return
@@ -216,76 +208,79 @@ function PayPageContent() {
       .catch(() => setChecking(false))
   }, [ready, authenticated, user, router, searchParams, selectedModule])
 
-  const handleConnectPhantom = async () => {
-    setLinkingPhantom(true)
-    try { await linkWallet() } catch (e) { console.error(e) }
-    setLinkingPhantom(false)
+  const pollPaymentStatus = async (paymentId: string) => {
+    for (let attempt = 0; attempt < 24; attempt += 1) {
+      setStatus(attempt === 0 ? 'Payment pending' : 'Waiting for treasury confirmation...')
+
+      const response = await fetch('/api/check-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.id, paymentId }),
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error ?? 'Payment failed')
+      }
+
+      if (data.status === 'confirmed' && data.paid) {
+        setStatus('Learning access unlocked')
+        router.replace('/learn/dashboard')
+        return true
+      }
+
+      if (data.status === 'delayed') {
+        setStatus('Verification delayed/manual review required')
+        return false
+      }
+
+      if (data.status === 'failed') {
+        throw new Error(data.error ?? 'Payment failed')
+      }
+
+      await new Promise((resolve) => window.setTimeout(resolve, 5000))
+    }
+
+    setStatus('Verification delayed/manual review required')
+    return false
   }
 
-  const handleFund = async (tier: typeof TIERS[0]) => {
+  const handleFund = async (tier: PaymentTier) => {
     if (!authenticated) { login(); return }
 
-    let address = activeWallet?.address
-    if (!address) {
-      const fallback = user?.linkedAccounts?.find(
-        (a: any) => a.type === 'wallet' && a.chainType === 'solana'
-      ) as any
-      address = fallback?.address
-    }
-    if (!address) {
-      alert('No Solana wallet found. Connect Phantom or sign out and back in.')
-      return
-    }
-
     setFunding(true)
-    setStatus('▸ OPENING PAYMENT...')
+    setStatus('Opening secure USDC checkout...')
 
     try {
-      await fundWallet({ address, options: { amount: tier.usdcAmount } })
-
-      setStatus('▸ CONFIRMING ON-CHAIN...')
-      const connection = new Connection(RPC, 'confirmed')
-      const senderPubkey = new PublicKey(address)
-      const treasuryPubkey = new PublicKey(TREASURY)
-      const senderATA = await getAssociatedTokenAddress(USDC_MINT, senderPubkey)
-      const treasuryATA = await getAssociatedTokenAddress(USDC_MINT, treasuryPubkey)
-
-      const transferIx = createTransferInstruction(
-        senderATA, treasuryATA, senderPubkey,
-        tier.usdcRaw, [], TOKEN_PROGRAM_ID
-      )
-
-      const tx = new Transaction().add(transferIx)
-      const { blockhash } = await connection.getLatestBlockhash()
-      tx.recentBlockhash = blockhash
-      tx.feePayer = senderPubkey
-
-      const walletToUse = phantomWallet ?? embeddedSolanaWallet
-      if (!walletToUse) throw new Error('No wallet available to sign')
-
-      const signedTx = await (walletToUse as any).sendTransaction(tx, connection)
-
-      setStatus('▸ RECORDING ACCESS...')
-      await connection.confirmTransaction(signedTx, 'confirmed')
-
-      await fetch('/api/confirm-payment', {
+      const treasuryWallet = getTreasuryWallet()
+      const pendingResponse = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user?.id,
-          walletAddress: address,
-          txSignature: signedTx,
           tier: tier.name,
           amount: tier.price,
           selectedModule,
-        })
+        }),
       })
+      const pendingPayment = await pendingResponse.json()
 
-      router.replace('/learn/dashboard')
+      if (!pendingResponse.ok) {
+        throw new Error(pendingPayment.error ?? 'Payment failed')
+      }
+
+      if (pendingPayment.destinationWallet !== treasuryWallet) {
+        throw new Error('Frontend and backend treasury wallets do not match')
+      }
+
+      await fundWallet({ address: treasuryWallet, options: { amount: tier.usdcAmount } })
+
+      setStatus('Waiting for treasury confirmation...')
+      await pollPaymentStatus(pendingPayment.paymentId)
 
     } catch (e: any) {
       console.error(e)
-      setStatus('')
+      setStatus('Payment failed')
       alert(e?.message ?? 'Payment failed. Please try again.')
     }
 
@@ -295,7 +290,7 @@ function PayPageContent() {
   if (checking) return (
     <div className="pv-loading">
       <style>{CSS}</style>
-      ▸ VERIFYING ACCESS...
+      Checking access...
     </div>
   )
 
@@ -307,27 +302,8 @@ function PayPageContent() {
         <div className="pv-eyebrow">▸ FOUNDING MEMBER ACCESS</div>
         <h1 className="pv-h1">Choose Your Track</h1>
         <p className="pv-sub">
-          Complete the coursework. Receive your IV-SOL allocation automatically.
-          No agent. No manual process. The certificate triggers delivery.
+          Pay by card with secure USDC checkout. Access unlocks after treasury confirmation.
         </p>
-
-        {authenticated && (
-          <div className="pv-phantom-strip">
-            {phantomWallet ? (
-              <div className="pv-phantom-connected">
-                ✓ PHANTOM — {phantomWallet.address.slice(0, 4)}...{phantomWallet.address.slice(-4)}
-              </div>
-            ) : (
-              <button
-                className="pv-phantom-btn"
-                onClick={handleConnectPhantom}
-                disabled={linkingPhantom}
-              >
-                {linkingPhantom ? '▸ CONNECTING...' : '+ CONNECT PHANTOM WALLET'}
-              </button>
-            )}
-          </div>
-        )}
 
         {funding && <div className="pv-status">{status}</div>}
 
@@ -336,19 +312,18 @@ function PayPageContent() {
             const isRequestedModuleTier = tier.name === 'MODULE' && searchParams.has('module')
             const featured = tier.name === 'FOUNDER' || isRequestedModuleTier
             const description = isRequestedModuleTier
-              ? `Unlock Module ${selectedModule} + 25,000 IV-SOL — buy more modules anytime`
+              ? `Unlock Module ${selectedModule} — buy more modules anytime`
               : tier.description
             return (
               <div
                 key={tier.name}
-                className={`pv-card ${featured ? 'featured' : ''}`}
-                style={{ animationDelay: `${i * 0.07}s`, paddingTop: featured ? '36px' : '28px' }}
+                className={`pv-card pv-card-delay-${i} ${featured ? 'featured' : ''}`}
               >
                 {featured && <div className="pv-featured-badge">{isRequestedModuleTier ? `MODULE ${selectedModule}` : 'FOUNDER'}</div>}
                 <div className="pv-tag">▸ {tier.tag}</div>
                 <div className="pv-price">{tier.label}</div>
                 <div className="pv-price-label">IN COURSEWORK</div>
-                <div className="pv-allocation">→ {tier.tokens} IV-SOL</div>
+                <div className="pv-allocation">→ {tier.tokenDisplay}</div>
                 <div className="pv-desc">{description}</div>
                 <div className="pv-divider" />
                 <button
@@ -357,9 +332,9 @@ function PayPageContent() {
                   className={`pv-btn ${featured ? 'pv-btn-lime' : 'pv-btn-ghost'}`}
                 >
                   {!authenticated
-                    ? 'SIGN IN TO ENROLL'
+                    ? 'Sign in required'
                     : funding
-                    ? status || 'PROCESSING...'
+                    ? status || 'Payment pending'
                     : 'START LEARNING NOW'}
                 </button>
               </div>
@@ -389,7 +364,7 @@ export default function PayPage() {
       <Suspense fallback={
         <div className="pv-loading">
           <style>{CSS}</style>
-          ▸ VERIFYING ACCESS...
+          Checking access...
         </div>
       }>
         <PayPageContent />
