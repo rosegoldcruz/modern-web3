@@ -37,6 +37,45 @@ function requireEnv(name: string) {
   return value
 }
 
+function getSolanaRpc() {
+  const rpc = process.env.SOLANA_RPC ?? process.env.NEXT_PUBLIC_SOLANA_RPC
+  if (!rpc) {
+    throw new Error('Missing required env var: SOLANA_RPC')
+  }
+  return rpc
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : 'Payment verification failed'
+}
+
+function isMissingEnvError(message: string) {
+  return message.startsWith('Missing required env var:')
+}
+
+function pendingVerificationErrorResponse(message: string) {
+  if (isMissingEnvError(message)) {
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    paid: false,
+    status: 'pending',
+    modulesUnlocked: [],
+    verificationStatus: 'delayed',
+    error: message,
+  })
+}
+
+function logPendingVerificationFailure(paymentId: string, tier: string | null | undefined, status: string | null | undefined, message: string) {
+  console.error('check-payment pending verification failed', {
+    paymentId,
+    tier,
+    status,
+    error: message,
+  })
+}
+
 function getTreasuryPublicKey() {
   const treasury = requireEnv('USDC_TREASURY_WALLET')
   return new PublicKey(treasury)
@@ -88,7 +127,7 @@ async function findTreasuryReceipt(row: PaymentRow) {
   }
 
   const createdAt = row.created_at ? new Date(row.created_at) : new Date(0)
-  const connection = new Connection(requireEnv('NEXT_PUBLIC_SOLANA_RPC'), 'confirmed')
+  const connection = new Connection(getSolanaRpc(), 'confirmed')
   const treasuryATA = await getAssociatedTokenAddress(USDC_MINT, treasuryPubkey)
   const signatures = await connection.getSignaturesForAddress(treasuryATA, { limit: 100 }, 'confirmed')
   const candidates: Array<{ signature: string; blockTime: number }> = []
@@ -139,92 +178,97 @@ async function findTreasuryReceipt(row: PaymentRow) {
 }
 
 async function verifyPendingPayment(userId: string, paymentId: string) {
-  const supabase = getSupabase()
-  const { data: payment, error } = await supabase
-    .from('iv_payments')
-    .select('*')
-    .eq('id', paymentId)
-    .or(`privy_user_id.eq.${userId},user_id.eq.${userId}`)
-    .single<PaymentRow>()
+  let payment: PaymentRow | null = null
 
-  if (error || !payment) {
-    return NextResponse.json({ paid: false, status: 'failed', error: 'Payment not found' }, { status: 404 })
+  try {
+    const supabase = getSupabase()
+    const { data, error } = await supabase
+      .from('iv_payments')
+      .select('*')
+      .eq('id', paymentId)
+      .or(`privy_user_id.eq.${userId},user_id.eq.${userId}`)
+      .single<PaymentRow>()
+
+    if (error || !data) {
+      return NextResponse.json({ paid: false, status: 'failed', error: 'Payment not found' }, { status: 404 })
+    }
+
+    payment = data
+
+    if (payment.status === 'confirmed') {
+      return NextResponse.json({ paid: true, status: 'confirmed', modulesUnlocked: payment.modules_unlocked ?? [] })
+    }
+
+    const receipt = await findTreasuryReceipt(payment)
+    if (receipt.status === 'pending') {
+      return NextResponse.json({ paid: false, status: 'pending', modulesUnlocked: [] })
+    }
+
+    if (receipt.status !== 'confirmed') {
+      return pendingVerificationErrorResponse(receipt.error ?? 'Verification delayed/manual review required')
+    }
+
+    const { data: existing } = await supabase
+      .from('iv_payments')
+      .select('id, modules_unlocked, privy_user_id, user_id')
+      .eq('tx_signature', receipt.signature)
+      .eq('status', 'confirmed')
+      .maybeSingle<PaymentRow>()
+
+    if (existing) {
+      const ownsExistingPayment = existing.id === payment.id || existing.privy_user_id === userId || existing.user_id === userId
+      return NextResponse.json({
+        paid: ownsExistingPayment,
+        status: ownsExistingPayment ? 'confirmed' : 'pending',
+        verificationStatus: ownsExistingPayment ? undefined : 'delayed',
+        error: ownsExistingPayment ? undefined : 'Verification delayed/manual review required',
+        modulesUnlocked: ownsExistingPayment ? existing.modules_unlocked ?? [] : [],
+      })
+    }
+
+    const createdAt = payment.created_at ? new Date(payment.created_at) : new Date(0)
+    const ambiguityWindowStart = new Date(createdAt.getTime() - 2 * 60 * 60 * 1000).toISOString()
+    const ambiguityWindowEnd = new Date((receipt.blockTime ?? Date.now() / 1000) * 1000).toISOString()
+    const { data: overlappingPending } = await supabase
+      .from('iv_payments')
+      .select('id')
+      .neq('id', payment.id)
+      .eq('status', 'pending')
+      .eq('provider', PAYMENT_PROVIDER)
+      .eq('tier', payment.tier)
+      .eq('amount_usd', payment.amount_usd ?? payment.amount)
+      .eq('destination_wallet', payment.destination_wallet)
+      .gte('created_at', ambiguityWindowStart)
+      .lte('created_at', ambiguityWindowEnd)
+
+    if (overlappingPending?.length) {
+      return pendingVerificationErrorResponse('Verification delayed/manual review required')
+    }
+
+    const moduleNumber = typeof payment.selected_module === 'number' ? payment.selected_module : undefined
+    const modulesUnlocked = modulesForPurchase(payment.tier as never, moduleNumber)
+    const now = new Date().toISOString()
+    const { error: updateError } = await supabase
+      .from('iv_payments')
+      .update({
+        tx_signature: receipt.signature,
+        modules_unlocked: modulesUnlocked,
+        paid: true,
+        status: 'confirmed',
+        confirmed_at: now,
+        updated_at: now,
+      })
+      .eq('id', payment.id)
+      .eq('status', 'pending')
+
+    if (updateError) throw updateError
+
+    return NextResponse.json({ paid: true, status: 'confirmed', modulesUnlocked })
+  } catch (error: unknown) {
+    const message = getErrorMessage(error)
+    logPendingVerificationFailure(paymentId, payment?.tier, payment?.status, message)
+    return pendingVerificationErrorResponse(message)
   }
-
-  if (payment.status === 'confirmed') {
-    return NextResponse.json({ paid: true, status: 'confirmed', modulesUnlocked: payment.modules_unlocked ?? [] })
-  }
-
-  const receipt = await findTreasuryReceipt(payment)
-  if (receipt.status !== 'confirmed') {
-    return NextResponse.json({
-      paid: false,
-      status: receipt.status,
-      error: receipt.error,
-      modulesUnlocked: [],
-    })
-  }
-
-  const { data: existing } = await supabase
-    .from('iv_payments')
-    .select('id, modules_unlocked, privy_user_id, user_id')
-    .eq('tx_signature', receipt.signature)
-    .eq('status', 'confirmed')
-    .maybeSingle<PaymentRow>()
-
-  if (existing) {
-    const ownsExistingPayment = existing.id === payment.id || existing.privy_user_id === userId || existing.user_id === userId
-    return NextResponse.json({
-      paid: ownsExistingPayment,
-      status: ownsExistingPayment ? 'confirmed' : 'delayed',
-      error: ownsExistingPayment ? undefined : 'Verification delayed/manual review required',
-      modulesUnlocked: ownsExistingPayment ? existing.modules_unlocked ?? [] : [],
-    })
-  }
-
-  const createdAt = payment.created_at ? new Date(payment.created_at) : new Date(0)
-  const ambiguityWindowStart = new Date(createdAt.getTime() - 2 * 60 * 60 * 1000).toISOString()
-  const ambiguityWindowEnd = new Date((receipt.blockTime ?? Date.now() / 1000) * 1000).toISOString()
-  const { data: overlappingPending } = await supabase
-    .from('iv_payments')
-    .select('id')
-    .neq('id', payment.id)
-    .eq('status', 'pending')
-    .eq('provider', PAYMENT_PROVIDER)
-    .eq('tier', payment.tier)
-    .eq('amount_usd', payment.amount_usd ?? payment.amount)
-    .eq('destination_wallet', payment.destination_wallet)
-    .gte('created_at', ambiguityWindowStart)
-    .lte('created_at', ambiguityWindowEnd)
-
-  if (overlappingPending?.length) {
-    return NextResponse.json({
-      paid: false,
-      status: 'delayed',
-      error: 'Verification delayed/manual review required',
-      modulesUnlocked: [],
-    })
-  }
-
-  const moduleNumber = typeof payment.selected_module === 'number' ? payment.selected_module : undefined
-  const modulesUnlocked = modulesForPurchase(payment.tier as never, moduleNumber)
-  const now = new Date().toISOString()
-  const { error: updateError } = await supabase
-    .from('iv_payments')
-    .update({
-      tx_signature: receipt.signature,
-      modules_unlocked: modulesUnlocked,
-      paid: true,
-      status: 'confirmed',
-      confirmed_at: now,
-      updated_at: now,
-    })
-    .eq('id', payment.id)
-    .eq('status', 'pending')
-
-  if (updateError) throw updateError
-
-  return NextResponse.json({ paid: true, status: 'confirmed', modulesUnlocked })
 }
 
 export async function POST(req: NextRequest) {
@@ -236,7 +280,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (paymentId) {
-      return verifyPendingPayment(userId, paymentId)
+      return await verifyPendingPayment(userId, paymentId)
     }
 
     const supabase = getSupabase()
