@@ -273,7 +273,15 @@ function PayPageContent() {
         throw new Error('Frontend and backend treasury wallets do not match')
       }
 
-      await fundWallet({ address: treasuryWallet, options: { amount: tier.usdcAmount } })
+      await fundWallet({
+        address: treasuryWallet,
+        options: {
+          amount: tier.usdcAmount,
+          asset: 'USDC',
+          chain: 'solana:mainnet',
+          card: { preferredProvider: 'coinbase' },
+        },
+      })
 
       setStatus('Waiting for treasury confirmation...')
       await pollPaymentStatus(pendingPayment.paymentId)
