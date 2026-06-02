@@ -552,6 +552,26 @@ const MODULES = [
 const PASS_SCORE = 8;
 const TOTAL_XP = MODULES.reduce((s, m) => s + m.xpReward, 0);
 
+function createShuffledQuiz(quiz) {
+  return quiz.map((question) => {
+    const choices = question.options.map((text, index) => ({
+      text,
+      isCorrect: index === question.correct,
+    }));
+
+    for (let i = choices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+
+    return {
+      ...question,
+      options: choices.map((choice) => choice.text),
+      correct: choices.findIndex((choice) => choice.isCorrect),
+    };
+  });
+}
+
 function createEmptyProgress() {
   return MODULES.map(() => ({ done: new Set(), score: null, passed: false }));
 }
@@ -1085,6 +1105,7 @@ export default function IronVaultAcademy(){
   const [answers, setAnswers] = useState({});
   const [curQ, setCurQ] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [quizQuestions, setQuizQuestions] = useState([]);
 
   useEffect(() => {
     if (!ready || !authenticated || !user?.id) return;
@@ -1192,6 +1213,7 @@ export default function IronVaultAcademy(){
   }
 
   function startQuiz(){
+    setQuizQuestions(createShuffledQuiz(MODULES[modIdx].quiz));
     setAnswers({});setCurQ(0);setRevealed(false);setView("quiz");
   }
 
@@ -1200,7 +1222,7 @@ export default function IronVaultAcademy(){
   function confirmAns(){ setRevealed(true); }
 
   function nextQ(){
-    const quiz=MODULES[modIdx].quiz;
+    const quiz=quizQuestions;
     if(curQ<quiz.length-1){ setCurQ(q=>q+1); setRevealed(false); }
     else {
       const score=quiz.reduce((s,q,i)=>s+(answers[i]===q.correct?1:0),0);
@@ -1441,7 +1463,8 @@ export default function IronVaultAcademy(){
 
   // ── QUIZ ──
   if(view==="quiz"){
-    const quiz=MODULES[modIdx].quiz;
+    const quiz=quizQuestions;
+    if(!quiz.length) return null;
     const q=quiz[curQ];
     const sel=answers[curQ];
     const correctSoFar=Object.entries(answers).filter(([i,a])=>quiz[parseInt(i)].correct===a).length;
