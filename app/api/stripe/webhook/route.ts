@@ -49,7 +49,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 })
   }
 
-  if (event.type !== 'checkout.session.completed') {
+  const isFulfillableEvent =
+    event.type === 'checkout.session.async_payment_succeeded' ||
+    (event.type === 'checkout.session.completed' &&
+      (event.data.object as Stripe.Checkout.Session).payment_status === 'paid')
+
+  if (!isFulfillableEvent) {
     return NextResponse.json({ received: true })
   }
 
