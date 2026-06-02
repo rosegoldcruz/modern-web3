@@ -552,6 +552,33 @@ const MODULES = [
 const PASS_SCORE = 8;
 const TOTAL_XP = MODULES.reduce((s, m) => s + m.xpReward, 0);
 
+function createEmptyProgress() {
+  return MODULES.map(() => ({ done: new Set(), score: null, passed: false }));
+}
+
+function hydrateProgress(payload) {
+  const next = createEmptyProgress();
+  const lessons = Array.isArray(payload?.lessons) ? payload.lessons : [];
+  const quizResults = Array.isArray(payload?.quizResults) ? payload.quizResults : [];
+
+  for (const lesson of lessons) {
+    const moduleIndex = Number(lesson?.module_index);
+    const lessonIndex = Number(lesson?.lesson_index);
+    if (Number.isInteger(moduleIndex) && Number.isInteger(lessonIndex) && next[moduleIndex]) {
+      next[moduleIndex].done.add(lessonIndex);
+    }
+  }
+
+  for (const quiz of quizResults) {
+    const moduleIndex = Number(quiz?.module_index);
+    if (!Number.isInteger(moduleIndex) || !next[moduleIndex]) continue;
+    next[moduleIndex].score = Number.isInteger(quiz?.score) ? quiz.score : null;
+    next[moduleIndex].passed = Boolean(quiz?.passed);
+  }
+
+  return next;
+}
+
 // ─── STYLES ────────────────────────────────────────────────────────────────
 const CSS = `
   ${FONTS}
@@ -1051,9 +1078,8 @@ export default function IronVaultAcademy(){
   const [paymentChecked, setPaymentChecked] = useState(false);
 
   // Progress
-  const [progress, setProgress] = useState(
-    MODULES.map(()=>({done:new Set(),score:null,passed:false}))
-  );
+  const [progress, setProgress] = useState(createEmptyProgress());
+  const [progressHydrated, setProgressHydrated] = useState(false);
 
   // Quiz
   const [answers, setAnswers] = useState({});
@@ -1064,6 +1090,7 @@ export default function IronVaultAcademy(){
     if (!ready || !authenticated || !user?.id) return;
 
     let cancelled = false;
+    setProgressHydrated(false);
 
     fetch("/api/check-payment", {
       method: "POST",
@@ -1080,7 +1107,25 @@ export default function IronVaultAcademy(){
         setModulesUnlocked(unlocked);
 
         if (hasPaid) {
-          setPaymentChecked(true);
+          fetch("/api/education-progress", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "get", userId: user.id }),
+          })
+            .then((response) => response.json())
+            .then((progressData) => {
+              if (cancelled) return;
+              setProgress(hydrateProgress(progressData));
+            })
+            .catch(() => {
+              if (cancelled) return;
+              setProgress(createEmptyProgress());
+            })
+            .finally(() => {
+              if (cancelled) return;
+              setPaymentChecked(true);
+              setProgressHydrated(true);
+            });
           return;
         }
 
@@ -1131,6 +1176,14 @@ export default function IronVaultAcademy(){
       next[mi].done.add(li);
       return next;
     });
+
+    if (user?.id) {
+      fetch("/api/education-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "lesson", userId: user.id, moduleIndex: mi, lessonIndex: li }),
+      }).catch(() => {});
+    }
   }
 
   function startQuiz(){
@@ -1152,6 +1205,15 @@ export default function IronVaultAcademy(){
         next[modIdx].score=score; next[modIdx].passed=passed;
         return next;
       });
+
+      if (user?.id) {
+        fetch("/api/education-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "quiz", userId: user.id, moduleIndex: modIdx, score, passed }),
+        }).catch(() => {});
+      }
+
       if(passed){setConfetti(true);setTimeout(()=>setConfetti(false),4000);}
       setView("results");
     }
@@ -1181,7 +1243,7 @@ export default function IronVaultAcademy(){
     );
   }
 
-  if(!paymentChecked || !paid) {
+  if(!paymentChecked || !paid || !progressHydrated) {
     return(
       <div className="iv">
         <style>{CSS}</style>
@@ -1210,7 +1272,7 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
-          <div className="iv-chip" onClick={async()=>{ await logout(); setProgress(MODULES.map(()=>({done:new Set(),score:null,passed:false}))); }}>
+          <div className="iv-chip" onClick={async()=>{ await logout(); setProgress(createEmptyProgress()); setProgressHydrated(false); }}>
             👤 {displayName}{displayEmail ? ` · ${displayEmail}` : ""} · Sign Out
           </div>
         </header>
