@@ -92,18 +92,7 @@ export async function POST(req: NextRequest) {
   const supabase = getSupabase()
 
   try {
-    // Idempotency check — provider_session_id stores the Stripe session ID
-    const { data: existing } = await supabase
-      .from('iv_payments')
-      .select('id, paid')
-      .eq('provider_session_id', session.id)
-      .maybeSingle()
-
-    if (existing?.paid) {
-      return NextResponse.json({ received: true })
-    }
-
-    // Read existing confirmed modules for this user
+    // Read existing confirmed modules for this user so we can merge them
     const { data: existingRows, error: readError } = await supabase
       .from('iv_payments')
       .select('modules_unlocked')
@@ -122,7 +111,7 @@ export async function POST(req: NextRequest) {
 
     const now = new Date().toISOString()
 
-    const { error: upsertError } = await supabase.from('iv_payments').insert({
+    const { error: insertError } = await supabase.from('iv_payments').insert({
       user_id: userId,
       privy_user_id: userId,
       tier,
@@ -136,8 +125,12 @@ export async function POST(req: NextRequest) {
       updated_at: now,
     })
 
-    if (upsertError) {
-      console.error('webhook: supabase insert failed', { code: upsertError.code })
+    if (insertError) {
+      // Unique constraint on provider_session_id — event already processed
+      if (insertError.code === '23505') {
+        return NextResponse.json({ received: true })
+      }
+      console.error('webhook: supabase insert failed', { code: insertError.code })
       return NextResponse.json({ error: 'Failed to record payment' }, { status: 500 })
     }
 

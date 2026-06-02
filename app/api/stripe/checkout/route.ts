@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required field: userId' }, { status: 400 })
     }
 
-    if (!tier || !(tier in TIER_CONFIG)) {
+    if (!tier || !Object.hasOwn(TIER_CONFIG, tier)) {
       return NextResponse.json({ error: `Invalid tier: ${tier}` }, { status: 400 })
     }
 
@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
     const stripePriceId = requireEnv(config.priceEnv)
 
     let modulesToUnlock: string[]
+    let cancelUrl = `${baseUrl}/learn/pay`
 
     if (tier === 'ENTRY') {
       const moduleNum = Number(selectedModule)
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'ENTRY tier requires a valid selectedModule (1–6)' }, { status: 400 })
       }
       modulesToUnlock = [`module_${moduleNum}`]
+      cancelUrl = `${baseUrl}/learn/pay?module=${moduleNum}`
     } else {
       modulesToUnlock = [...ALL_MODULES]
     }
@@ -70,7 +72,7 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       line_items: [{ price: stripePriceId, quantity: 1 }],
       success_url: `${baseUrl}/learn?payment=success`,
-      cancel_url: `${baseUrl}/learn/pay`,
+      cancel_url: cancelUrl,
       client_reference_id: userId,
       metadata: {
         userId,
