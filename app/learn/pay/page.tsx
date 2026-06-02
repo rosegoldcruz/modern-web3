@@ -1,10 +1,8 @@
 'use client'
 
 import { usePrivy } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import { PublicKey } from '@solana/web3.js'
 import { PrivyAuthProvider } from '@/components/privy-auth-provider'
 import { getPaymentTiers, type PaymentTier } from '@/lib/payment-tiers'
 
@@ -164,20 +162,17 @@ const CSS = `
   }
 `
 
-const TIERS = getPaymentTiers(process.env.NEXT_PUBLIC_ENABLE_USDC_TEST_PAYMENT === 'true')
+const TIERS = getPaymentTiers(false)
 
-function getTreasuryWallet() {
-  const value = process.env.NEXT_PUBLIC_USDC_TREASURY_WALLET
-  if (!value) {
-    throw new Error('Missing required env var: NEXT_PUBLIC_USDC_TREASURY_WALLET')
-  }
-  new PublicKey(value)
-  return value
+const TIER_NAME_MAP: Record<string, string> = {
+  MODULE: 'ENTRY',
+  STARTER: 'FOUNDATION',
+  BUILDER: 'BUILDER_ACCELERATOR',
+  FOUNDER: 'FOUNDER_ELITE',
 }
 
 function PayPageContent() {
   const { user, authenticated, ready, login } = usePrivy()
-  const { fundWallet } = useFundWallet()
   const router = useRouter()
   const searchParams = useSearchParams()
   const requestedModule = Number(searchParams.get('module'))
@@ -208,91 +203,42 @@ function PayPageContent() {
       .catch(() => setChecking(false))
   }, [ready, authenticated, user, router, searchParams, selectedModule])
 
-  const pollPaymentStatus = async (paymentId: string) => {
-    for (let attempt = 0; attempt < 24; attempt += 1) {
-      setStatus(attempt === 0 ? 'Payment pending' : 'Waiting for treasury confirmation...')
-
-      const response = await fetch('/api/check-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user?.id, paymentId }),
-      })
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error ?? 'Payment failed')
-      }
-
-      if (data.status === 'confirmed' && data.paid) {
-        setStatus('Learning access unlocked')
-        router.replace('/learn/dashboard')
-        return true
-      }
-
-      if (data.status === 'delayed') {
-        setStatus('Verification delayed/manual review required')
-        return false
-      }
-
-      if (data.status === 'failed') {
-        throw new Error(data.error ?? 'Payment failed')
-      }
-
-      await new Promise((resolve) => window.setTimeout(resolve, 5000))
-    }
-
-    setStatus('Verification delayed/manual review required')
-    return false
-  }
-
-  const handleFund = async (tier: PaymentTier) => {
+  const handleStripeCheckout = async (tier: PaymentTier) => {
     if (!authenticated) { login(); return }
 
+    const stripeTier = TIER_NAME_MAP[tier.name]
+    if (!stripeTier) {
+      alert(`Unknown tier: ${tier.name}`)
+      return
+    }
+
     setFunding(true)
-    setStatus('Opening secure USDC checkout...')
+    setStatus('▸ REDIRECTING TO CHECKOUT...')
 
     try {
-      const treasuryWallet = getTreasuryWallet()
-      const pendingResponse = await fetch('/api/create-payment', {
+      const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user?.id,
-          tier: tier.name,
-          amount: tier.price,
+          tier: stripeTier,
           selectedModule,
         }),
       })
-      const pendingPayment = await pendingResponse.json()
+      const data = await res.json()
 
-      if (!pendingResponse.ok) {
-        throw new Error(pendingPayment.error ?? 'Payment failed')
+      if (data.url) {
+        window.location.href = data.url
+        return
       }
 
-      if (pendingPayment.destinationWallet !== treasuryWallet) {
-        throw new Error('Frontend and backend treasury wallets do not match')
-      }
-
-      await fundWallet({
-        address: treasuryWallet,
-        options: {
-          amount: tier.usdcAmount,
-          asset: 'USDC',
-          chain: 'solana:mainnet',
-          card: { preferredProvider: 'coinbase' },
-        },
-      })
-
-      setStatus('Waiting for treasury confirmation...')
-      await pollPaymentStatus(pendingPayment.paymentId)
-
+      throw new Error(data.error ?? 'Failed to create checkout session')
     } catch (e: any) {
       console.error(e)
-      setStatus('Payment failed')
+      setFunding(false)
+      setStatus('')
       alert(e?.message ?? 'Payment failed. Please try again.')
     }
-
-    setFunding(false)
   }
 
   if (checking) return (
@@ -310,7 +256,7 @@ function PayPageContent() {
         <div className="pv-eyebrow">▸ FOUNDING MEMBER ACCESS</div>
         <h1 className="pv-h1">Choose Your Track</h1>
         <p className="pv-sub">
-          Pay by card with secure USDC checkout. Access unlocks after treasury confirmation.
+          Pay by card with secure checkout. Access unlocks after payment confirmation.
         </p>
 
         {funding && <div className="pv-status">{status}</div>}
@@ -335,7 +281,7 @@ function PayPageContent() {
                 <div className="pv-desc">{description}</div>
                 <div className="pv-divider" />
                 <button
-                  onClick={() => handleFund(tier)}
+                  onClick={() => handleStripeCheckout(tier)}
                   disabled={funding}
                   className={`pv-btn ${featured ? 'pv-btn-lime' : 'pv-btn-ghost'}`}
                 >
