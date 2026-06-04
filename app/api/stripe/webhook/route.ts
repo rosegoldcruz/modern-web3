@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
 
 const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'] as const
 type Module = typeof ALL_MODULES[number]
@@ -133,6 +134,8 @@ export async function POST(req: NextRequest) {
       console.error('webhook: supabase insert failed', { code: insertError.code })
       return NextResponse.json({ error: 'Failed to record payment' }, { status: 500 })
     }
+
+    await syncUserProfileFromPayment(userId, tier)
 
     return NextResponse.json({ received: true })
   } catch (e: unknown) {

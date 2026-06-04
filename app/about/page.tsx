@@ -86,7 +86,7 @@ export default function AboutPage() {
                 Education first. Always.
               </h2>
               <p className="mb-4 text-base leading-relaxed text-white/60 sm:text-lg">
-                The Iron Vault Token is not a get-rich-quick scheme. It is the utility layer of a financial education ecosystem being built to last. Before anyone participates in the token, they complete a curriculum that teaches them exactly what they're getting into.
+                The Iron Vault Token is not a get-rich-quick scheme. It is the utility layer of a financial education ecosystem being built to last. Before anyone participates in the token, they complete a curriculum that teaches them exactly what they&apos;re getting into.
               </p>
               <p className="text-base leading-relaxed text-white/60 sm:text-lg">
                 Complete the coursework modules &rarr; receive IV-SOL automatically. It&apos;s that simple.

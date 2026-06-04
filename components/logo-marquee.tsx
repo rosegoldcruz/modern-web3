@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 
+type LogoItem = {
+  name: string
+  content: string
+  color: string
+  bg?: string
+  image?: string
+}
+
 export function LogoMarquee() {
   const [pausedRow, setPausedRow] = useState<string | null>(null)
   const [isInView, setIsInView] = useState(true)
@@ -48,7 +56,7 @@ export function LogoMarquee() {
     { name: "Medium", content: "M", color: "text-neutral-300" },
   ]
 
-  const LogoCard = ({ logo, rowId }: { logo: any; rowId: string }) => (
+  const LogoCard = ({ logo, rowId }: { logo: LogoItem; rowId: string }) => (
     <div
       className="flex-shrink-0 mx-3"
       onMouseEnter={() => setPausedRow(rowId)}

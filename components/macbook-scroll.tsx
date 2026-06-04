@@ -299,8 +299,8 @@ function Keypad() {
           <span className="block">;</span>
         </KBtn>
         <KBtn>
-          <span className="block">\"</span>
-          <span className="block">'</span>
+          <span className="block">&quot;</span>
+          <span className="block">&apos;</span>
         </KBtn>
         <KBtn className="w-[2.85rem] items-end justify-end pb-[2px] pr-[4px]" childrenClassName="items-end">
           return

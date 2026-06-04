@@ -205,6 +205,7 @@ export const Plasma: React.FC<PlasmaProps> = ({
     let stopped = false
     let lastTime = 0
     const t0 = performance.now()
+    const uniformRecord = program.uniforms as Record<string, { value: number }>
     const loop = (t: number) => {
       if (stopped || document.visibilityState === "hidden") {
         raf = requestAnimationFrame(loop)
@@ -217,9 +218,9 @@ export const Plasma: React.FC<PlasmaProps> = ({
         const timeValue = (t - t0) * 0.001
         if (direction === "pingpong") {
           const cycle = Math.sin(timeValue * 0.5) * directionMultiplier
-          ;(program.uniforms.uDirection as any).value = cycle
+          uniformRecord.uDirection.value = cycle
         }
-        ;(program.uniforms.iTime as any).value = timeValue
+        uniformRecord.iTime.value = timeValue
         renderer.render({ scene: mesh })
         lastTime = t
       }

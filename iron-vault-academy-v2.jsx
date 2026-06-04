@@ -1299,6 +1299,9 @@ export default function IronVaultAcademy(){
             <div className="iv-xp-track"><div className="iv-xp-fill" style={{width:`${(totalXP/TOTAL_XP)*100}%`}}/></div>
             <span className="iv-xp-val">{totalXP.toLocaleString()}</span>
           </div>
+          <Link href="/learn/backoffice" className="iv-chip" style={{textDecoration:"none"}}>
+            Vault Backoffice
+          </Link>
           <div className="iv-chip" onClick={async()=>{ await logout(); setProgress(createEmptyProgress()); setProgressHydrated(false); }}>
             👤 {displayName}{displayEmail ? ` · ${displayEmail}` : ""} · Sign Out
           </div>

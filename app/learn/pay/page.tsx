@@ -233,11 +233,12 @@ function PayPageContent() {
       }
 
       throw new Error(data.error ?? 'Failed to create checkout session')
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e)
       setFunding(false)
       setStatus('')
-      alert(e?.message ?? 'Payment failed. Please try again.')
+      const message = e instanceof Error ? e.message : 'Payment failed. Please try again.'
+      alert(message)
     }
   }
 

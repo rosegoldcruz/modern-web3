@@ -104,7 +104,7 @@ export default function LearnPage() {
         {/* TERMINAL PREVIEW — operator console, not dashboard */}
         <section className="mx-auto max-w-5xl px-4 pb-32 sm:px-8">
           <div className="lv-mono mb-6 flex items-center justify-between text-[10px] tracking-[0.3em] text-white/30">
-            <span>// OPERATOR_CONSOLE</span>
+            <span>{"// OPERATOR_CONSOLE"}</span>
             <span>VIEW: SAMPLE</span>
           </div>
 
@@ -152,7 +152,7 @@ export default function LearnPage() {
             <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="lv-mono mb-4 text-[10px] tracking-[0.35em] text-white/40">
-                  // ACCESS_TIERS
+                  {"// ACCESS_TIERS"}
                 </p>
                 <h2 className="lv-display text-5xl text-white sm:text-7xl">
                   CLEARANCE PATHS
@@ -204,7 +204,7 @@ export default function LearnPage() {
 
         {/* PROTOCOL — minimal, terminal style */}
         <section className="mx-auto max-w-5xl px-4 py-28 sm:px-8">
-          <p className="lv-mono mb-4 text-[10px] tracking-[0.35em] text-white/40">// PROTOCOL</p>
+          <p className="lv-mono mb-4 text-[10px] tracking-[0.35em] text-white/40">{"// PROTOCOL"}</p>
           <h2 className="lv-display mb-16 text-5xl text-white sm:text-7xl">
             SIX MODULES.
             <br />
@@ -232,7 +232,7 @@ export default function LearnPage() {
         <section className="border-t border-white/[0.06]">
           <div className="mx-auto max-w-4xl px-4 py-32 text-center sm:px-8">
             <p className="lv-mono mb-8 text-[10px] tracking-[0.35em] text-white/40">
-              // TERMINAL_AWAITING
+              {"// TERMINAL_AWAITING"}
             </p>
             <h2 className="lv-display text-balance text-5xl leading-[0.95] text-white sm:text-7xl">
               THE VAULT OPENS

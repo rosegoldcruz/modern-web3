@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { ALL_MODULES, getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
+import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
 
 function getSupabase() {
   return createClient(
@@ -196,6 +197,9 @@ async function verifyPendingPayment(userId: string, paymentId: string) {
     payment = data
 
     if (payment.status === 'confirmed') {
+      if (payment.tier) {
+        await syncUserProfileFromPayment(userId, payment.tier)
+      }
       return NextResponse.json({ paid: true, status: 'confirmed', modulesUnlocked: payment.modules_unlocked ?? [] })
     }
 
@@ -217,6 +221,11 @@ async function verifyPendingPayment(userId: string, paymentId: string) {
 
     if (existing) {
       const ownsExistingPayment = existing.id === payment.id || existing.privy_user_id === userId || existing.user_id === userId
+
+      if (ownsExistingPayment && payment.tier) {
+        await syncUserProfileFromPayment(userId, payment.tier)
+      }
+
       return NextResponse.json({
         paid: ownsExistingPayment,
         status: ownsExistingPayment ? 'confirmed' : 'pending',
@@ -262,6 +271,10 @@ async function verifyPendingPayment(userId: string, paymentId: string) {
       .eq('status', 'pending')
 
     if (updateError) throw updateError
+
+    if (payment.tier) {
+      await syncUserProfileFromPayment(userId, payment.tier)
+    }
 
     return NextResponse.json({ paid: true, status: 'confirmed', modulesUnlocked })
   } catch (error: unknown) {

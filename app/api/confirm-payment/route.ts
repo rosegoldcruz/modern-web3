@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
+import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
 
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 
@@ -125,6 +126,8 @@ export async function POST(req: NextRequest) {
     })
 
     if (error) throw error
+
+    await syncUserProfileFromPayment(userId, tier)
 
     return NextResponse.json({ success: true, modulesUnlocked })
   } catch (e: unknown) {

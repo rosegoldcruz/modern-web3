@@ -289,7 +289,7 @@ export function OrderForm({ isOpen, onClose, selectedPackage }: OrderFormProps) 
             <div className="space-y-6">
               <div className="text-center">
                 <h3 className="text-xl font-semibold text-white mb-2">Confirm Your Package</h3>
-                <p className="text-neutral-400">Let's make sure we have the right package for you</p>
+                <p className="text-neutral-400">Let&apos;s make sure we have the right package for you</p>
               </div>
 
               <Card className="glass-border-subtle border-neutral-800 bg-neutral-900/50">
@@ -315,7 +315,7 @@ export function OrderForm({ isOpen, onClose, selectedPackage }: OrderFormProps) 
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-white">Do you have a 3D model?</h4>
                   <p className="text-neutral-400">
-                    If you don't have a 3D model, we can create one for you at an additional cost.
+                    If you don&apos;t have a 3D model, we can create one for you at an additional cost.
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <Button
