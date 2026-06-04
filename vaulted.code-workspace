@@ -2,6 +2,15 @@
     "folders": [
         {
             "path": "."
+        },
+        {
+            "path": "../info.ironvaulttoken.com"
+        },
+        {
+            "path": "../member.ironvaulttoken.com"
         }
-    ]
+    ],
+    "settings": {
+        "powershell.cwd": "ironvaulttoken.com"
+    }
 }
