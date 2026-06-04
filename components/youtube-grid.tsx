@@ -11,6 +11,7 @@ type YouTubeGridProps = {
 
 type YTPlayerLike = {
   destroy?: () => void
+  playVideo: () => void
   pauseVideo: () => void
 }
 
