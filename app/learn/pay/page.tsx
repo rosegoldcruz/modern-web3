@@ -3,7 +3,6 @@
 import { usePrivy } from '@privy-io/react-auth'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import { PrivyAuthProvider } from '@/components/privy-auth-provider'
 import { getPaymentTiers, type PaymentTier } from '@/lib/payment-tiers'
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`
@@ -315,15 +314,13 @@ function PayPageContent() {
 
 export default function PayPage() {
   return (
-    <PrivyAuthProvider>
-      <Suspense fallback={
-        <div className="pv-loading">
-          <style>{CSS}</style>
-          Checking access...
-        </div>
-      }>
-        <PayPageContent />
-      </Suspense>
-    </PrivyAuthProvider>
+    <Suspense fallback={
+      <div className="pv-loading">
+        <style>{CSS}</style>
+        Checking access...
+      </div>
+    }>
+      <PayPageContent />
+    </Suspense>
   )
 }

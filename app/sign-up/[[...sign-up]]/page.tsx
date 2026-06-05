@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { PrivyAuthProvider } from "@/components/privy-auth-provider"
 import { PrivySignUpCard } from "@/components/privy-sign-up-card"
 
 export default function SignUpPage() {
@@ -20,9 +19,5 @@ export default function SignUpPage() {
     )
   }
 
-  return (
-    <PrivyAuthProvider>
-      <PrivySignUpCard />
-    </PrivyAuthProvider>
-  )
+  return <PrivySignUpCard />
 }
