@@ -4,6 +4,8 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { ALL_MODULES, getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
 import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
+import { requirePrivyUser } from '@/lib/server/privy-auth'
+import { hasActiveMemberEntitlement } from '@/lib/server/member-entitlements'
 
 function getSupabase() {
   return createClient(
@@ -286,14 +288,53 @@ async function verifyPendingPayment(userId: string, paymentId: string) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, paymentId } = await req.json()
+    const body = await req.json()
+    const { userId, paymentId } = body
 
-    if (!userId) {
+    let auth: { privyUserId: string; email: string | null; walletAddress: string | null } | null = null
+    try {
+      auth = await requirePrivyUser(req)
+    } catch {
+      auth = null
+    }
+
+    const effectiveUserId = auth?.privyUserId ?? (typeof userId === 'string' ? userId : null)
+
+    if (!effectiveUserId) {
       return NextResponse.json({ paid: false, status: 'sign_in_required', modulesUnlocked: [] })
     }
 
+    const entitlementAccess = await hasActiveMemberEntitlement({
+      privyUserId: effectiveUserId,
+      email: auth?.email ?? null,
+      walletAddress: auth?.walletAddress ?? null,
+    })
+
+    if (entitlementAccess && !paymentId) {
+      return NextResponse.json({
+        paid: true,
+        hasEntitlement: true,
+        status: 'confirmed',
+        modulesUnlocked: [...ALL_MODULES],
+      })
+    }
+
     if (paymentId) {
-      return await verifyPendingPayment(userId, paymentId)
+      const pendingResult = await verifyPendingPayment(effectiveUserId, paymentId)
+      if (!entitlementAccess) {
+        return pendingResult
+      }
+
+      const payload = await pendingResult.json().catch(() => null)
+      return NextResponse.json({
+        ...(payload ?? {}),
+        paid: true,
+        hasEntitlement: true,
+        status: payload?.status === 'confirmed' ? 'confirmed' : 'confirmed',
+        modulesUnlocked: Array.isArray(payload?.modulesUnlocked) && payload.modulesUnlocked.length > 0
+          ? payload.modulesUnlocked
+          : [...ALL_MODULES],
+      })
     }
 
     const supabase = getSupabase()
@@ -307,8 +348,9 @@ export async function POST(req: NextRequest) {
       const modulesUnlocked = aggregateModules(data ?? [])
 
       return NextResponse.json({
-        paid: Boolean(data?.length),
-        status: data?.length ? 'confirmed' : 'none',
+        paid: Boolean(data?.length) || entitlementAccess,
+        hasEntitlement: entitlementAccess,
+        status: data?.length || entitlementAccess ? 'confirmed' : 'none',
         modulesUnlocked,
       })
     }
@@ -322,8 +364,9 @@ export async function POST(req: NextRequest) {
     const modulesUnlocked = aggregateModules(legacyData ?? [])
 
     return NextResponse.json({
-      paid: Boolean(legacyData?.length),
-      status: legacyData?.length ? 'confirmed' : 'none',
+      paid: Boolean(legacyData?.length) || entitlementAccess,
+      hasEntitlement: entitlementAccess,
+      status: legacyData?.length || entitlementAccess ? 'confirmed' : 'none',
       modulesUnlocked,
     })
   } catch (e: unknown) {

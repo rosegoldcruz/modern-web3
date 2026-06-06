@@ -1,0 +1,212 @@
+import { getSupabaseAdmin } from '@/lib/server/supabase-admin'
+
+type EntitlementStatus = 'active' | 'revoked' | 'expired'
+
+type MemberEntitlementRow = {
+  id: string
+  status: EntitlementStatus
+  expires_at: string | null
+}
+
+export type GrantStripeMemberEntitlementInput = {
+  email?: string | null
+  walletAddress?: string | null
+  privyUserId?: string | null
+  stripeCustomerId?: string | null
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  paymentTier?: string | null
+  metadata?: Record<string, unknown>
+}
+
+export type GrantStripeMemberEntitlementResult = {
+  entitlementId: string | null
+  alreadyExists: boolean
+}
+
+export type MemberEntitlementIdentityInput = {
+  privyUserId?: string | null
+  email?: string | null
+  walletAddress?: string | null
+}
+
+function normalizeOptional(value: string | null | undefined): string | null {
+  if (!value) return null
+  const normalized = value.trim()
+  return normalized.length > 0 ? normalized : null
+}
+
+function normalizeEmail(value: string | null | undefined): string | null {
+  const normalized = normalizeOptional(value)
+  return normalized ? normalized.toLowerCase() : null
+}
+
+function normalizeWalletAddress(value: string | null | undefined): string | null {
+  const normalized = normalizeOptional(value)
+  return normalized ? normalized.toLowerCase() : null
+}
+
+function isMissingTableError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const maybeError = error as { code?: string; message?: string }
+  return maybeError.code === '42P01' || maybeError.message?.includes('iv_member_entitlements') === true
+}
+
+async function assertMemberEntitlementsTableExists(): Promise<void> {
+  const { error } = await getSupabaseAdmin().from('iv_member_entitlements').select('id').limit(1)
+  if (!error) return
+
+  if (isMissingTableError(error)) {
+    throw new Error('Missing required table: iv_member_entitlements')
+  }
+
+  throw error
+}
+
+function isActiveEntitlement(entitlement: MemberEntitlementRow): boolean {
+  if (entitlement.status !== 'active') return false
+  if (!entitlement.expires_at) return true
+
+  const expiresAtMs = Date.parse(entitlement.expires_at)
+  if (Number.isNaN(expiresAtMs)) return true
+  return expiresAtMs > Date.now()
+}
+
+async function findExistingByStripeReference(
+  column: 'stripe_checkout_session_id' | 'stripe_payment_intent_id',
+  value: string,
+): Promise<MemberEntitlementRow | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('iv_member_entitlements')
+    .select('id,status,expires_at')
+    .eq(column, value)
+    .order('granted_at', { ascending: false })
+    .limit(1)
+
+  if (error) throw error
+  if (!data || data.length === 0) return null
+  return data[0] as MemberEntitlementRow
+}
+
+async function findActiveEntitlement(
+  column: 'privy_user_id' | 'email' | 'wallet_address',
+  value: string,
+): Promise<MemberEntitlementRow | null> {
+  const nowIso = new Date().toISOString()
+  const { data, error } = await getSupabaseAdmin()
+    .from('iv_member_entitlements')
+    .select('id,status,expires_at')
+    .eq(column, value)
+    .eq('status', 'active')
+    .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
+    .order('granted_at', { ascending: false })
+    .limit(1)
+
+  if (error) throw error
+  if (!data || data.length === 0) return null
+  return data[0] as MemberEntitlementRow
+}
+
+export async function hasActiveMemberEntitlement(input: MemberEntitlementIdentityInput): Promise<boolean> {
+  const identity = {
+    privyUserId: normalizeOptional(input.privyUserId),
+    email: normalizeEmail(input.email),
+    walletAddress: normalizeWalletAddress(input.walletAddress),
+  }
+
+  await assertMemberEntitlementsTableExists()
+
+  const checks: Array<Promise<MemberEntitlementRow | null>> = []
+
+  if (identity.privyUserId) {
+    checks.push(findActiveEntitlement('privy_user_id', identity.privyUserId))
+  }
+
+  if (identity.email) {
+    checks.push(findActiveEntitlement('email', identity.email))
+  }
+
+  if (identity.walletAddress) {
+    checks.push(findActiveEntitlement('wallet_address', identity.walletAddress))
+  }
+
+  for (const check of checks) {
+    const entitlement = await check
+    if (entitlement && isActiveEntitlement(entitlement)) return true
+  }
+
+  return false
+}
+
+export async function grantStripeMemberEntitlement(
+  input: GrantStripeMemberEntitlementInput,
+): Promise<GrantStripeMemberEntitlementResult> {
+  const identity = {
+    privyUserId: normalizeOptional(input.privyUserId),
+    email: normalizeEmail(input.email),
+    walletAddress: normalizeWalletAddress(input.walletAddress),
+  }
+
+  if (!identity.privyUserId && !identity.email && !identity.walletAddress) {
+    throw new Error('Missing required identity: privyUserId, email, or walletAddress')
+  }
+
+  const stripeCheckoutSessionId = normalizeOptional(input.stripeCheckoutSessionId)
+  const stripePaymentIntentId = normalizeOptional(input.stripePaymentIntentId)
+
+  await assertMemberEntitlementsTableExists()
+
+  if (stripeCheckoutSessionId) {
+    const existingByCheckout = await findExistingByStripeReference('stripe_checkout_session_id', stripeCheckoutSessionId)
+    if (existingByCheckout) {
+      return { entitlementId: existingByCheckout.id, alreadyExists: true }
+    }
+  }
+
+  if (stripePaymentIntentId) {
+    const existingByIntent = await findExistingByStripeReference('stripe_payment_intent_id', stripePaymentIntentId)
+    if (existingByIntent) {
+      return { entitlementId: existingByIntent.id, alreadyExists: true }
+    }
+  }
+
+  if (await hasActiveMemberEntitlement(identity)) {
+    return { entitlementId: null, alreadyExists: true }
+  }
+
+  const metadata: Record<string, unknown> = {
+    ...(input.metadata ?? {}),
+  }
+
+  if (input.paymentTier) {
+    metadata.payment_tier = input.paymentTier
+  }
+
+  const { data, error } = await getSupabaseAdmin()
+    .from('iv_member_entitlements')
+    .insert({
+      source: 'stripe',
+      status: 'active',
+      privy_user_id: identity.privyUserId,
+      email: identity.email,
+      wallet_address: identity.walletAddress,
+      stripe_customer_id: normalizeOptional(input.stripeCustomerId),
+      stripe_checkout_session_id: stripeCheckoutSessionId,
+      stripe_payment_intent_id: stripePaymentIntentId,
+      metadata,
+    })
+    .select('id')
+    .single<{ id: string }>()
+
+  if (error) {
+    if (isMissingTableError(error)) {
+      throw new Error('Missing required table: iv_member_entitlements')
+    }
+    throw error
+  }
+
+  return {
+    entitlementId: data.id,
+    alreadyExists: false,
+  }
+}

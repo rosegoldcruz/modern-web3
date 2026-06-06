@@ -5,7 +5,7 @@ import { ArrowRight, GraduationCap, Vault, Users, LifeBuoy, Star } from 'lucide-
 import { useBackofficeAuth } from '@/hooks/useBackofficeAuth'
 
 const quickLinks = [
-  { href: '/learn/academy', title: 'Continue Academy', desc: 'Resume your Iron Vault curriculum and earn XP.', icon: GraduationCap, accent: 'lime' },
+  { href: 'https://member.ironvaulttoken.com/dashboard', title: 'Continue Academy', desc: 'Resume your Iron Vault curriculum and earn XP.', icon: GraduationCap, accent: 'lime' },
   { href: '/learn/vault', title: 'Open Vault', desc: 'View your position matrix, investments, and referral stats.', icon: Vault, accent: 'purple' },
   { href: '/learn/referrals', title: 'Refer a Friend', desc: 'Share your referral link and submit new leads.', icon: Users, accent: 'lime' },
   { href: '/learn/status', title: 'Submit Status Request', desc: 'Open a support ticket with the Iron Vault team.', icon: LifeBuoy, accent: 'purple' },

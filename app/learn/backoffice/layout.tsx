@@ -1,16 +1,9 @@
 import type { ReactNode } from 'react'
-import { PrivyAuthProvider } from '@/components/privy-auth-provider'
-import { BackofficeProvider } from '@/components/backoffice/BackofficeProvider'
-import { BackofficeLayout } from '@/components/backoffice/BackofficeLayout'
+import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
 export default function LearnBackofficeLayout({ children }: { children: ReactNode }) {
-  return (
-    <PrivyAuthProvider>
-      <BackofficeProvider>
-        <BackofficeLayout>{children}</BackofficeLayout>
-      </BackofficeProvider>
-    </PrivyAuthProvider>
-  )
+  void children
+  redirect('https://member.ironvaulttoken.com/dashboard')
 }

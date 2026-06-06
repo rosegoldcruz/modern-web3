@@ -36,7 +36,8 @@ function requireEnv(name: string): string {
 export async function POST(req: NextRequest) {
   try {
     const stripeSecretKey = requireEnv('STRIPE_SECRET_KEY')
-    const baseUrl = requireEnv('NEXT_PUBLIC_BASE_URL')
+    const successUrl = process.env.STRIPE_CHECKOUT_SUCCESS_URL?.trim() || 'https://member.ironvaulttoken.com/dashboard'
+    const cancelUrl = process.env.STRIPE_CHECKOUT_CANCEL_URL?.trim() || 'https://ironvaulttoken.com/learn'
 
     const body = await req.json()
     const { userId, tier, selectedModule } = body
@@ -53,7 +54,6 @@ export async function POST(req: NextRequest) {
     const stripePriceId = requireEnv(config.priceEnv)
 
     let modulesToUnlock: string[]
-    let cancelUrl = `${baseUrl}/learn/pay`
 
     if (tier === 'ENTRY') {
       const moduleNum = Number(selectedModule)
@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'ENTRY tier requires a valid selectedModule (1–6)' }, { status: 400 })
       }
       modulesToUnlock = [`module_${moduleNum}`]
-      cancelUrl = `${baseUrl}/learn/pay?module=${moduleNum}`
     } else {
       modulesToUnlock = [...ALL_MODULES]
     }
@@ -71,7 +70,7 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [{ price: stripePriceId, quantity: 1 }],
-      success_url: `${baseUrl}/learn?payment=success`,
+      success_url: successUrl,
       cancel_url: cancelUrl,
       client_reference_id: userId,
       metadata: {

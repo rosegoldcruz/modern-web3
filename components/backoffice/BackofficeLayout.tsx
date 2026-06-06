@@ -26,8 +26,8 @@ type NavItem = {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/learn/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/learn/academy', label: 'Academy', icon: GraduationCap },
+  { href: 'https://member.ironvaulttoken.com/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: 'https://member.ironvaulttoken.com/dashboard', label: 'Academy', icon: GraduationCap },
   { href: '/learn/vault', label: 'Vault', icon: Vault },
   { href: '/learn/referrals', label: 'Referrals', icon: Users },
   { href: '/learn/vip', label: 'VIP', icon: Star },
@@ -42,7 +42,7 @@ function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
     <nav className="space-y-1">
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon
-        const isActive = pathname === item.href || (item.href !== '/learn/dashboard' && pathname.startsWith(`${item.href}/`))
+        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
         return (
           <Link

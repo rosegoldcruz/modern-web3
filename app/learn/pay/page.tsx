@@ -1,7 +1,7 @@
 'use client'
 
 import { usePrivy } from '@privy-io/react-auth'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import { PrivyAuthProvider } from '@/components/privy-auth-provider'
 import { getPaymentTiers, type PaymentTier } from '@/lib/payment-tiers'
@@ -172,8 +172,7 @@ const TIER_NAME_MAP: Record<string, string> = {
 }
 
 function PayPageContent() {
-  const { user, authenticated, ready, login } = usePrivy()
-  const router = useRouter()
+  const { user, authenticated, ready, login, getAccessToken } = usePrivy()
   const searchParams = useSearchParams()
   const requestedModule = Number(searchParams.get('module'))
   const selectedModule = Number.isInteger(requestedModule)
@@ -186,22 +185,47 @@ function PayPageContent() {
   useEffect(() => {
     if (!ready) return
     if (!authenticated) { setChecking(false); return }
-    fetch('/api/check-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user?.id })
-    })
-      .then(r => r.json())
-      .then(d => {
+
+    let cancelled = false
+
+    ;(async () => {
+      try {
+        const token = await getAccessToken()
+        const headers: HeadersInit = { 'Content-Type': 'application/json' }
+        if (token) {
+          headers.Authorization = `Bearer ${token}`
+        }
+
+        const response = await fetch('/api/check-payment', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ userId: user?.id }),
+        })
+
+        const data = await response.json()
         const targetModule = `module_${selectedModule}`
-        const alreadyUnlocked = d.modulesUnlocked?.includes(targetModule)
+        const alreadyUnlocked = data.modulesUnlocked?.includes(targetModule)
         const isTargetedModulePurchase = searchParams.has('module')
 
-        if (d.paid && (!isTargetedModulePurchase || alreadyUnlocked)) router.replace('/learn/dashboard')
-        else setChecking(false)
-      })
-      .catch(() => setChecking(false))
-  }, [ready, authenticated, user, router, searchParams, selectedModule])
+        if (!cancelled && data.paid && (!isTargetedModulePurchase || alreadyUnlocked)) {
+          window.location.href = 'https://member.ironvaulttoken.com/dashboard'
+          return
+        }
+
+        if (!cancelled) {
+          setChecking(false)
+        }
+      } catch {
+        if (!cancelled) {
+          setChecking(false)
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [ready, authenticated, user, searchParams, selectedModule, getAccessToken])
 
   const handleStripeCheckout = async (tier: PaymentTier) => {
     if (!authenticated) { login(); return }

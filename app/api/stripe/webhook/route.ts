@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
+import { grantStripeMemberEntitlement } from '@/lib/server/member-entitlements'
 
 const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'] as const
 type Module = typeof ALL_MODULES[number]
@@ -61,6 +62,25 @@ export async function POST(req: NextRequest) {
 
   const session = event.data.object as Stripe.Checkout.Session
   const { userId, tier, modulesToUnlock: modulesToUnlockRaw } = session.metadata ?? {}
+  const customerEmail = session.customer_details?.email ?? session.customer_email ?? null
+  const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null
+  const stripePaymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : null
+  const metadataPrivyUserId = session.metadata?.privyUserId ?? session.metadata?.userId ?? null
+  const metadataWalletAddress = session.metadata?.walletAddress ?? session.metadata?.wallet_address ?? null
+
+  const entitlementPayload = {
+    email: customerEmail,
+    walletAddress: metadataWalletAddress,
+    privyUserId: metadataPrivyUserId,
+    stripeCustomerId,
+    stripeCheckoutSessionId: session.id,
+    stripePaymentIntentId,
+    paymentTier: tier ?? null,
+    metadata: {
+      stripe_event_type: event.type,
+      provider: 'stripe',
+    },
+  }
 
   if (!userId || !tier || !modulesToUnlockRaw) {
     console.error('webhook: missing metadata fields', { userId: !!userId, tier: !!tier, modulesToUnlock: !!modulesToUnlockRaw })
@@ -129,11 +149,28 @@ export async function POST(req: NextRequest) {
     if (insertError) {
       // Unique constraint on provider_session_id — event already processed
       if (insertError.code === '23505') {
+        const entitlementResult = await grantStripeMemberEntitlement(entitlementPayload)
+        console.info('stripe webhook entitlement sync', {
+          eventType: event.type,
+          checkoutSessionId: session.id,
+          paymentIntentId: stripePaymentIntentId,
+          alreadyExists: entitlementResult.alreadyExists,
+          entitlementId: entitlementResult.entitlementId,
+        })
         return NextResponse.json({ received: true })
       }
       console.error('webhook: supabase insert failed', { code: insertError.code })
       return NextResponse.json({ error: 'Failed to record payment' }, { status: 500 })
     }
+
+    const entitlementResult = await grantStripeMemberEntitlement(entitlementPayload)
+    console.info('stripe webhook entitlement granted', {
+      eventType: event.type,
+      checkoutSessionId: session.id,
+      paymentIntentId: stripePaymentIntentId,
+      alreadyExists: entitlementResult.alreadyExists,
+      entitlementId: entitlementResult.entitlementId,
+    })
 
     await syncUserProfileFromPayment(userId, tier)
 

@@ -88,6 +88,12 @@ export default function LearnPage() {
               <span className="lv-mono text-[10px] tracking-[0.2em]">▸</span>
             </Link>
             <Link
+              href="https://member.ironvaulttoken.com/dashboard"
+              className="lv-mono inline-flex items-center gap-3 border border-white/15 px-8 py-4 text-[10px] tracking-[0.3em] text-white/60 transition hover:border-white/40 hover:text-white"
+            >
+              MEMBER LOGIN
+            </Link>
+            <Link
               href="/how-it-works"
               className="lv-mono inline-flex items-center gap-3 border border-white/15 px-8 py-4 text-[10px] tracking-[0.3em] text-white/60 transition hover:border-white/40 hover:text-white"
             >

@@ -1,20 +1,5 @@
-"use client"
-
-import dynamic from 'next/dynamic'
-
-const IronVaultAcademy = dynamic(
-  () => import('@/iron-vault-academy-v2'),
-  { ssr: false, loading: () => (
-    <div className="min-h-[400px] grid place-items-center">
-      <p className="text-sm text-zinc-400">Loading Academy...</p>
-    </div>
-  )}
-)
+import { redirect } from 'next/navigation'
 
 export default function AcademyPage() {
-  return (
-    <div className="-mx-4 -my-6 sm:-mx-6 lg:-mx-8">
-      <IronVaultAcademy />
-    </div>
-  )
+  redirect('https://member.ironvaulttoken.com/dashboard')
 }
