@@ -115,6 +115,20 @@ const CSS = `
   }
   .pv-desc{font-size:12px;color:#444;line-height:1.6;margin-bottom:24px;}
   .pv-divider{height:1px;background:#141414;margin-bottom:20px;}
+  .pv-module-picker{margin-bottom:20px;}
+  .pv-module-label{
+    display:block;font-family:'Space Mono',monospace;font-size:8px;
+    letter-spacing:2px;color:#777;margin-bottom:10px;
+  }
+  .pv-module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .pv-module-option{
+    border:1px solid #242424;background:#0A0A0A;color:#777;
+    border-radius:3px;padding:9px 6px;font-family:'Space Mono',monospace;
+    font-size:9px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;
+  }
+  .pv-module-option:hover{border-color:rgba(170,255,0,0.35);color:#E8E8E8;}
+  .pv-module-option.active{border-color:#AAFF00;background:rgba(170,255,0,0.08);color:#AAFF00;}
+  .pv-scope-note{font-size:11px;color:#666;line-height:1.5;margin-bottom:18px;}
   .pv-btn{
     width:100%;border:none;border-radius:3px;
     padding:15px;font-family:'Bebas Neue',sans-serif;
@@ -175,9 +189,10 @@ function PayPageContent() {
   const { user, authenticated, ready, login, getAccessToken } = usePrivy()
   const searchParams = useSearchParams()
   const requestedModule = Number(searchParams.get('module'))
-  const selectedModule = Number.isInteger(requestedModule)
-    ? Math.min(Math.max(requestedModule, 1), 6)
-    : 1
+  const initialModule = Number.isInteger(requestedModule) && requestedModule >= 1 && requestedModule <= 6
+    ? requestedModule
+    : null
+  const [selectedModule, setSelectedModule] = useState<number | null>(initialModule)
   const [checking, setChecking] = useState(true)
   const [funding, setFunding] = useState(false)
   const [status, setStatus] = useState('')
@@ -203,8 +218,8 @@ function PayPageContent() {
         })
 
         const data = await response.json()
-        const targetModule = `module_${selectedModule}`
-        const alreadyUnlocked = data.modulesUnlocked?.includes(targetModule)
+        const targetModule = selectedModule ? `module_${selectedModule}` : null
+        const alreadyUnlocked = targetModule ? data.modulesUnlocked?.includes(targetModule) : false
         const isTargetedModulePurchase = searchParams.has('module')
 
         if (!cancelled && data.paid && (!isTargetedModulePurchase || alreadyUnlocked)) {
@@ -236,6 +251,11 @@ function PayPageContent() {
       return
     }
 
+    if (tier.name === 'MODULE' && !selectedModule) {
+      alert('Choose a module before checkout.')
+      return
+    }
+
     setFunding(true)
     setStatus('▸ REDIRECTING TO CHECKOUT...')
 
@@ -253,7 +273,7 @@ function PayPageContent() {
         },
         body: JSON.stringify({
           tier: stripeTier,
-          selectedModule,
+          ...(tier.name === 'MODULE' ? { module_number: selectedModule } : {}),
         }),
       })
       const data = await res.json()
@@ -295,32 +315,60 @@ function PayPageContent() {
 
         <div className="pv-grid">
           {TIERS.map((tier, i) => {
-            const isRequestedModuleTier = tier.name === 'MODULE' && searchParams.has('module')
-            const featured = tier.name === 'FOUNDER' || isRequestedModuleTier
-            const description = isRequestedModuleTier
-              ? `Unlock Module ${selectedModule} — buy more modules anytime`
+            const isModuleTier = tier.name === 'MODULE'
+            const featured = tier.name === 'FOUNDER' || isModuleTier
+            const description = isModuleTier && selectedModule
+              ? `Unlock Module ${selectedModule} only. All other modules require another purchase or upgrade.`
               : tier.description
+            const checkoutDisabled = funding || (isModuleTier && !selectedModule)
             return (
               <div
                 key={tier.name}
                 className={`pv-card pv-card-delay-${i} ${featured ? 'featured' : ''}`}
               >
-                {featured && <div className="pv-featured-badge">{isRequestedModuleTier ? `MODULE ${selectedModule}` : 'FOUNDER'}</div>}
+                {featured && <div className="pv-featured-badge">{isModuleTier ? 'CHOOSE MODULE' : 'FOUNDER'}</div>}
                 <div className="pv-tag">▸ {tier.tag}</div>
                 <div className="pv-price">{tier.label}</div>
                 <div className="pv-price-label">IN COURSEWORK</div>
                 <div className="pv-allocation">→ {tier.tokenDisplay}</div>
                 <div className="pv-desc">{description}</div>
+                {isModuleTier ? (
+                  <>
+                    <div className="pv-module-picker">
+                      <span className="pv-module-label">SELECT ONE MODULE</span>
+                      <div className="pv-module-grid">
+                        {[1, 2, 3, 4, 5, 6].map((moduleNumber) => (
+                          <button
+                            key={moduleNumber}
+                            type="button"
+                            className={`pv-module-option ${selectedModule === moduleNumber ? 'active' : ''}`}
+                            onClick={() => setSelectedModule(moduleNumber)}
+                            disabled={funding}
+                          >
+                            Module {moduleNumber}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="pv-scope-note">
+                      $25 unlocks one selected module only. You choose which module; all other modules require another purchase or upgrade.
+                    </div>
+                  </>
+                ) : (
+                  <div className="pv-scope-note">$100, $500, and $1,000 tracks unlock all 6 modules.</div>
+                )}
                 <div className="pv-divider" />
                 <button
                   onClick={() => handleStripeCheckout(tier)}
-                  disabled={funding}
+                  disabled={checkoutDisabled}
                   className={`pv-btn ${featured ? 'pv-btn-lime' : 'pv-btn-ghost'}`}
                 >
                   {!authenticated
                     ? 'Sign in required'
                     : funding
                     ? status || 'Payment pending'
+                    : isModuleTier && !selectedModule
+                    ? 'CHOOSE MODULE'
                     : 'START LEARNING NOW'}
                 </button>
               </div>

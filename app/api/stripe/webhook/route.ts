@@ -7,7 +7,9 @@ import { grantStripeMemberEntitlement } from '@/lib/server/member-entitlements'
 const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'] as const
 type Module = typeof ALL_MODULES[number]
 
-const VALID_TIERS = new Set(['ENTRY', 'FOUNDATION', 'BUILDER_ACCELERATOR', 'FOUNDER_ELITE'])
+const VALID_LEGACY_TIERS = new Set(['ENTRY', 'FOUNDATION', 'BUILDER_ACCELERATOR', 'FOUNDER_ELITE'])
+const VALID_ACCESS_TYPES = new Set(['single_module', 'all_modules'])
+const VALID_REWARD_TRACKS = new Set(['single_module', 'full_academy'])
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -61,7 +63,16 @@ export async function POST(req: NextRequest) {
   }
 
   const session = event.data.object as Stripe.Checkout.Session
-  const { userId, tier, modulesToUnlock: modulesToUnlockRaw } = session.metadata ?? {}
+  const {
+    userId,
+    tier,
+    legacyTier,
+    modulesToUnlock: modulesToUnlockRaw,
+    access_type: accessType,
+    reward_track: rewardTrack,
+    module_number: moduleNumberRaw,
+    stripe_price_id: stripePriceId,
+  } = session.metadata ?? {}
   const customerEmail = session.customer_details?.email ?? session.customer_email ?? null
   const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null
   const stripePaymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : null
@@ -75,21 +86,33 @@ export async function POST(req: NextRequest) {
     stripeCustomerId,
     stripeCheckoutSessionId: session.id,
     stripePaymentIntentId,
-    paymentTier: tier ?? null,
+    paymentTier: tier ?? legacyTier ?? null,
     metadata: {
       stripe_event_type: event.type,
       provider: 'stripe',
+      access_type: accessType ?? null,
+      module_number: moduleNumberRaw ? Number(moduleNumberRaw) : null,
+      tier: tier ?? null,
+      legacy_tier: legacyTier ?? null,
+      reward_track: rewardTrack ?? null,
+      stripe_price_id: stripePriceId ?? null,
+      stripe_session_id: session.id,
     },
   }
 
-  if (!userId || !tier || !modulesToUnlockRaw) {
+  if (!userId || !tier || !legacyTier || !modulesToUnlockRaw || !accessType || !rewardTrack) {
     console.error('webhook: missing metadata fields', { userId: !!userId, tier: !!tier, modulesToUnlock: !!modulesToUnlockRaw })
     return NextResponse.json({ error: 'Missing metadata' }, { status: 400 })
   }
 
-  if (!VALID_TIERS.has(tier)) {
-    console.error('webhook: invalid tier in metadata', { tier })
+  if (!VALID_LEGACY_TIERS.has(legacyTier)) {
+    console.error('webhook: invalid legacy tier in metadata', { legacyTier })
     return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
+  }
+
+  if (!VALID_ACCESS_TYPES.has(accessType) || !VALID_REWARD_TRACKS.has(rewardTrack)) {
+    console.error('webhook: invalid access metadata')
+    return NextResponse.json({ error: 'Invalid access metadata' }, { status: 400 })
   }
 
   let parsedModules: string[]
@@ -108,6 +131,20 @@ export async function POST(req: NextRequest) {
   if (validModules.length === 0) {
     console.error('webhook: no valid modules after filtering', { parsedModules })
     return NextResponse.json({ error: 'No valid modules to unlock' }, { status: 400 })
+  }
+
+  const moduleNumber = moduleNumberRaw ? Number(moduleNumberRaw) : null
+  if (accessType === 'single_module') {
+    if (typeof moduleNumber !== 'number' || !Number.isInteger(moduleNumber) || moduleNumber < 1 || moduleNumber > 6) {
+      return NextResponse.json({ error: 'Invalid module_number' }, { status: 400 })
+    }
+    if (validModules.length !== 1 || validModules[0] !== `module_${moduleNumber}`) {
+      return NextResponse.json({ error: 'Invalid single module scope' }, { status: 400 })
+    }
+  }
+
+  if (accessType === 'all_modules' && validModules.length !== ALL_MODULES.length) {
+    return NextResponse.json({ error: 'Invalid all modules scope' }, { status: 400 })
   }
 
   const supabase = getSupabase()
@@ -135,7 +172,7 @@ export async function POST(req: NextRequest) {
     const { error: insertError } = await supabase.from('iv_payments').insert({
       user_id: userId,
       privy_user_id: userId,
-      tier,
+      tier: legacyTier,
       paid: true,
       status: 'confirmed',
       modules_unlocked: mergedModules,
@@ -172,7 +209,7 @@ export async function POST(req: NextRequest) {
       entitlementId: entitlementResult.entitlementId,
     })
 
-    await syncUserProfileFromPayment(userId, tier)
+    await syncUserProfileFromPayment(userId, legacyTier)
 
     return NextResponse.json({ received: true })
   } catch (e: unknown) {

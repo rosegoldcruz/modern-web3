@@ -6,6 +6,8 @@ type MemberEntitlementRow = {
   id: string
   status: EntitlementStatus
   expires_at: string | null
+  source?: string | null
+  metadata?: Record<string, unknown> | null
 }
 
 export type GrantStripeMemberEntitlementInput = {
@@ -28,6 +30,12 @@ export type MemberEntitlementIdentityInput = {
   privyUserId?: string | null
   email?: string | null
   walletAddress?: string | null
+}
+
+export type MemberEntitlementScope = {
+  hasEntitlement: boolean
+  accessType: 'single_module' | 'all_modules' | null
+  modulesUnlocked: string[]
 }
 
 function normalizeOptional(value: string | null | undefined): string | null {
@@ -72,13 +80,23 @@ function isActiveEntitlement(entitlement: MemberEntitlementRow): boolean {
   return expiresAtMs > Date.now()
 }
 
+function getAccessType(entitlement: MemberEntitlementRow): 'single_module' | 'all_modules' {
+  const accessType = entitlement.metadata?.access_type
+  if (accessType === 'single_module') return 'single_module'
+  return 'all_modules'
+}
+
+function isAllModuleInput(input: GrantStripeMemberEntitlementInput): boolean {
+  return input.metadata?.access_type === 'all_modules'
+}
+
 async function findExistingByStripeReference(
   column: 'stripe_checkout_session_id' | 'stripe_payment_intent_id',
   value: string,
 ): Promise<MemberEntitlementRow | null> {
   const { data, error } = await getSupabaseAdmin()
     .from('iv_member_entitlements')
-    .select('id,status,expires_at')
+    .select('id,status,expires_at,source,metadata')
     .eq(column, value)
     .order('granted_at', { ascending: false })
     .limit(1)
@@ -95,7 +113,7 @@ async function findActiveEntitlement(
   const nowIso = new Date().toISOString()
   const { data, error } = await getSupabaseAdmin()
     .from('iv_member_entitlements')
-    .select('id,status,expires_at')
+    .select('id,status,expires_at,source,metadata')
     .eq(column, value)
     .eq('status', 'active')
     .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
@@ -108,6 +126,11 @@ async function findActiveEntitlement(
 }
 
 export async function hasActiveMemberEntitlement(input: MemberEntitlementIdentityInput): Promise<boolean> {
+  const scope = await getActiveMemberEntitlementScope(input)
+  return scope.hasEntitlement
+}
+
+export async function getActiveMemberEntitlementScope(input: MemberEntitlementIdentityInput): Promise<MemberEntitlementScope> {
   const identity = {
     privyUserId: normalizeOptional(input.privyUserId),
     email: normalizeEmail(input.email),
@@ -132,10 +155,20 @@ export async function hasActiveMemberEntitlement(input: MemberEntitlementIdentit
 
   for (const check of checks) {
     const entitlement = await check
-    if (entitlement && isActiveEntitlement(entitlement)) return true
+    if (entitlement && isActiveEntitlement(entitlement)) {
+      const accessType = getAccessType(entitlement)
+      const moduleNumber = Number(entitlement.metadata?.module_number)
+      return {
+        hasEntitlement: true,
+        accessType,
+        modulesUnlocked: accessType === 'single_module' && Number.isInteger(moduleNumber) && moduleNumber >= 1 && moduleNumber <= 6
+          ? [`module_${moduleNumber}`]
+          : ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'],
+      }
+    }
   }
 
-  return false
+  return { hasEntitlement: false, accessType: null, modulesUnlocked: [] }
 }
 
 export async function grantStripeMemberEntitlement(
@@ -170,8 +203,35 @@ export async function grantStripeMemberEntitlement(
     }
   }
 
-  if (await hasActiveMemberEntitlement(identity)) {
-    return { entitlementId: null, alreadyExists: true }
+  const identityChecks: Array<Promise<MemberEntitlementRow | null>> = []
+  if (identity.privyUserId) identityChecks.push(findActiveEntitlement('privy_user_id', identity.privyUserId))
+  if (identity.email) identityChecks.push(findActiveEntitlement('email', identity.email))
+  if (identity.walletAddress) identityChecks.push(findActiveEntitlement('wallet_address', identity.walletAddress))
+
+  for (const check of identityChecks) {
+    const existing = await check
+    if (!existing || !isActiveEntitlement(existing)) continue
+
+    if (isAllModuleInput(input) && existing.source === 'stripe' && getAccessType(existing) === 'single_module') {
+      const { error } = await getSupabaseAdmin()
+        .from('iv_member_entitlements')
+        .update({
+          metadata: {
+            ...(existing.metadata ?? {}),
+            ...(input.metadata ?? {}),
+            upgraded_from: 'single_module',
+          },
+          stripe_customer_id: normalizeOptional(input.stripeCustomerId),
+          stripe_checkout_session_id: stripeCheckoutSessionId,
+          stripe_payment_intent_id: stripePaymentIntentId,
+        })
+        .eq('id', existing.id)
+
+      if (error) throw error
+      return { entitlementId: existing.id, alreadyExists: false }
+    }
+
+    return { entitlementId: existing.id, alreadyExists: true }
   }
 
   const metadata: Record<string, unknown> = {

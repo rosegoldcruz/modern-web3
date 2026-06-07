@@ -5,7 +5,7 @@ import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { ALL_MODULES, getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
 import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
 import { requirePrivyUser } from '@/lib/server/privy-auth'
-import { hasActiveMemberEntitlement } from '@/lib/server/member-entitlements'
+import { getActiveMemberEntitlementScope } from '@/lib/server/member-entitlements'
 
 function getSupabase() {
   return createClient(
@@ -304,18 +304,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ paid: false, status: 'sign_in_required', modulesUnlocked: [] })
     }
 
-    const entitlementAccess = await hasActiveMemberEntitlement({
+    const entitlementScope = await getActiveMemberEntitlementScope({
       privyUserId: effectiveUserId,
       email: auth?.email ?? null,
       walletAddress: auth?.walletAddress ?? null,
     })
+    const entitlementAccess = entitlementScope.hasEntitlement
 
     if (entitlementAccess && !paymentId) {
       return NextResponse.json({
         paid: true,
         hasEntitlement: true,
         status: 'confirmed',
-        modulesUnlocked: [...ALL_MODULES],
+        modulesUnlocked: entitlementScope.modulesUnlocked,
       })
     }
 
@@ -333,7 +334,7 @@ export async function POST(req: NextRequest) {
         status: payload?.status === 'confirmed' ? 'confirmed' : 'confirmed',
         modulesUnlocked: Array.isArray(payload?.modulesUnlocked) && payload.modulesUnlocked.length > 0
           ? payload.modulesUnlocked
-          : [...ALL_MODULES],
+          : entitlementScope.modulesUnlocked,
       })
     }
 

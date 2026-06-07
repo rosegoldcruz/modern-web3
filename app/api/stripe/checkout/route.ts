@@ -8,20 +8,32 @@ const TIER_CONFIG = {
   ENTRY: {
     priceEnv: 'STRIPE_PRICE_ENTRY',
     label: 'Entry',
+    accessType: 'single_module',
+    paymentTier: 'single_module',
+    rewardTrack: 'single_module',
   },
   FOUNDATION: {
     priceEnv: 'STRIPE_PRICE_FOUNDATION',
     label: 'Foundation',
+    accessType: 'all_modules',
+    paymentTier: 'foundation',
+    rewardTrack: 'full_academy',
     modulesToUnlock: ALL_MODULES,
   },
   BUILDER_ACCELERATOR: {
     priceEnv: 'STRIPE_PRICE_BUILDER_ACCELERATOR',
     label: 'Builder Accelerator',
+    accessType: 'all_modules',
+    paymentTier: 'accelerator',
+    rewardTrack: 'full_academy',
     modulesToUnlock: ALL_MODULES,
   },
   FOUNDER_ELITE: {
     priceEnv: 'STRIPE_PRICE_FOUNDER_ELITE',
     label: 'Founder Elite',
+    accessType: 'all_modules',
+    paymentTier: 'founder',
+    rewardTrack: 'full_academy',
     modulesToUnlock: ALL_MODULES,
   },
 } as const
@@ -42,7 +54,7 @@ export async function POST(req: NextRequest) {
     const auth = await requirePrivyUser(req)
 
     const body = await req.json()
-    const { tier, selectedModule } = body
+    const { tier } = body
 
     if (!tier || !Object.hasOwn(TIER_CONFIG, tier)) {
       return NextResponse.json({ error: `Invalid tier: ${tier}` }, { status: 400 })
@@ -52,14 +64,19 @@ export async function POST(req: NextRequest) {
     const stripePriceId = requireEnv(config.priceEnv)
 
     let modulesToUnlock: string[]
+    let moduleNumber: number | null = null
 
     if (tier === 'ENTRY') {
-      const moduleNum = Number(selectedModule)
+      const moduleNum = Number(body.module_number)
       if (!Number.isInteger(moduleNum) || moduleNum < 1 || moduleNum > 6) {
         return NextResponse.json({ error: 'ENTRY tier requires a valid selectedModule (1–6)' }, { status: 400 })
       }
+      moduleNumber = moduleNum
       modulesToUnlock = [`module_${moduleNum}`]
     } else {
+      if (body.module_number !== undefined || body.selectedModule !== undefined) {
+        return NextResponse.json({ error: `${config.label} does not accept module_number` }, { status: 400 })
+      }
       modulesToUnlock = [...ALL_MODULES]
     }
 
@@ -67,10 +84,15 @@ export async function POST(req: NextRequest) {
     const metadata: Record<string, string> = {
       userId: auth.privyUserId,
       privyUserId: auth.privyUserId,
-      tier,
+      tier: config.paymentTier,
+      legacyTier: tier,
       modulesToUnlock: JSON.stringify(modulesToUnlock),
+      access_type: config.accessType,
+      reward_track: config.rewardTrack,
+      stripe_price_id: stripePriceId,
     }
 
+    if (moduleNumber) metadata.module_number = String(moduleNumber)
     if (auth.email) metadata.email = auth.email
     if (auth.walletAddress) metadata.walletAddress = auth.walletAddress
 
