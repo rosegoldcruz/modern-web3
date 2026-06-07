@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { requirePrivyUser } from '@/lib/server/privy-auth'
 
 const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'] as const
 
@@ -38,13 +39,10 @@ export async function POST(req: NextRequest) {
     const stripeSecretKey = requireEnv('STRIPE_SECRET_KEY')
     const successUrl = process.env.STRIPE_CHECKOUT_SUCCESS_URL?.trim() || 'https://member.ironvaulttoken.com/dashboard'
     const cancelUrl = process.env.STRIPE_CHECKOUT_CANCEL_URL?.trim() || 'https://ironvaulttoken.com/learn'
+    const auth = await requirePrivyUser(req)
 
     const body = await req.json()
-    const { userId, tier, selectedModule } = body
-
-    if (!userId || typeof userId !== 'string') {
-      return NextResponse.json({ error: 'Missing required field: userId' }, { status: 400 })
-    }
+    const { tier, selectedModule } = body
 
     if (!tier || !Object.hasOwn(TIER_CONFIG, tier)) {
       return NextResponse.json({ error: `Invalid tier: ${tier}` }, { status: 400 })
@@ -66,23 +64,31 @@ export async function POST(req: NextRequest) {
     }
 
     const stripe = new Stripe(stripeSecretKey)
+    const metadata: Record<string, string> = {
+      userId: auth.privyUserId,
+      privyUserId: auth.privyUserId,
+      tier,
+      modulesToUnlock: JSON.stringify(modulesToUnlock),
+    }
+
+    if (auth.email) metadata.email = auth.email
+    if (auth.walletAddress) metadata.walletAddress = auth.walletAddress
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [{ price: stripePriceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      client_reference_id: userId,
-      metadata: {
-        userId,
-        tier,
-        modulesToUnlock: JSON.stringify(modulesToUnlock),
-      },
+      client_reference_id: auth.privyUserId,
+      metadata,
     })
 
     return NextResponse.json({ url: session.url })
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : 'Failed to create checkout session'
+    if (message.startsWith('Unauthorized:')) {
+      return NextResponse.json({ error: message }, { status: 401 })
+    }
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

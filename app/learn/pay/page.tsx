@@ -240,11 +240,18 @@ function PayPageContent() {
     setStatus('▸ REDIRECTING TO CHECKOUT...')
 
     try {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('Sign in required before checkout.')
+      }
+
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          userId: user?.id,
           tier: stripeTier,
           selectedModule,
         }),
