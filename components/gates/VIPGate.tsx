@@ -12,11 +12,7 @@ export function VIPGate({ children }: VIPGateProps) {
   const { loading, isVip, isAdmin } = useBackofficeAuth()
 
   if (loading) {
-    return (
-      <div className="min-h-[420px] grid place-items-center rounded-2xl border border-zinc-800 bg-zinc-950/60 p-8">
-        <p className="text-sm text-zinc-300">Loading access policy...</p>
-      </div>
-    )
+    return null
   }
 
   if (isVip || isAdmin) {

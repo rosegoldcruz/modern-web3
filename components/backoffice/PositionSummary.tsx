@@ -70,11 +70,7 @@ export function PositionSummary() {
   )
 
   if (loading) {
-    return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
-        <p className="text-sm text-zinc-400">Loading position matrix...</p>
-      </div>
-    )
+    return null
   }
 
   if (error) {

@@ -182,7 +182,7 @@ const CSS = `
     font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;
     color:#444;text-align:center;max-width:560px;margin:0 auto 18px;line-height:1.8;
   }
-  .pv-loading{
+  .pv-access-check{
     min-height:100vh;background:#080808;
     display:flex;align-items:center;justify-content:center;
     font-family:'Space Mono',monospace;font-size:10px;
@@ -326,7 +326,7 @@ function PayPageContent() {
   }
 
   if (checking) return (
-    <div className="pv-loading">
+    <div className="pv-access-check">
       <style>{CSS}</style>
       Checking access...
     </div>
@@ -442,7 +442,7 @@ export default function PayPage() {
   return (
     <PrivyAuthProvider>
       <Suspense fallback={
-        <div className="pv-loading">
+        <div className="pv-access-check">
           <style>{CSS}</style>
           Checking access...
         </div>

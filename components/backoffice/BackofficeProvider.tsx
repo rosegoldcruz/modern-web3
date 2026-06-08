@@ -78,9 +78,7 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-[#080808] text-zinc-100 grid place-items-center px-6">
-        <p className="text-sm tracking-wide text-zinc-300">Loading secure backoffice...</p>
-      </div>
+      <div className="min-h-screen bg-[#080808] text-zinc-100" />
     )
   }
 
@@ -105,9 +103,7 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
 
   if (loading && !profile) {
     return (
-      <div className="min-h-screen bg-[#080808] text-zinc-100 grid place-items-center px-6">
-        <p className="text-sm tracking-wide text-zinc-300">Loading backoffice profile...</p>
-      </div>
+      <div className="min-h-screen bg-[#080808] text-zinc-100" />
     )
   }
 
