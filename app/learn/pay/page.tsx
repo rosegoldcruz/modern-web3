@@ -46,7 +46,25 @@ const CSS = `
   }
   .pv-sub{
     font-size:14px;color:#555;line-height:1.7;
-    max-width:480px;margin:0 auto 48px;text-align:center;
+    max-width:560px;margin:0 auto 22px;text-align:center;
+  }
+  .pv-reward-callout{
+    max-width:620px;margin:0 auto 42px;text-align:center;
+    border:1px solid rgba(170,255,0,0.18);background:rgba(170,255,0,0.035);
+    border-radius:4px;padding:18px 20px;
+  }
+  .pv-reward-title{
+    font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;
+    color:#AAFF00;margin-bottom:6px;
+  }
+  .pv-reward-sub{font-size:13px;color:#888;line-height:1.6;}
+  .pv-reward-line{
+    font-family:'Space Mono',monospace;font-size:11px;line-height:1.5;
+    color:#AAFF00;margin-bottom:8px;
+  }
+  .pv-module-line{
+    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;
+    color:#999;margin-bottom:14px;
   }
   .pv-phantom-strip{
     display:flex;align-items:center;justify-content:center;
@@ -160,6 +178,10 @@ const CSS = `
     font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;
     color:#2A2A2A;text-align:center;max-width:480px;margin:0 auto;line-height:1.8;
   }
+  .pv-reward-note{
+    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;
+    color:#444;text-align:center;max-width:560px;margin:0 auto 18px;line-height:1.8;
+  }
   .pv-loading{
     min-height:100vh;background:#080808;
     display:flex;align-items:center;justify-content:center;
@@ -183,6 +205,13 @@ const TIER_NAME_MAP: Record<string, string> = {
   STARTER: 'FOUNDATION',
   BUILDER: 'BUILDER_ACCELERATOR',
   FOUNDER: 'FOUNDER_ELITE',
+}
+
+const REWARD_ELIGIBILITY: Record<string, string> = {
+  MODULE: '25,000 IV-SOL',
+  STARTER: '100,000 IV-SOL',
+  BUILDER: '500,000 IV-SOL',
+  FOUNDER: '1,000,000 IV-SOL',
 }
 
 function PayPageContent() {
@@ -310,6 +339,12 @@ function PayPageContent() {
         <p className="pv-sub">
           Pay by card with secure checkout. Access unlocks after payment confirmation.
         </p>
+        <div className="pv-reward-callout">
+          <div className="pv-reward-title">Earn IV-SOL as you learn</div>
+          <div className="pv-reward-sub">
+            Reward eligibility is calculated at 1,000 IV-SOL per $1 spent after completing eligible coursework.
+          </div>
+        </div>
 
         {funding && <div className="pv-status">{status}</div>}
 
@@ -331,6 +366,8 @@ function PayPageContent() {
                 <div className="pv-price">{tier.label}</div>
                 <div className="pv-price-label">IN COURSEWORK</div>
                 <div className="pv-allocation">→ {tier.tokenDisplay}</div>
+                <div className="pv-reward-line">Reward eligibility: {REWARD_ELIGIBILITY[tier.name]}</div>
+                <div className="pv-module-line">{isModuleTier ? 'Choose any 1 module' : 'All 6 modules'}</div>
                 <div className="pv-desc">{description}</div>
                 {isModuleTier ? (
                   <>
@@ -382,9 +419,12 @@ function PayPageContent() {
         </div>
 
         <div className="pv-legal">
+          <div className="pv-reward-note">
+            IV-SOL rewards are distributed after eligible module completion and quiz requirements are met. Token transfers may be subject to network/token transfer fees.
+          </div>
           IV-SOL IS A UTILITY TOKEN — NOT A STOCK OR SECURITY.<br />
           IT DOES NOT GUARANTEE FINANCIAL RETURNS.<br />
-          CRYPTO MARKETS ARE VOLATILE. PARTICIPATION INVOLVES RISK.
+          CRYPTO MARKETS ARE VOLATILE. BUT SO IS THE ECONOMY. LET'S WIN!
         </div>
 
       </div>
