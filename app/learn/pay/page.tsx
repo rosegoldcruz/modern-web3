@@ -198,13 +198,12 @@ const CSS = `
   }
 `
 
-const TIERS = getPaymentTiers(false)
-
 const TIER_NAME_MAP: Record<string, string> = {
   MODULE: 'ENTRY',
   STARTER: 'FOUNDATION',
   BUILDER: 'BUILDER_ACCELERATOR',
   FOUNDER: 'FOUNDER_ELITE',
+  TEST_MODULE: 'INTERNAL_TEST',
 }
 
 const REWARD_ELIGIBILITY: Record<string, string> = {
@@ -212,11 +211,14 @@ const REWARD_ELIGIBILITY: Record<string, string> = {
   STARTER: '100,000 IV-SOL',
   BUILDER: '500,000 IV-SOL',
   FOUNDER: '1,000,000 IV-SOL',
+  TEST_MODULE: '1000 raw IV-SOL micro test',
 }
 
 function PayPageContent() {
   const { user, authenticated, ready, login, getAccessToken } = usePrivy()
   const searchParams = useSearchParams()
+  const internalTestEnabled = searchParams.get('internal_test') === '1'
+  const tiers = getPaymentTiers(internalTestEnabled)
   const requestedModule = Number(searchParams.get('module'))
   const initialModule = Number.isInteger(requestedModule) && requestedModule >= 1 && requestedModule <= 6
     ? requestedModule
@@ -280,7 +282,7 @@ function PayPageContent() {
       return
     }
 
-    if (tier.name === 'MODULE' && !selectedModule) {
+    if ((tier.name === 'MODULE' || tier.name === 'TEST_MODULE') && !selectedModule) {
       alert('Choose a module before checkout.')
       return
     }
@@ -303,6 +305,7 @@ function PayPageContent() {
         body: JSON.stringify({
           tier: stripeTier,
           ...(tier.name === 'MODULE' ? { module_number: selectedModule } : {}),
+          ...(tier.name === 'TEST_MODULE' ? { module_number: selectedModule } : {}),
         }),
       })
       const data = await res.json()
@@ -349,8 +352,9 @@ function PayPageContent() {
         {funding && <div className="pv-status">{status}</div>}
 
         <div className="pv-grid">
-          {TIERS.map((tier, i) => {
-            const isModuleTier = tier.name === 'MODULE'
+          {tiers.map((tier, i) => {
+            const isModuleTier = tier.name === 'MODULE' || tier.name === 'TEST_MODULE'
+            const isTestTier = tier.name === 'TEST_MODULE'
             const featured = tier.name === 'FOUNDER' || isModuleTier
             const description = isModuleTier && selectedModule
               ? `Unlock Module ${selectedModule} only. All other modules require another purchase or upgrade.`
@@ -361,7 +365,7 @@ function PayPageContent() {
                 key={tier.name}
                 className={`pv-card pv-card-delay-${i} ${featured ? 'featured' : ''}`}
               >
-                {featured && <div className="pv-featured-badge">{isModuleTier ? 'CHOOSE MODULE' : 'FOUNDER'}</div>}
+                {featured && <div className="pv-featured-badge">{isTestTier ? 'INTERNAL TEST' : isModuleTier ? 'CHOOSE MODULE' : 'FOUNDER'}</div>}
                 <div className="pv-tag">▸ {tier.tag}</div>
                 <div className="pv-price">{tier.label}</div>
                 <div className="pv-price-label">IN COURSEWORK</div>
@@ -388,7 +392,9 @@ function PayPageContent() {
                       </div>
                     </div>
                     <div className="pv-scope-note">
-                      $25 unlocks one selected module only. You choose which module; all other modules require another purchase or upgrade.
+                      {isTestTier
+                        ? '$1 internal micro test unlocks one selected module only and is not a customer reward amount.'
+                        : '$25 unlocks one selected module only. You choose which module; all other modules require another purchase or upgrade.'}
                     </div>
                   </>
                 ) : (

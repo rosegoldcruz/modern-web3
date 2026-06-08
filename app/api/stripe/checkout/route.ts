@@ -36,6 +36,14 @@ const TIER_CONFIG = {
     rewardTrack: 'full_academy',
     modulesToUnlock: ALL_MODULES,
   },
+  INTERNAL_TEST: {
+    priceEnv: 'STRIPE_INTERNAL_TEST_PRICE_ID',
+    label: 'Internal Test',
+    accessType: 'single_module',
+    paymentTier: 'single_module_test',
+    rewardTrack: 'single_module',
+    internalTest: true,
+  },
 } as const
 
 type TierKey = keyof typeof TIER_CONFIG
@@ -44,6 +52,16 @@ function requireEnv(name: string): string {
   const value = process.env[name]
   if (!value) throw new Error(`Missing required env var: ${name}`)
   return value
+}
+
+function isInternalDollarTestEnabled(): boolean {
+  return process.env.ENABLE_INTERNAL_DOLLAR_TEST?.trim().toLowerCase() === 'true'
+}
+
+function getTierConfig(tier: unknown) {
+  if (!tier || typeof tier !== 'string' || !Object.hasOwn(TIER_CONFIG, tier)) return null
+  if (tier === 'INTERNAL_TEST' && !isInternalDollarTestEnabled()) return null
+  return TIER_CONFIG[tier as TierKey]
 }
 
 export async function POST(req: NextRequest) {
@@ -56,17 +74,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { tier } = body
 
-    if (!tier || !Object.hasOwn(TIER_CONFIG, tier)) {
+    const config = getTierConfig(tier)
+    if (!config) {
       return NextResponse.json({ error: `Invalid tier: ${tier}` }, { status: 400 })
     }
 
-    const config = TIER_CONFIG[tier as TierKey]
     const stripePriceId = requireEnv(config.priceEnv)
 
     let modulesToUnlock: string[]
     let moduleNumber: number | null = null
 
-    if (tier === 'ENTRY') {
+    if (tier === 'ENTRY' || tier === 'INTERNAL_TEST') {
       const moduleNum = Number(body.module_number)
       if (!Number.isInteger(moduleNum) || moduleNum < 1 || moduleNum > 6) {
         return NextResponse.json({ error: 'ENTRY tier requires a valid selectedModule (1–6)' }, { status: 400 })
@@ -93,6 +111,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (moduleNumber) metadata.module_number = String(moduleNumber)
+    if ('internalTest' in config && config.internalTest) metadata.internal_test = 'true'
     if (auth.email) metadata.email = auth.email
     if (auth.walletAddress) metadata.walletAddress = auth.walletAddress
 

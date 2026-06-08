@@ -7,7 +7,7 @@ import { grantStripeMemberEntitlement } from '@/lib/server/member-entitlements'
 const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'] as const
 type Module = typeof ALL_MODULES[number]
 
-const VALID_LEGACY_TIERS = new Set(['ENTRY', 'FOUNDATION', 'BUILDER_ACCELERATOR', 'FOUNDER_ELITE'])
+const VALID_LEGACY_TIERS = new Set(['ENTRY', 'FOUNDATION', 'BUILDER_ACCELERATOR', 'FOUNDER_ELITE', 'INTERNAL_TEST'])
 const VALID_ACCESS_TYPES = new Set(['single_module', 'all_modules'])
 const VALID_REWARD_TRACKS = new Set(['single_module', 'full_academy'])
 
@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
     reward_track: rewardTrack,
     module_number: moduleNumberRaw,
     stripe_price_id: stripePriceId,
+    internal_test: internalTestRaw,
   } = session.metadata ?? {}
   const customerEmail = session.customer_details?.email ?? session.customer_email ?? null
   const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null
@@ -97,6 +98,7 @@ export async function POST(req: NextRequest) {
       reward_track: rewardTrack ?? null,
       stripe_price_id: stripePriceId ?? null,
       stripe_session_id: session.id,
+      internal_test: internalTestRaw === 'true',
     },
   }
 
@@ -108,6 +110,11 @@ export async function POST(req: NextRequest) {
   if (!VALID_LEGACY_TIERS.has(legacyTier)) {
     console.error('webhook: invalid legacy tier in metadata', { legacyTier })
     return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
+  }
+
+  if (legacyTier === 'INTERNAL_TEST' && internalTestRaw !== 'true') {
+    console.error('webhook: internal test tier missing marker')
+    return NextResponse.json({ error: 'Invalid test metadata' }, { status: 400 })
   }
 
   if (!VALID_ACCESS_TYPES.has(accessType) || !VALID_REWARD_TRACKS.has(rewardTrack)) {
