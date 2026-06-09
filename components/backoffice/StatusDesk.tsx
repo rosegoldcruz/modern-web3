@@ -167,11 +167,9 @@ export function StatusDesk() {
 
         <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
           <h2 className="text-lg font-semibold text-zinc-100 mb-4">Your Tickets</h2>
-          {loading ? (
-            <p className="text-sm text-zinc-400">Loading tickets...</p>
-          ) : tickets.length === 0 ? (
+          {!loading && tickets.length === 0 ? (
             <p className="text-sm text-zinc-400">No tickets submitted yet.</p>
-          ) : (
+          ) : !loading ? (
             <div className="space-y-3">
               {tickets.map((ticket) => (
                 <article key={ticket.id} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
@@ -194,7 +192,7 @@ export function StatusDesk() {
                 </article>
               ))}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </section>

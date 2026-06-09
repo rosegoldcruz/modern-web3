@@ -77,9 +77,7 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
   }, [error, loading, profile, refreshProfile])
 
   if (!ready) {
-    return (
-      <div className="min-h-screen bg-[#080808] text-zinc-100" />
-    )
+    return null
   }
 
   if (!authenticated) {
@@ -102,9 +100,7 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
   }
 
   if (loading && !profile) {
-    return (
-      <div className="min-h-screen bg-[#080808] text-zinc-100" />
-    )
+    return null
   }
 
   if (error && !profile) {

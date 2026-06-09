@@ -1271,20 +1271,7 @@ export default function IronVaultAcademy(){
   }
 
   if(!paymentChecked || !paid || !progressHydrated) {
-    return(
-      <div className="iv">
-        <style>{CSS}</style>
-        <div className="iv-wrap" style={{minHeight:"100vh",display:"grid",placeItems:"center",padding:"40px 20px"}}>
-          <div className="iv-stat" style={{maxWidth:560,width:"100%",textAlign:"center",padding:"32px"}}>
-            <div className="iv-eyebrow" style={{justifyContent:"center"}}>▸ VERIFYING ACCESS</div>
-            <h1 className="iv-h1" style={{marginBottom:16}}>Checking payment status</h1>
-            <p className="iv-sub" style={{margin:"0 auto",maxWidth:420}}>
-              Your academy access is unlocked after a confirmed payment is found on your account.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // ── HUB ──

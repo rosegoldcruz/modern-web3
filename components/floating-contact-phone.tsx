@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
-import { Wifi, BatteryCharging, Send, Shield, CheckCircle, Loader2 } from "lucide-react"
+import { Wifi, BatteryCharging, Send, Shield, CheckCircle } from "lucide-react"
 import { motion } from "motion/react"
 import { Drawer } from "vaul"
 
@@ -290,7 +290,7 @@ function EarlyAccessForm({
       >
         {status === "sending" ? (
           <>
-            <Loader2 size={16} className="animate-spin" /> Sending...
+            Sending...
           </>
         ) : (
           <>

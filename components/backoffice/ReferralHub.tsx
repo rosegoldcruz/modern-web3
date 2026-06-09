@@ -250,11 +250,9 @@ export function ReferralHub() {
 
         <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
           <h2 className="text-lg font-semibold text-zinc-100 mb-4">Referral Leads</h2>
-          {loading ? (
-            <p className="text-sm text-zinc-400">Loading referrals...</p>
-          ) : referrals.length === 0 ? (
+          {!loading && referrals.length === 0 ? (
             <p className="text-sm text-zinc-400">No referral leads submitted yet.</p>
-          ) : (
+          ) : !loading ? (
             <div className="space-y-3">
               {referrals.map((lead) => (
                 <article key={lead.id} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
@@ -274,7 +272,7 @@ export function ReferralHub() {
                 </article>
               ))}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </section>

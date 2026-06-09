@@ -326,10 +326,7 @@ function PayPageContent() {
   }
 
   if (checking) return (
-    <div className="pv-access-check">
-      <style>{CSS}</style>
-      Checking access...
-    </div>
+    null
   )
 
   return (
@@ -441,12 +438,7 @@ function PayPageContent() {
 export default function PayPage() {
   return (
     <PrivyAuthProvider>
-      <Suspense fallback={
-        <div className="pv-access-check">
-          <style>{CSS}</style>
-          Checking access...
-        </div>
-      }>
+      <Suspense fallback={null}>
         <PayPageContent />
       </Suspense>
     </PrivyAuthProvider>

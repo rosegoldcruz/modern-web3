@@ -87,7 +87,7 @@ export function VaultPage() {
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-lg font-semibold text-zinc-100 mb-4">Vault Participation Matrix</h2>
             {posLoading ? (
-              <p className="text-sm text-zinc-400">Loading position data...</p>
+              null
             ) : posError ? (
               <p className="text-sm text-red-300">{posError}</p>
             ) : (
@@ -105,7 +105,7 @@ export function VaultPage() {
           {/* Investment Summary */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
             <h2 className="text-lg font-semibold text-zinc-100 mb-4">Investment Summary</h2>
-            {posLoading ? <p className="text-sm text-zinc-400">Loading...</p> : posError ? <p className="text-sm text-red-300">{posError}</p> : position ? (
+            {posLoading ? null : posError ? <p className="text-sm text-red-300">{posError}</p> : position ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   { label: 'Investment Total', value: formatCurrency(position.investment_total) },

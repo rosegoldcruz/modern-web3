@@ -65,7 +65,7 @@ export default function PhoneVideo({
     }
 
     observer = new IntersectionObserver(onIntersect, {
-      rootMargin: "50px", // Start loading 50px before entering viewport
+      rootMargin: "50px",
       threshold: 0.1,
     })
     observer.observe(el)
