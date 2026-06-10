@@ -1,52 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { requirePrivyUser } from '@/lib/server/privy-auth'
-
-const ALL_MODULES = ['module_1', 'module_2', 'module_3', 'module_4', 'module_5', 'module_6'] as const
-
-const TIER_CONFIG = {
-  ENTRY: {
-    priceEnv: 'STRIPE_PRICE_ENTRY',
-    label: 'Entry',
-    accessType: 'single_module',
-    paymentTier: 'single_module',
-    rewardTrack: 'single_module',
-  },
-  FOUNDATION: {
-    priceEnv: 'STRIPE_PRICE_FOUNDATION',
-    label: 'Foundation',
-    accessType: 'all_modules',
-    paymentTier: 'foundation',
-    rewardTrack: 'full_academy',
-    modulesToUnlock: ALL_MODULES,
-  },
-  BUILDER_ACCELERATOR: {
-    priceEnv: 'STRIPE_PRICE_BUILDER_ACCELERATOR',
-    label: 'Builder Accelerator',
-    accessType: 'all_modules',
-    paymentTier: 'accelerator',
-    rewardTrack: 'full_academy',
-    modulesToUnlock: ALL_MODULES,
-  },
-  FOUNDER_ELITE: {
-    priceEnv: 'STRIPE_PRICE_FOUNDER_ELITE',
-    label: 'Founder Elite',
-    accessType: 'all_modules',
-    paymentTier: 'founder',
-    rewardTrack: 'full_academy',
-    modulesToUnlock: ALL_MODULES,
-  },
-  INTERNAL_TEST: {
-    priceEnv: 'STRIPE_INTERNAL_TEST_PRICE_ID',
-    label: 'Internal Test',
-    accessType: 'single_module',
-    paymentTier: 'single_module_test',
-    rewardTrack: 'single_module',
-    internalTest: true,
-  },
-} as const
-
-type TierKey = keyof typeof TIER_CONFIG
+import { getStripePackageConfig, modulesForStripePackage } from '@/lib/server/stripe-package-config'
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -56,12 +11,6 @@ function requireEnv(name: string): string {
 
 function isInternalDollarTestEnabled(): boolean {
   return process.env.ENABLE_INTERNAL_DOLLAR_TEST?.trim().toLowerCase() === 'true'
-}
-
-function getTierConfig(tier: unknown) {
-  if (!tier || typeof tier !== 'string' || !Object.hasOwn(TIER_CONFIG, tier)) return null
-  if (tier === 'INTERNAL_TEST' && !isInternalDollarTestEnabled()) return null
-  return TIER_CONFIG[tier as TierKey]
 }
 
 export async function POST(req: NextRequest) {
@@ -74,7 +23,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { tier } = body
 
-    const config = getTierConfig(tier)
+    const config = getStripePackageConfig(tier, isInternalDollarTestEnabled())
     if (!config) {
       return NextResponse.json({ error: `Invalid tier: ${tier}` }, { status: 400 })
     }
@@ -90,12 +39,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'ENTRY tier requires a valid selectedModule (1–6)' }, { status: 400 })
       }
       moduleNumber = moduleNum
-      modulesToUnlock = [`module_${moduleNum}`]
+      modulesToUnlock = modulesForStripePackage(config, moduleNum)
     } else {
       if (body.module_number !== undefined || body.selectedModule !== undefined) {
         return NextResponse.json({ error: `${config.label} does not accept module_number` }, { status: 400 })
       }
-      modulesToUnlock = [...ALL_MODULES]
+      modulesToUnlock = modulesForStripePackage(config)
     }
 
     const stripe = new Stripe(stripeSecretKey)

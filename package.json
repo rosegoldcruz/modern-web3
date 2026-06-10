@@ -6,7 +6,8 @@
     "build": "next build --no-lint",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "verify:package-coverage": "tsx scripts/verify-package-coverage.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -80,6 +81,7 @@
     "eslint-config-next": "^15.5.15",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
+    "tsx": "^4.22.4",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
   }
