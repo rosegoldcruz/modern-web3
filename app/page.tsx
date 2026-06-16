@@ -16,15 +16,15 @@ export default function Page() {
   const pageStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "@id": "https://theskitbit.com/",
+    "@id": "https://www.ironvaulttoken.com/",
     name: "Iron Vault | Real Estate. Tokenized. Understood.",
     description:
       "Iron Vault is an education-first entry point into understanding how real-world assets — specifically real estate — can be structured, represented, and integrated into decentralized financial systems.",
-    url: "https://theskitbit.com/",
+    url: "https://www.ironvaulttoken.com/",
     mainEntity: {
       "@type": "Organization",
       name: "Iron Vault",
-      url: "https://theskitbit.com",
+      url: "https://www.ironvaulttoken.com",
       sameAs: [],
     },
   }

@@ -68,7 +68,7 @@ export function OrderForm({ isOpen, onClose, selectedPackage }: OrderFormProps) 
   })
 
   useEffect(() => {
-    const savedContent = localStorage.getItem("skitbit-content")
+    const savedContent = localStorage.getItem("ironvault-content")
     if (savedContent) {
       const content = JSON.parse(savedContent)
       if (content.orderForm) {
