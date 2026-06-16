@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Script from "next/script"
 import { motion } from "motion/react"
 import { ShieldCheck, Users, RefreshCw, Rocket, MessageSquare } from "lucide-react"
+import { Footer } from "@/components/footer"
 import { LandingPlasmaBackground } from "@/components/landing-plasma-background"
 
 const spring = { type: "spring", stiffness: 220, damping: 26, mass: 0.9 } as const
