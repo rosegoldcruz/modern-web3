@@ -1,12 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
 import Script from "next/script"
 import { motion } from "motion/react"
-import { Phone, ShieldCheck, Users, RefreshCw, Rocket, MessageSquare } from "lucide-react"
-import { Footer } from "@/components/footer"
+import { ShieldCheck, Users, RefreshCw, Rocket, MessageSquare } from "lucide-react"
 import { LandingPlasmaBackground } from "@/components/landing-plasma-background"
 
 const spring = { type: "spring", stiffness: 220, damping: 26, mass: 0.9 } as const
@@ -63,34 +60,6 @@ export default function SalesPage() {
       <LandingPlasmaBackground />
 
       <div className="relative min-h-screen text-white">
-        {/* ========== HEADER ========== */}
-        <header className="sticky top-0 z-40 px-3 pt-3 sm:px-4 sm:pt-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="liquid-glass-header flex min-h-16 items-center justify-between gap-4 rounded-3xl px-4 py-2 sm:min-h-20 sm:px-6 sm:py-3">
-              <Link href="/" className="flex min-w-0 items-center gap-3">
-                <Image
-                  src="/logos/pwcw-logo.webp"
-                  alt="Commonwealth Ventures LLC"
-                  width={188}
-                  height={44}
-                  className="h-auto w-33 shrink-0 object-contain sm:w-39 lg:w-47"
-                  priority
-                />
-                <span className="hidden text-[10px] font-medium uppercase tracking-[0.26em] text-lime-300/85 md:inline lg:text-[11px]">
-                  Iron Vault Sales
-                </span>
-              </Link>
-
-              <Link
-                href="tel:8883682502"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-lime-400 px-5 text-sm font-semibold text-black transition-all hover:scale-[1.02] hover:bg-lime-300 hover:shadow-md"
-              >
-                <Phone className="h-4 w-4" />
-                <span className="hidden sm:inline">Call Us Today</span>
-              </Link>
-            </div>
-          </div>
-        </header>
 
         {/* ========== HERO ========== */}
         <section className="relative px-5 pt-16 pb-8 sm:px-8 sm:pt-24 sm:pb-12">
