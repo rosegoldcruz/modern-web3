@@ -4,6 +4,7 @@ type EntitlementStatus = 'active' | 'revoked' | 'expired'
 
 type MemberEntitlementRow = {
   id: string
+  privy_user_id: string | null
   status: EntitlementStatus
   expires_at: string | null
   source?: string | null
@@ -96,7 +97,7 @@ async function findExistingByStripeReference(
 ): Promise<MemberEntitlementRow | null> {
   const { data, error } = await getSupabaseAdmin()
     .from('iv_member_entitlements')
-    .select('id,status,expires_at,source,metadata')
+    .select('id,privy_user_id,status,expires_at,source,metadata')
     .eq(column, value)
     .order('granted_at', { ascending: false })
     .limit(1)
@@ -113,7 +114,7 @@ async function findActiveEntitlement(
   const nowIso = new Date().toISOString()
   const { data, error } = await getSupabaseAdmin()
     .from('iv_member_entitlements')
-    .select('id,status,expires_at,source,metadata')
+    .select('id,privy_user_id,status,expires_at,source,metadata')
     .eq(column, value)
     .eq('status', 'active')
     .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
@@ -211,6 +212,17 @@ export async function grantStripeMemberEntitlement(
   for (const check of identityChecks) {
     const existing = await check
     if (!existing || !isActiveEntitlement(existing)) continue
+
+    // Cross-account guard: an email or wallet match that belongs to a different Privy user
+    // must not block entitlement creation for the actual paying user. Only the privy_user_id
+    // check is authoritative for dedup when both sides have a privy_user_id.
+    if (identity.privyUserId && existing.privy_user_id && existing.privy_user_id !== identity.privyUserId) {
+      console.warn('grantStripeMemberEntitlement: skipping cross-account identity match', {
+        matchedEntitlementId: existing.id,
+        payingPrivyUserId: identity.privyUserId,
+      })
+      continue
+    }
 
     if (isAllModuleInput(input) && existing.source === 'stripe' && getAccessType(existing) === 'single_module') {
       const { error } = await getSupabaseAdmin()
