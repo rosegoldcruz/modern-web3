@@ -16,8 +16,10 @@ export type StripeFulfillmentResult = {
 
 function parseMetadata(session: Stripe.Checkout.Session) {
   const metadata = session.metadata ?? {}
+  const productKey = metadata.product_key ?? metadata.productKey ?? metadata.legacyTier
   const legacyTier = metadata.legacyTier
   const tier = metadata.tier
+  const paymentTier = metadata.paymentTier ?? metadata.payment_tier ?? metadata.tier
   const userId = metadata.userId ?? metadata.privyUserId
   const accessType = metadata.access_type
   const rewardTrack = metadata.reward_track
@@ -54,7 +56,7 @@ function parseMetadata(session: Stripe.Checkout.Session) {
 
   if (accessType === 'all_modules' && validModules.length !== ALL_MODULES.length) throw new Error('Invalid all modules scope')
 
-  return { metadata, userId, tier, legacyTier, accessType, rewardTrack, validModules, moduleNumber }
+  return { metadata, userId, productKey, tier, paymentTier, legacyTier, accessType, rewardTrack, validModules, moduleNumber }
 }
 
 export async function fulfillStripeCheckoutSession(
@@ -92,9 +94,14 @@ export async function fulfillStripeCheckoutSession(
     metadata: {
       stripe_event_type: eventType,
       provider: 'stripe',
+      product_key: parsed.productKey,
       access_type: parsed.accessType,
       module_number: parsed.moduleNumber,
+      modulesToUnlock: parsed.validModules,
       tier: parsed.tier,
+      paymentTier: parsed.paymentTier,
+      payment_tier: parsed.paymentTier,
+      legacyTier: parsed.legacyTier,
       legacy_tier: parsed.legacyTier,
       reward_track: parsed.rewardTrack,
       stripe_price_id: parsed.metadata.stripe_price_id ?? null,

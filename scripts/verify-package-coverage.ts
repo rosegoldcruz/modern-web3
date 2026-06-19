@@ -19,8 +19,10 @@ function buildMetadata(tier: typeof REQUIRED_TIERS[number]) {
     userId: 'did:privy:test',
     privyUserId: 'did:privy:test',
     walletAddress: 'wallet-if-available',
+    product_key: tier,
     legacyTier: tier,
     tier: config.paymentTier,
+    paymentTier: config.paymentTier,
     payment_tier: config.paymentTier,
     modulesToUnlock: JSON.stringify(modulesToUnlock),
     access_type: config.accessType,
@@ -35,7 +37,7 @@ function buildMetadata(tier: typeof REQUIRED_TIERS[number]) {
 function verifyMetadataCoverage() {
   for (const tier of REQUIRED_TIERS) {
     const metadata = buildMetadata(tier)
-    for (const field of ['userId', 'privyUserId', 'walletAddress', 'legacyTier', 'tier', 'payment_tier', 'access_type', 'reward_track']) {
+    for (const field of ['userId', 'privyUserId', 'walletAddress', 'product_key', 'legacyTier', 'tier', 'paymentTier', 'payment_tier', 'modulesToUnlock', 'access_type', 'reward_track']) {
       assert(metadata[field], `${tier} missing metadata ${field}`)
     }
     if (STRIPE_PACKAGE_CONFIG[tier].accessType === 'single_module') {

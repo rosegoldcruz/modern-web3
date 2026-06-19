@@ -51,7 +51,9 @@ export async function POST(req: NextRequest) {
     const metadata: Record<string, string> = {
       userId: auth.privyUserId,
       privyUserId: auth.privyUserId,
+      product_key: config.tier,
       tier: config.paymentTier,
+      paymentTier: config.paymentTier,
       legacyTier: tier,
       modulesToUnlock: JSON.stringify(modulesToUnlock),
       access_type: config.accessType,
