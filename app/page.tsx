@@ -2,7 +2,6 @@
 import { BottomNav } from "@/components/bottom-nav"
 import { Hero } from "@/components/hero"
 import { IronVaultDifference } from "@/components/iron-vault-difference"
-import { IronVaultCTA } from "@/components/iron-vault-cta"
 import OrbitingImages from "@/components/orbiting-images"
 import { AppverseFooter } from "@/components/appverse-footer"
 import { IronVaultShowcase } from "@/components/iron-vault-showcase"
@@ -85,7 +84,6 @@ export default function Page() {
             className="px-4 md:px-6"
           />
         </section>
-        <IronVaultCTA />
         <AppverseFooter />
       </main>
       <BottomNav />
@@ -98,12 +96,6 @@ export default function Page() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(pageStructuredData),
         }}
-      />
-
-      {/* GoHighLevel form embed script */}
-      <Script
-        src="https://link.msgsndr.com/js/form_embed.js"
-        strategy="lazyOnload"
       />
     </>
   )
