@@ -23,10 +23,10 @@ const team = [
     initials: "DC",
   },
   {
-    name: "Mark Hannah",
+    name: "Chris Storms",
     role: "Director of Community",
-    bio: "Mark owns the member experience — from first contact to founding member. He ensures that everyone who enters the Iron Vault ecosystem feels informed, supported, and part of something being built for the long term.",
-    initials: "MH",
+    bio: "Chris owns the member experience — from first contact to founding member. He ensures that everyone who enters the Iron Vault ecosystem feels informed, supported, and part of something being built for the long term.",
+    initials: "CS",
   },
 ]
 
@@ -41,7 +41,7 @@ const values = [
   },
   {
     label: "Real assets, real accountability.",
-    text: "Commonwealth Ventures LLC is a registered Arizona entity. We are not anonymous.",
+    text: "IVT MEDIA GROUP is a registered Wyoming entity. We are not anonymous.",
   },
   {
     label: "Built for the long term.",
@@ -67,7 +67,7 @@ export default function AboutPage() {
               We built this because nobody else was teaching it right.
             </h1>
             <p className="max-w-2xl text-lg leading-relaxed text-white/60 sm:text-xl">
-              Commonwealth Ventures LLC was founded on a simple observation: the financial systems that build real wealth are deliberately complicated, and the people who most need access to them are the least likely to get a straight explanation. Iron Vault exists to fix that.
+              IVT MEDIA GROUP was founded on a simple observation: the financial systems that build real wealth are deliberately complicated, and the people who most need access to them are the least likely to get a straight explanation. Iron Vault exists to fix that.
             </p>
           </div>
         </section>
@@ -137,7 +137,7 @@ export default function AboutPage() {
               </p>
             </div>
             <p className="mb-6 max-w-2xl text-sm text-white/50 sm:text-base">
-              Christopher, Daniel, and Mark operate on behalf of Commonwealth Ventures LLC, the Arizona-registered entity behind the Iron Vault ecosystem.
+              Christopher, Daniel, and Chris operate on behalf of IVT MEDIA GROUP, the Wyoming-registered entity behind the Iron Vault ecosystem.
             </p>
 
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -177,9 +177,9 @@ export default function AboutPage() {
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)]">
-              <EntityRow label="Legal entity" value="Commonwealth Ventures LLC" />
-              <EntityRow label="Entity ID" value={<span className="font-mono text-xs">23883142</span>} />
-              <EntityRow label="State" value="Arizona, USA" />
+              <EntityRow label="Legal entity" value="IVT MEDIA GROUP" />
+              <EntityRow label="Entity ID" value={<span className="font-mono text-xs">2026-001990799</span>} />
+              <EntityRow label="State" value="Wyoming, USA" />
               <EntityRow
                 label="Status"
                 value={<span className="text-lime-300">Active &mdash; In Good Standing</span>}

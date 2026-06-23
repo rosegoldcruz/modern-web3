@@ -17,7 +17,7 @@ const faqs: FAQSection[] = [
     items: [
       {
         q: "What is Iron Vault?",
-        a: "Iron Vault is a financial education platform built by Commonwealth Ventures LLC. We teach everyday people how real estate, digital assets, and passive income systems actually work — in plain English, before asking them to do anything. The Iron Vault Token (IV-SOL) is the ecosystem's utility layer, built on Solana.",
+        a: "Iron Vault is a financial education platform built by IVT MEDIA GROUP. We teach everyday people how real estate, digital assets, and passive income systems actually work — in plain English, before asking them to do anything. The Iron Vault Token (IV-SOL) is the ecosystem's utility layer, built on Solana.",
       },
       {
         q: "Who is this for?",
@@ -29,7 +29,7 @@ const faqs: FAQSection[] = [
       },
       {
         q: "Who runs this?",
-        a: "Commonwealth Ventures LLC — a legally registered Arizona domestic LLC (Entity ID: 23883142), formed September 15, 2025, and active in good standing with the Arizona Corporation Commission. Christopher Maxon serves as CEO. Daniel Cruz leads growth and platform development. Mark Hannah leads community.",
+        a: "IVT MEDIA GROUP — a legally registered Wyoming domestic LLC (Entity ID: 2026-001990799), formed May 28, 2026, and active in good standing with the Wyoming Secretary of State. Christopher Maxon serves as CEO. Daniel Cruz leads growth and platform development. Chris Storms leads community.",
       },
     ],
   },
@@ -67,11 +67,11 @@ const faqs: FAQSection[] = [
       },
       {
         q: "What is the 6% transaction fee and where does it go?",
-        a: "IV-SOL uses the Token 2022 transfer fee extension — a Solana-native feature that applies a 6% fee on token transfers. That fee is split: 3% funds Commonwealth Ventures operations (development, acquisitions, infrastructure) and 3% flows back into the ecosystem for community participants. The exact on-chain distribution mechanism will be published in the whitepaper.",
+        a: "IV-SOL uses the Token 2022 transfer fee extension — a Solana-native feature that applies a 6% fee on token transfers. That fee is split: 3% funds IVT MEDIA GROUP operations (development, acquisitions, infrastructure) and 3% flows back into the ecosystem for community participants. The exact on-chain distribution mechanism will be published in the whitepaper.",
       },
       {
         q: "Is IV-SOL an investment?",
-        a: "IV-SOL is a utility token. It is not a stock, bond, or security. It does not represent equity in Commonwealth Ventures LLC. Participation in the ecosystem does not guarantee any financial return. Crypto markets are volatile. Only engage with what you fully understand and can afford to lose.",
+        a: "IV-SOL is a utility token. It is not a stock, bond, or security. It does not represent equity in IVT MEDIA GROUP. Participation in the ecosystem does not guarantee any financial return. Crypto markets are volatile. Only engage with what you fully understand and can afford to lose.",
       },
       {
         q: "How is the token supply distributed?",
@@ -105,7 +105,7 @@ const faqs: FAQSection[] = [
     items: [
       {
         q: "How do I know this is legitimate?",
-        a: "Commonwealth Ventures LLC is verifiable in 30 seconds on the Arizona Corporation Commission's public business search at azcc.gov — Entity ID 23883142, active, in good standing. The IV-SOL token contract is publicly visible on Solscan at address DTe8U4RnErPN1CKiJ5HcyZPEAGXMg6j6ueindYuowfjV. We are not anonymous. We are not hiding.",
+        a: "IVT MEDIA GROUP is verifiable in 30 seconds on the Wyoming Secretary of State's public business search at wyobiz.wyo.gov — Entity ID 2026-001990799, active, in good standing. The IV-SOL token contract is publicly visible on Solscan at address DTe8U4RnErPN1CKiJ5HcyZPEAGXMg6j6ueindYuowfjV. We are not anonymous. We are not hiding.",
       },
       {
         q: "Has the token been audited?",

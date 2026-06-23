@@ -8,7 +8,7 @@ const sections = [
     eyebrow: "What We Collect",
     title: "We collect the information needed to deliver course access, authentication, and token-related functionality.",
     body: [
-      "Commonwealth Ventures LLC, operator of Iron Vault, may collect personal information that you provide directly when you sign up, request access, purchase coursework, contact us, authenticate through our platform, or otherwise interact with the service. The primary categories of information we collect include your name, email address, phone number, and wallet address.",
+      "IVT MEDIA GROUP, operator of Iron Vault, may collect personal information that you provide directly when you sign up, request access, purchase coursework, contact us, authenticate through our platform, or otherwise interact with the service. The primary categories of information we collect include your name, email address, phone number, and wallet address.",
       "We may also collect related account and usage information tied to those identifiers, such as authentication status, course enrollment details, coursework progress, token allocation eligibility status, transaction-related metadata, communications with support, and technical information associated with your use of the website and platform.",
       "If you connect a wallet or use token-related functionality, we may collect and store your wallet address and related ecosystem data necessary to verify eligibility, display information, or facilitate token distribution mechanics. Public blockchain information is inherently transparent, and transactions associated with a wallet address may be visible on public networks and block explorers independent of our systems.",
     ],
@@ -19,7 +19,7 @@ const sections = [
     title: "We use your data to operate the platform, grant course access, distribute tokens, and communicate with you.",
     body: [
       "We use the information we collect to create and manage your account, authenticate you, provide access to coursework, track course completion, determine eligibility for IV-SOL token allocation where applicable, facilitate token distribution workflows, respond to questions, deliver customer support, and maintain the overall performance, integrity, and security of the platform.",
-      "We may also use your name, email address, and phone number to send platform-related communications, onboarding messages, course updates, account notices, transaction or access confirmations, support responses, and marketing or informational communications relating to Iron Vault and Commonwealth Ventures LLC, subject to applicable law and any opt-out rights you may have.",
+      "We may also use your name, email address, and phone number to send platform-related communications, onboarding messages, course updates, account notices, transaction or access confirmations, support responses, and marketing or informational communications relating to Iron Vault and IVT MEDIA GROUP, subject to applicable law and any opt-out rights you may have.",
       "We use technical and operational data to monitor platform stability, detect fraud or abuse, troubleshoot issues, improve user experience, analyze feature performance, maintain records, and comply with legal, accounting, regulatory, and risk-management obligations.",
     ],
   },
@@ -28,7 +28,7 @@ const sections = [
     eyebrow: "We Do Not Sell Your Data",
     title: "Your personal information is not sold for money to third parties.",
     body: [
-      "Commonwealth Ventures LLC does not sell your personal information to third parties. We do not exchange your personal data for direct monetary compensation in the ordinary course of operating Iron Vault.",
+      "IVT MEDIA GROUP does not sell your personal information to third parties. We do not exchange your personal data for direct monetary compensation in the ordinary course of operating Iron Vault.",
       "We may share limited data with service providers and infrastructure partners that help us operate the platform, authenticate users, process payments, support token-related workflows, communicate with users, or maintain site functionality, but those operational disclosures are different from selling data. Where we use service providers, we do so for business purposes connected to running Iron Vault.",
       "If our practices materially change in the future, we would update this Privacy Policy to reflect those changes. Until then, the operating position is simple: we do not sell your data.",
     ],
@@ -56,10 +56,10 @@ const sections = [
   {
     id: "contact",
     eyebrow: "Contact",
-    title: "Commonwealth Ventures LLC is the business responsible for this policy.",
+    title: "IVT MEDIA GROUP is the business responsible for this policy.",
     body: [
-      "If you have questions about this Privacy Policy, your information, our data practices, or a request relating to your personal information, you may contact Commonwealth Ventures LLC at (888) 368-2502.",
-      "This Privacy Policy applies to Iron Vault, the financial education platform operated by Commonwealth Ventures LLC. By using the platform, you acknowledge that you have reviewed this policy and understand how your information may be collected, used, and shared as described here.",
+      "If you have questions about this Privacy Policy, your information, our data practices, or a request relating to your personal information, you may contact IVT MEDIA GROUP at (888) 368-2502.",
+      "This Privacy Policy applies to Iron Vault, the financial education platform operated by IVT MEDIA GROUP. By using the platform, you acknowledge that you have reviewed this policy and understand how your information may be collected, used, and shared as described here.",
     ],
   },
 ] as const
@@ -76,10 +76,10 @@ export default function PrivacyPage() {
               Privacy Policy
             </p>
             <h1 className="mb-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Privacy Policy for Iron Vault / Commonwealth Ventures LLC
+              Privacy Policy for Iron Vault / IVT MEDIA GROUP
             </h1>
             <p className="max-w-3xl text-lg leading-relaxed text-white/60 sm:text-xl">
-              This policy explains what personal information Iron Vault collects, how it is used, what third-party services support the platform, and the commitments Commonwealth Ventures LLC makes regarding your data.
+              This policy explains what personal information Iron Vault collects, how it is used, what third-party services support the platform, and the commitments IVT MEDIA GROUP makes regarding your data.
             </p>
           </div>
         </section>

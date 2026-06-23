@@ -14,7 +14,7 @@ interface FooterContent {
 
 const defaultContent: FooterContent = {
   tagline: "Real estate. Tokenized. Understood. The entry point into decentralized real-world asset finance.",
-  copyright: "© 2025 — Commonwealth Ventures LLC",
+  copyright: "© 2025 — IVT MEDIA GROUP",
 }
 
 export function AppverseFooter() {
