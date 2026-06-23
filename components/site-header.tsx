@@ -13,9 +13,9 @@ export function SiteHeader() {
             <Image
               src="/IVT/ivt-alpha.png"
               alt="IVT MEDIA GROUP"
-              width={188}
-              height={44}
-              className="h-auto w-[132px] shrink-0 object-contain sm:w-[156px] lg:w-[188px]"
+              width={148}
+              height={35}
+              className="h-auto w-[104px] shrink-0 object-contain sm:w-[124px] lg:w-[148px]"
               priority
             />
             <span className="hidden text-[10px] font-medium uppercase tracking-[0.26em] text-lime-300/85 md:inline lg:text-[11px]">

@@ -62,7 +62,7 @@ export default function Page() {
             images={[
               "/images/commercial%203.png",
               "/images/commercial%204.png",
-              "/logos/cw.png",
+              "/IVT/ivt-black.png",
               "/images/office%201.png",
               "/images/office%205.png",
               "/images/office%207.png",
