@@ -3,6 +3,7 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import Script from "next/script"
+import { RedditTrackingProvider } from "@/components/analytics/reddit-tracking-provider"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -69,6 +70,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <RedditTrackingProvider />
         <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_80%_-10%,rgba(139,92,246,0.16),transparent_48%),linear-gradient(180deg,#050507_0%,#0a0a0d_100%)]" />
         <div className="relative z-10">{children}</div>
       </body>

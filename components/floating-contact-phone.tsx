@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react"
 import { Wifi, BatteryCharging, Send, Shield, CheckCircle } from "lucide-react"
 import { motion } from "motion/react"
 import { Drawer } from "vaul"
+import { trackRedditEvent } from "@/lib/reddit/client"
+import { createRedditConversionId, REDDIT_TRACKING_TYPES } from "@/lib/reddit/events"
 
 const WEBHOOK =
   process.env.NEXT_PUBLIC_CUSTOM_PHONE_FORM_WEBHOOK_URL ||
@@ -195,7 +197,7 @@ function EarlyAccessForm({
     const data = new FormData(form)
     setStatus("sending")
     try {
-      await fetch(WEBHOOK, {
+      const response = await fetch(WEBHOOK, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -208,6 +210,18 @@ function EarlyAccessForm({
           form_label: "custom-phone-form",
         }),
       })
+
+      if (!response.ok) {
+        throw new Error("Lead form submission failed")
+      }
+
+      const conversionId = createRedditConversionId()
+      await trackRedditEvent({
+        type: REDDIT_TRACKING_TYPES.LEAD,
+        conversionId,
+        eventSourceUrl: window.location.href,
+      })
+
       setStatus("sent")
       onSent?.()
     } catch {

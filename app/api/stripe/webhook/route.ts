@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { fulfillStripeCheckoutSession } from '@/lib/server/stripe-fulfillment'
+import { REDDIT_TRACKING_TYPES, createRedditConversionId } from '@/lib/reddit/events'
+import { postRedditConversionEvent } from '@/lib/server/reddit-capi'
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -50,6 +52,34 @@ export async function POST(req: NextRequest) {
 
   try {
     const fulfillment = await fulfillStripeCheckoutSession(session, event.type)
+
+    if (!fulfillment.paymentAlreadyExists) {
+      const redditConversionId = session.metadata?.reddit_conversion_id ?? createRedditConversionId()
+      const redditClickId = session.metadata?.rdt_cid
+      const successUrl = typeof session.success_url === 'string' && session.success_url.length > 0
+        ? session.success_url
+        : process.env.NEXT_PUBLIC_BASE_URL
+
+      if (successUrl) {
+        const redditResponse = await postRedditConversionEvent({
+          type: REDDIT_TRACKING_TYPES.PURCHASE,
+          conversionId: redditConversionId,
+          eventSourceUrl: successUrl,
+          clickId: redditClickId,
+          externalId: session.client_reference_id ?? undefined,
+          metadata: {
+            currency: session.currency?.toUpperCase(),
+            value: typeof session.amount_total === 'number' ? session.amount_total / 100 : undefined,
+          },
+        })
+
+        if (!redditResponse.ok) {
+          const redditError = await redditResponse.text().catch(() => 'unknown Reddit API error')
+          console.error('stripe webhook reddit capi error', { status: redditResponse.status, redditError })
+        }
+      }
+    }
+
     console.info('stripe webhook entitlement granted', {
       eventType: event.type,
       checkoutSessionId: session.id,

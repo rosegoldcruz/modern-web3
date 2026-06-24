@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { requirePrivyUser } from '@/lib/server/privy-auth'
 import { getStripePackageConfig, modulesForStripePackage } from '@/lib/server/stripe-package-config'
+import { createRedditConversionId } from '@/lib/reddit/events'
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -13,12 +14,23 @@ function isInternalDollarTestEnabled(): boolean {
   return process.env.ENABLE_INTERNAL_DOLLAR_TEST?.trim().toLowerCase() === 'true'
 }
 
+function appendSuccessTrackingParams(successUrl: string, conversionId: string): string {
+  const url = new URL(successUrl)
+  if (!url.searchParams.get('payment')) {
+    url.searchParams.set('payment', 'success')
+  }
+  url.searchParams.set('reddit_conversion_id', conversionId)
+  return url.toString()
+}
+
 export async function POST(req: NextRequest) {
   try {
     const stripeSecretKey = requireEnv('STRIPE_SECRET_KEY')
-    const successUrl = process.env.STRIPE_CHECKOUT_SUCCESS_URL?.trim() || 'https://member.ironvaulttoken.com/dashboard'
+    const successUrl = process.env.STRIPE_CHECKOUT_SUCCESS_URL?.trim() || 'https://www.ironvaulttoken.com/learn/dashboard?payment=success'
     const cancelUrl = process.env.STRIPE_CHECKOUT_CANCEL_URL?.trim() || 'https://ironvaulttoken.com/learn'
     const auth = await requirePrivyUser(req)
+    const redditClickId = req.cookies.get('rdt_cid')?.value
+    const redditConversionId = createRedditConversionId()
 
     const body = await req.json()
     const { tier } = body
@@ -65,11 +77,13 @@ export async function POST(req: NextRequest) {
     if ('internalTest' in config && config.internalTest) metadata.internal_test = 'true'
     if (auth.email) metadata.email = auth.email
     if (auth.walletAddress) metadata.walletAddress = auth.walletAddress
+    metadata.reddit_conversion_id = redditConversionId
+    if (redditClickId) metadata.rdt_cid = redditClickId
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [{ price: stripePriceId, quantity: 1 }],
-      success_url: successUrl,
+      success_url: appendSuccessTrackingParams(successUrl, redditConversionId),
       cancel_url: cancelUrl,
       client_reference_id: auth.privyUserId,
       metadata,

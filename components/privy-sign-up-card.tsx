@@ -4,16 +4,37 @@ import { useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { usePrivy } from "@privy-io/react-auth"
+import { trackRedditEvent } from "@/lib/reddit/client"
+import { createRedditConversionId, REDDIT_TRACKING_TYPES } from "@/lib/reddit/events"
+
+const SIGN_UP_ATTEMPT_KEY = "reddit_sign_up_attempt"
 
 export function PrivySignUpCard() {
   const { authenticated, login, ready } = usePrivy()
   const router = useRouter()
 
   useEffect(() => {
-    if (ready && authenticated) {
-      router.replace("/learn")
+    if (!ready || !authenticated) return
+
+    if (typeof window !== "undefined" && window.sessionStorage.getItem(SIGN_UP_ATTEMPT_KEY) === "1") {
+      window.sessionStorage.removeItem(SIGN_UP_ATTEMPT_KEY)
+      const conversionId = createRedditConversionId()
+      void trackRedditEvent({
+        type: REDDIT_TRACKING_TYPES.SIGN_UP,
+        conversionId,
+        eventSourceUrl: window.location.href,
+      })
     }
+
+    router.replace("/learn")
   }, [authenticated, ready, router])
+
+  function handleLogin() {
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(SIGN_UP_ATTEMPT_KEY, "1")
+    }
+    void login()
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4">
@@ -25,7 +46,7 @@ export function PrivySignUpCard() {
         </p>
         <button
           className="w-full rounded-full bg-[#AAFF00] px-5 py-3 font-semibold text-black transition hover:bg-[#98e600] disabled:cursor-not-allowed disabled:opacity-60"
-          onClick={login}
+          onClick={handleLogin}
           disabled={!ready}
         >
           {authenticated ? "Already signed in" : "Continue with Privy"}
