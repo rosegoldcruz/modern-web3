@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { SiteHeader } from "@/components/site-header"
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');`
 
@@ -45,6 +46,8 @@ export default function LearnPage() {
       </div>
 
       <div className="relative z-10">
+        <SiteHeader />
+
         {/* Terminal status bar */}
         <div className="border-b border-white/[0.06] bg-black/40 backdrop-blur-sm">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
