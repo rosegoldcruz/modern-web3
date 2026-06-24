@@ -50,15 +50,21 @@ export async function trackRedditEvent({
 
   if (!includeCapi) return
 
-  await fetch("/api/reddit/conversion", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type,
-      conversionId,
-      eventSourceUrl: eventSourceUrl ?? window.location.href,
-      metadata,
-    }),
-    keepalive: true,
-  })
+  try {
+    await fetch("/api/reddit/conversion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type,
+        conversionId,
+        eventSourceUrl: eventSourceUrl ?? window.location.href,
+        metadata,
+      }),
+      keepalive: true,
+    })
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[reddit-conversion] Failed to post CAPI event", error instanceof Error ? error.message : error)
+    }
+  }
 }

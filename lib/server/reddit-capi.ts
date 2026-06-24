@@ -2,6 +2,13 @@ import type { RedditTrackingType } from "@/lib/reddit/events"
 
 const REDDIT_CONVERSION_ENDPOINT = "https://ads-api.reddit.com/api/v3/pixels"
 
+export class MissingRedditCapiEnvError extends Error {
+  constructor(public readonly envName: string) {
+    super(`Missing required env var: ${envName}`)
+    this.name = "MissingRedditCapiEnvError"
+  }
+}
+
 export type RedditConversionPayload = {
   type: RedditTrackingType
   conversionId: string
@@ -26,7 +33,7 @@ export type RedditConversionPayload = {
 function requireEnv(name: string): string {
   const value = process.env[name]
   if (!value) {
-    throw new Error(`Missing required env var: ${name}`)
+    throw new MissingRedditCapiEnvError(name)
   }
 
   return value

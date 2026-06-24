@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { REDDIT_TRACKING_TYPES, type RedditTrackingType } from "@/lib/reddit/events"
-import { getClientIpAddress, postRedditConversionEvent } from "@/lib/server/reddit-capi"
+import { getClientIpAddress, MissingRedditCapiEnvError, postRedditConversionEvent } from "@/lib/server/reddit-capi"
 
 type RequestBody = {
   type: RedditTrackingType
@@ -15,6 +15,10 @@ type RequestBody = {
 }
 
 const REDDIT_CLICK_COOKIE = "rdt_cid"
+
+function logRedditConversion(message: string, details: Record<string, unknown>): void {
+  console.warn("[reddit-conversion]", message, details)
+}
 
 function isValidTrackingType(value: string): value is RedditTrackingType {
   return Object.values(REDDIT_TRACKING_TYPES).includes(value as RedditTrackingType)
@@ -61,6 +65,11 @@ export async function POST(request: NextRequest) {
 
     const payload = await response.json().catch(() => null)
     if (!response.ok) {
+      logRedditConversion("Reddit CAPI rejected conversion event", {
+        redditStatus: response.status,
+        redditResponse: payload,
+      })
+
       return NextResponse.json(
         {
           error: "Failed to post conversion event",
@@ -73,7 +82,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, redditResponse: payload })
   } catch (error) {
+    if (error instanceof MissingRedditCapiEnvError) {
+      logRedditConversion("Reddit CAPI disabled because required env is missing", {
+        missingEnv: error.envName,
+      })
+
+      return new NextResponse(null, { status: 204 })
+    }
+
     const message = error instanceof Error ? error.message : "Failed to post conversion event"
-    return NextResponse.json({ error: message }, { status: 500 })
+    logRedditConversion("Reddit CAPI conversion event failed", {
+      message,
+    })
+
+    return NextResponse.json({ error: message }, { status: 502 })
   }
 }

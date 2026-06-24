@@ -33,16 +33,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <head>
-        {/* Font Preload */}
-        <link
-          rel="preload"
-          href="/fonts/Inter.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-          fetchPriority="high"
-        />
-
         {/* Google Tag Manager (deferred) */}
         <Script id="gtm-script" strategy="lazyOnload">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
