@@ -1,294 +1,359 @@
 import Link from "next/link"
+import { ArrowRight, BookOpen, CheckCircle2, Lock, Minus, ShieldCheck } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
+import { BottomNav } from "@/components/bottom-nav"
+import { AppverseFooter } from "@/components/appverse-footer"
 
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');`
+const promiseCards = [
+  {
+    title: "Education Before Participation",
+    body: "Iron Vault starts with learning because nobody should be rushed into token participation before they understand the system.",
+    icon: BookOpen,
+  },
+  {
+    title: "Real Assets, Plain English",
+    body: "We explain real estate, digital assets, token utility, and platform access in direct language for everyday people.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "No Hype, No Guarantees",
+    body: "The Academy is built to slow down the decision, remove pressure, and make the risks easier to see before anyone pays.",
+    icon: Minus,
+  },
+  {
+    title: "Verify Before You Move",
+    body: "Completion, checkpoints, and platform rules come before deeper access, member tools, rewards, or token allocation eligibility.",
+    icon: CheckCircle2,
+  },
+] satisfies Array<{ title: string; body: string; icon: LucideIcon }>
 
-const CSS = `
-  ${FONTS}
-  .lv-root{font-family:'DM Sans',system-ui,sans-serif;}
-  .lv-mono{font-family:'Space Mono',ui-monospace,monospace;}
-  .lv-display{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;}
-  .lv-grid-bg{
-    background-image:
-      linear-gradient(rgba(123,47,190,0.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(123,47,190,0.05) 1px,transparent 1px);
-    background-size:80px 80px;
-  }
-  .lv-scanline{
-    background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(255,255,255,0.012) 3px,rgba(255,255,255,0.012) 4px);
-  }
-  .lv-fade{animation:lvFade 0.7s ease both;}
-  @keyframes lvFade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-  .lv-blink{animation:lvBlink 1.4s steps(2,start) infinite;}
-  @keyframes lvBlink{to{visibility:hidden;}}
-  .lv-tier:hover .lv-tier-arrow{transform:translateX(4px);}
-`
+const pathSteps = [
+  { number: "01", title: "Acquire", body: "Start with the public Academy entry and understand what Iron Vault is teaching." },
+  { number: "02", title: "Verify", body: "Work through the lesson path and confirm the foundation before moving deeper." },
+  { number: "03", title: "Unlock", body: "Choose a paid track only after the Academy and platform rules make sense." },
+  { number: "04", title: "Understand", body: "Build context around real assets, token utility, custody, and risk." },
+  { number: "05", title: "Participate", body: "Enter the member portal with a clearer view of what access means." },
+  { number: "06", title: "Continue", body: "Use the paid dashboard for course progress, vault access, referrals, VIP, status, and account tools." },
+]
 
-const TIERS = [
-  { code: "T-01", name: "MODULE", price: "$25", allocation: "25,000", clearance: "ENTRY" },
-  { code: "T-02", name: "STARTER", price: "$100", allocation: "100,000", clearance: "FOUNDATION" },
-  { code: "T-03", name: "BUILDER", price: "$500", allocation: "500,000", clearance: "ACCELERATOR" },
-  { code: "T-04", name: "FOUNDER", price: "$1,000", allocation: "1,000,000", clearance: "ELITE" },
+const lockedModules = [
+  "Vault Thesis",
+  "Digital Ownership Basics",
+  "Token Utility",
+  "Real-World Asset Foundations",
+  "Risk And Volatility",
+  "Verification Path",
+]
+
+const tiers = [
+  {
+    name: "Starter",
+    price: "$100",
+    allocation: "100,000 IV-SOL",
+    body: "Foundation access for people who want the full Academy path without jumping straight to the highest tier.",
+    event: "Learn_Pricing_Starter_Click",
+  },
+  {
+    name: "Builder",
+    price: "$500",
+    allocation: "500,000 IV-SOL",
+    body: "A deeper commitment track for members who want broader education access and stronger platform positioning.",
+    event: "Learn_Pricing_Builder_Click",
+    featured: true,
+  },
+  {
+    name: "Founder",
+    price: "$1,000",
+    allocation: "1,000,000 IV-SOL",
+    body: "Founder-level coursework access for early participants who want the highest listed founding allocation tier.",
+    event: "Learn_Pricing_Founder_Click",
+  },
+]
+
+const transparency = [
+  "Digital assets involve risk, volatility, and changing market conditions.",
+  "Education does not guarantee profit, returns, token value, or future financial outcomes.",
+  "Token allocations, access, and rewards depend on verified completion and platform rules.",
 ]
 
 export default function LearnPage() {
   return (
-    <main className="lv-root min-h-screen bg-[#050505] text-white selection:bg-[#AAFF00] selection:text-black">
-      <style>{CSS}</style>
-
-      {/* Atmospheric background */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 lv-grid-bg opacity-60" />
-        <div className="absolute inset-0 lv-scanline" />
-        <div className="absolute -top-72 right-[-220px] h-[700px] w-[700px] rounded-full bg-[radial-gradient(circle,rgba(123,47,190,0.18),transparent_70%)]" />
-        <div className="absolute -bottom-72 left-[-200px] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(170,255,0,0.07),transparent_72%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.85)_100%)]" />
-      </div>
-
-      <div className="relative z-10">
+    <>
+      <main className="min-h-[100dvh] overflow-hidden pb-[calc(env(safe-area-inset-bottom)+88px)] text-white lg:pb-0">
         <SiteHeader />
 
-        {/* Terminal status bar */}
-        <div className="border-b border-white/[0.06] bg-black/40 backdrop-blur-sm">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
-            <div className="lv-mono flex items-center gap-3 text-[10px] tracking-[0.25em] text-white/40">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#AAFF00] shadow-[0_0_8px_#AAFF00]" />
-              <span>IRON_VAULT // ACADEMY_LAYER</span>
-            </div>
-            <div className="lv-mono text-[10px] tracking-[0.25em] text-white/30">
-              STATUS: <span className="text-[#AAFF00]">ONLINE</span>
-            </div>
-          </div>
-        </div>
-
-        {/* HERO — cinematic, sparse */}
-        <section className="mx-auto flex min-h-[88vh] max-w-6xl flex-col items-center justify-center px-4 py-24 text-center sm:px-8">
-          <div className="lv-fade lv-mono mb-10 inline-flex items-center gap-3 border border-white/10 bg-black/40 px-4 py-2 text-[10px] tracking-[0.35em] text-white/50">
-            <span className="h-1.5 w-1.5 bg-[#7B2FBE]" />
-            RESTRICTED ACCESS LAYER
-          </div>
-
-          <h1 className="lv-display lv-fade text-balance text-[14vw] leading-[0.92] text-white sm:text-[110px] md:text-[140px]">
-            EDUCATION
-            <br />
-            <span className="text-white/30">BEFORE</span>
-            <br />
-            <span className="text-[#AAFF00]">DISTRIBUTION</span>
-          </h1>
-
-          <p className="lv-mono lv-fade mt-12 max-w-md text-[11px] leading-relaxed tracking-[0.18em] text-white/45">
-            START WITH THE FREE ACADEMY ENTRY.
-            <br />
-            UNDERSTAND THE SYSTEM BEFORE YOU UNLOCK THE VAULT.
-          </p>
-
-          <div className="lv-fade mt-14 flex flex-col items-center gap-4 sm:flex-row">
-            <Link
-              href="/academy"
-              className="lv-display group relative inline-flex items-center gap-4 border border-[#AAFF00] bg-[#AAFF00] px-10 py-4 text-base text-black transition hover:bg-[#BFFF33]"
-            >
-              <span>START FREE MODULE</span>
-              <span className="lv-mono text-[10px] tracking-[0.2em]">▸</span>
-            </Link>
-            <Link
-              href="https://member.ironvaulttoken.com/dashboard"
-              className="lv-mono inline-flex items-center gap-3 border border-white/15 px-8 py-4 text-[10px] tracking-[0.3em] text-white/60 transition hover:border-white/40 hover:text-white"
-            >
-              MEMBER LOGIN
-            </Link>
-            <Link
-              href="/how-it-works"
-              className="lv-mono inline-flex items-center gap-3 border border-white/15 px-8 py-4 text-[10px] tracking-[0.3em] text-white/60 transition hover:border-white/40 hover:text-white"
-            >
-              SYSTEM BRIEF
-            </Link>
-          </div>
-
-          <div className="lv-mono mt-20 flex items-center gap-2 text-[9px] tracking-[0.3em] text-white/25">
-            <span className="lv-blink">▌</span>
-            <span>AWAITING_OPERATOR_INPUT</span>
-          </div>
-        </section>
-
-        {/* TERMINAL PREVIEW — operator console, not dashboard */}
-        <section className="mx-auto max-w-5xl px-4 pb-32 sm:px-8">
-          <div className="lv-mono mb-6 flex items-center justify-between text-[10px] tracking-[0.3em] text-white/30">
-            <span>{"// OPERATOR_CONSOLE"}</span>
-            <span>VIEW: SAMPLE</span>
-          </div>
-
-          <div className="border border-white/10 bg-black/60 backdrop-blur-sm">
-            {/* Terminal header */}
-            <div className="flex items-center justify-between border-b border-white/[0.06] bg-white/[0.02] px-5 py-3">
-              <div className="lv-mono flex items-center gap-2 text-[10px] tracking-[0.2em] text-white/40">
-                <span className="h-2 w-2 rounded-full bg-[#7B2FBE]" />
-                IV_CONSOLE_v0.1
-              </div>
-              <div className="lv-mono text-[9px] tracking-[0.25em] text-white/25">
-                SESSION: 0x7F2A
-              </div>
-            </div>
-
-            {/* Console body */}
-            <div className="grid divide-y divide-white/[0.05] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-              <div className="divide-y divide-white/[0.05]">
-                <ConsoleRow label="OPERATOR_ID" value="0xA3…F09B" />
-                <ConsoleRow label="CLEARANCE" value="STARTER" accent />
-                <ConsoleRow label="MODULES_VERIFIED" value="04 / 06" />
-                <ConsoleRow label="CHECKPOINT" value="ACTIVE" accent />
-              </div>
-              <div className="divide-y divide-white/[0.05]">
-                <ConsoleRow label="VAULT_ACCESS" value="PARTIAL" />
-                <ConsoleRow label="ALLOCATION_TIER" value="100,000 IV-SOL" accent />
-                <ConsoleRow label="DISTRIBUTION" value="PENDING_COMPLETION" />
-                <ConsoleRow label="SYSTEM_STATUS" value="LOCKED" warn />
-              </div>
-            </div>
-
-            {/* Console footer */}
-            <div className="border-t border-white/[0.06] bg-white/[0.02] px-5 py-3">
-              <div className="lv-mono flex items-center gap-2 text-[10px] tracking-[0.2em] text-white/35">
-                <span className="lv-blink text-[#AAFF00]">▌</span>
-                <span>EXEC: complete_module --id=05</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ACCESS TIERS — classified clearance, not pricing cards */}
-        <section className="border-y border-white/[0.06] bg-black/40">
-          <div className="mx-auto max-w-6xl px-4 py-28 sm:px-8">
-            <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="lv-mono mb-4 text-[10px] tracking-[0.35em] text-white/40">
-                  {"// ACCESS_TIERS"}
-                </p>
-                <h2 className="lv-display text-5xl text-white sm:text-7xl">
-                  CLEARANCE PATHS
-                </h2>
-              </div>
-              <p className="lv-mono max-w-xs text-[10px] leading-relaxed tracking-[0.18em] text-white/40">
-                EACH TIER GRANTS COURSEWORK ACCESS AND A FIXED IV-SOL ALLOCATION UPON VERIFIED COMPLETION.
+        {/* Hero */}
+        <section className="relative mx-auto w-full max-w-[1400px] px-4 pt-12 pb-12 sm:px-6 sm:pt-20 sm:pb-16">
+          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[520px] max-w-5xl rounded-full bg-[radial-gradient(circle_at_center,rgba(132,204,22,0.11),rgba(126,34,206,0.11)_38%,transparent_70%)] blur-3xl" />
+          <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-lime-300">
+                The Iron Vault Academy
               </p>
+              <h1 className="mb-5 max-w-3xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                Learn first. Participate after.
+              </h1>
+              <p className="max-w-2xl text-lg leading-relaxed text-white/65 sm:text-xl">
+                Iron Vault starts with education before token participation. The Academy explains real assets, digital ownership, platform access, and risk in plain English before asking users to pay or enter the member system.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/academy"
+                  aria-label="Start learning now in the free Iron Vault Academy entry"
+                  data-reddit-event="Learn_Hero_StartLearning_Click"
+                  className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
+                >
+                  Start Learning Now
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                </Link>
+                <Link
+                  href="#modules"
+                  aria-label="View the Iron Vault Academy module path"
+                  data-reddit-event="Learn_Hero_ViewModules_Click"
+                  className="inline-flex min-h-[50px] items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition-all hover:border-lime-400/40 hover:bg-white/[0.08] hover:text-lime-200"
+                >
+                  View Modules
+                </Link>
+              </div>
             </div>
 
-            <div className="border border-white/10">
-              {TIERS.map((tier, i) => (
-                <Link
-                  key={tier.code}
-                  href="/academy"
-                  className={`lv-tier group grid grid-cols-12 items-center gap-4 px-5 py-6 transition hover:bg-white/[0.03] sm:px-8 sm:py-8 ${
-                    i !== TIERS.length - 1 ? "border-b border-white/[0.06]" : ""
-                  }`}
+            <div className="rounded-3xl border border-white/10 bg-[rgba(255,255,255,0.05)] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-5">
+              <div className="rounded-2xl border border-white/10 bg-black/35 p-5 sm:p-6">
+                <div className="mb-5 flex items-center justify-between gap-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Academy flow</p>
+                  <span className="rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-xs font-semibold text-lime-200">
+                    Public first
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  <FlowRow label="/learn" value="Academy landing" active />
+                  <FlowRow label="/academy" value="Free entry + Module 0" active />
+                  <FlowRow label="Modules 1-6" value="Locked previews" />
+                  <FlowRow label="/learn/pay" value="Pricing and unlock" />
+                  <FlowRow label="Member portal" value="Protected access" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Academy promise */}
+        <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="mx-auto max-w-6xl">
+            <SectionIntro
+              label="Academy promise"
+              title="A cleaner path into the Vault."
+              body="The Learn page should answer the question before the paywall: what is this, why does the Academy exist, and what happens after someone understands it?"
+            />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {promiseCards.map(({ title, body, icon: Icon }) => (
+                <article
+                  key={title}
+                  className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-6 transition-colors hover:border-lime-400/30 hover:bg-[rgba(255,255,255,0.08)]"
                 >
-                  <div className="lv-mono col-span-2 text-[10px] tracking-[0.25em] text-white/30 sm:col-span-1">
-                    {tier.code}
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-full border border-lime-400/30 bg-lime-400/10 text-lime-300">
+                    <Icon className="h-5 w-5" aria-hidden />
                   </div>
-                  <div className="col-span-10 sm:col-span-3">
-                    <div className="lv-display text-2xl text-white sm:text-3xl">{tier.name}</div>
-                    <div className="lv-mono mt-1 text-[9px] tracking-[0.25em] text-[#7B2FBE]">
-                      {tier.clearance}
-                    </div>
-                  </div>
-                  <div className="col-span-6 sm:col-span-3">
-                    <div className="lv-mono text-[9px] tracking-[0.25em] text-white/30">COURSEWORK</div>
-                    <div className="lv-display mt-1 text-2xl text-white sm:text-3xl">{tier.price}</div>
-                  </div>
-                  <div className="col-span-6 sm:col-span-4">
-                    <div className="lv-mono text-[9px] tracking-[0.25em] text-white/30">ALLOCATION</div>
-                    <div className="lv-display mt-1 text-2xl text-[#AAFF00] sm:text-3xl">
-                      {tier.allocation}
-                      <span className="lv-mono ml-2 text-[10px] tracking-[0.2em] text-white/40">IV-SOL</span>
-                    </div>
-                  </div>
-                  <div className="lv-tier-arrow lv-mono col-span-12 mt-2 flex items-center justify-end gap-2 text-[10px] tracking-[0.3em] text-white/30 transition group-hover:text-[#AAFF00] sm:col-span-1 sm:mt-0">
-                    <span>REQUEST</span>
-                    <span>▸</span>
-                  </div>
-                </Link>
+                  <h2 className="mb-3 text-xl font-bold tracking-tight text-white">{title}</h2>
+                  <p className="text-sm leading-relaxed text-white/58 sm:text-base">{body}</p>
+                </article>
               ))}
             </div>
           </div>
         </section>
 
-        {/* PROTOCOL — minimal, terminal style */}
-        <section className="mx-auto max-w-5xl px-4 py-28 sm:px-8">
-          <p className="lv-mono mb-4 text-[10px] tracking-[0.35em] text-white/40">{"// PROTOCOL"}</p>
-          <h2 className="lv-display mb-16 text-5xl text-white sm:text-7xl">
-            FREE ENTRY.
-            <br />
-            <span className="text-white/30">TWELVE PREVIEWS.</span>
-          </h2>
+        {/* Module path */}
+        <section id="modules" className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="mx-auto max-w-6xl">
+            <SectionIntro
+              label="Module path"
+              title="Six modules. One path."
+              body="Module 0 gives people the free entry point. Modules 1-6 stay visible as previews so the Academy has shape before payment."
+            />
 
-          <div className="grid gap-px bg-white/[0.06] sm:grid-cols-3">
-            {[
-              { n: "01", t: "ORIENT", d: "Start Module 0 free. Learn what the academy is before payment." },
-              { n: "02", t: "PREVIEW", d: "Review Modules 1-12 as locked previews so the full path is visible." },
-              { n: "03", t: "UNLOCK", d: "Choose a paid track only after the education path makes sense." },
-            ].map((step) => (
-              <div key={step.n} className="bg-[#050505] p-8 sm:p-10">
-                <div className="lv-mono text-[10px] tracking-[0.3em] text-[#7B2FBE]">STEP_{step.n}</div>
-                <div className="lv-display mt-4 text-3xl text-white">{step.t}</div>
-                <div className="lv-mono mt-4 text-[10px] leading-relaxed tracking-[0.15em] text-white/45">
-                  {step.d}
+            <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-2xl border border-lime-400/30 bg-lime-400/[0.05] p-6 sm:p-8">
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Module 0 - Free</p>
+                <h2 className="mb-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  Start with the lesson, not the checkout.
+                </h2>
+                <p className="mb-6 text-base leading-relaxed text-white/60 sm:text-lg">
+                  The free entry explains why Iron Vault puts education first, what the Academy unlocks later, and why users should understand the system before entering a paid member area.
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+                  <Link
+                    href="/academy"
+                    aria-label="Open Module 0 free academy entry"
+                    data-reddit-event="Learn_Body_Module0_Click"
+                    className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.28)] transition-all hover:scale-[1.02] hover:bg-lime-300"
+                  >
+                    Open Module 0
+                  </Link>
+                  <Link
+                    href="#pricing"
+                    aria-label="View Iron Vault Academy pricing tiers"
+                    data-reddit-event="Learn_Body_ViewPricing_Click"
+                    className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition hover:border-lime-400/40 hover:text-lime-200"
+                  >
+                    View Pricing
+                  </Link>
                 </div>
               </div>
-            ))}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {lockedModules.map((module, index) => (
+                  <article key={module} className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-5">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
+                        Module {String(index + 1).padStart(2, "0")}
+                      </p>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/45">
+                        <Lock className="h-3 w-3" aria-hidden />
+                        Preview
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold tracking-tight text-white">{module}</h3>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {pathSteps.map((step) => (
+                <article key={step.number} className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-lime-300">Step {step.number}</p>
+                  <h3 className="mb-2 text-xl font-bold tracking-tight text-white">{step.title}</h3>
+                  <p className="text-sm leading-relaxed text-white/55">{step.body}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* FINAL CTA — restrained, severe */}
-        <section className="border-t border-white/[0.06]">
-          <div className="mx-auto max-w-4xl px-4 py-32 text-center sm:px-8">
-            <p className="lv-mono mb-8 text-[10px] tracking-[0.35em] text-white/40">
-              {"// TERMINAL_AWAITING"}
-            </p>
-            <h2 className="lv-display text-balance text-5xl leading-[0.95] text-white sm:text-7xl">
-              THE VAULT OPENS
-              <br />
-              <span className="text-[#AAFF00]">THROUGH COMPLETION.</span>
-            </h2>
-            <div className="mt-14">
-              <Link
-                href="/academy"
-                className="lv-display inline-flex items-center gap-4 border border-[#AAFF00] bg-[#AAFF00] px-12 py-5 text-base text-black transition hover:bg-[#BFFF33]"
-              >
-                <span>OPEN ACADEMY ENTRY</span>
-                <span className="lv-mono text-[10px] tracking-[0.2em]">▸</span>
-              </Link>
+        {/* Pricing */}
+        <section id="pricing" className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="mx-auto max-w-6xl">
+            <SectionIntro
+              label="Pricing and unlock"
+              title="Choose the track after the Academy makes sense."
+              body="$100, $500, and $1,000 tracks remain the paid unlock path. The page explains the education before sending people to checkout."
+            />
+
+            <div className="grid gap-5 lg:grid-cols-3">
+              {tiers.map((tier) => (
+                <article
+                  key={tier.name}
+                  className={`relative overflow-hidden rounded-2xl border p-6 transition-colors sm:p-7 ${
+                    tier.featured
+                      ? "border-lime-400/35 bg-lime-400/[0.055]"
+                      : "border-white/10 bg-[rgba(255,255,255,0.04)] hover:border-lime-400/25"
+                  }`}
+                >
+                  {tier.featured && (
+                    <div className="mb-4 inline-flex rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs font-semibold text-lime-200">
+                      Popular track
+                    </div>
+                  )}
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">{tier.name}</p>
+                  <div className="mb-4 flex items-end gap-3">
+                    <p className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{tier.price}</p>
+                    <p className="pb-2 text-sm text-white/45">in coursework</p>
+                  </div>
+                  <p className="mb-4 text-2xl font-extrabold tracking-tight text-lime-300">{tier.allocation}</p>
+                  <p className="mb-7 text-sm leading-relaxed text-white/58 sm:text-base">{tier.body}</p>
+                  <Link
+                    href="/learn/pay"
+                    aria-label={`Unlock the ${tier.name} Academy track`}
+                    data-reddit-event={tier.event}
+                    className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-lime-400 px-5 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.28)] transition-all hover:scale-[1.02] hover:bg-lime-300"
+                  >
+                    Unlock {tier.name}
+                  </Link>
+                </article>
+              ))}
             </div>
-            <p className="lv-mono mt-10 text-[9px] tracking-[0.3em] text-white/25">
-              NO INVESTMENT. NO RETURNS. COURSEWORK ONLY.
-            </p>
           </div>
         </section>
-      </div>
-    </main>
+
+        {/* Transparency */}
+        <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-4 flex items-center gap-3">
+              <span aria-hidden className="h-px w-7 bg-lime-300/50" />
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Risk and transparency</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)]">
+              {transparency.map((item, index) => (
+                <div
+                  key={item}
+                  className={`flex gap-3 px-5 py-4 sm:px-6 sm:py-5 ${index === transparency.length - 1 ? "" : "border-b border-white/10"}`}
+                >
+                  <Minus className="mt-1 h-4 w-4 shrink-0 text-lime-300" aria-hidden />
+                  <p className="text-base leading-relaxed text-white/62 sm:text-lg">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-24">
+          <div className="mx-auto max-w-4xl rounded-3xl border border-lime-400/30 bg-[rgba(255,255,255,0.05)] p-6 text-center shadow-[0_24px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:p-10">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Academy entry</p>
+            <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+              Start with the lesson, not the hype.
+            </h2>
+            <p className="mx-auto mb-7 max-w-2xl text-base leading-relaxed text-white/58 sm:text-lg">
+              Learn what Iron Vault is building, preview the path, and move into paid access only when the Academy makes sense.
+            </p>
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+              <Link
+                href="/academy"
+                aria-label="Start learning now with the free Academy entry"
+                data-reddit-event="Learn_FinalCTA_StartLearning_Click"
+                className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
+              >
+                Start Learning Now
+              </Link>
+              <Link
+                href="/learn/pay"
+                aria-label="Get early access through Iron Vault Academy pricing"
+                data-reddit-event="Learn_FinalCTA_GetEarlyAccess_Click"
+                className="inline-flex min-h-[50px] items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition-all hover:border-lime-400/40 hover:bg-white/[0.08] hover:text-lime-200"
+              >
+                Get Early Access
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <AppverseFooter />
+      </main>
+      <BottomNav />
+    </>
   )
 }
 
-function ConsoleRow({
-  label,
-  value,
-  accent,
-  warn,
-}: {
-  label: string
-  value: string
-  accent?: boolean
-  warn?: boolean
-}) {
+function SectionIntro({ label, title, body }: { label: string; title: string; body: string }) {
   return (
-    <div className="flex items-center justify-between px-5 py-4 sm:px-6 sm:py-5">
-      <span className="lv-mono text-[10px] tracking-[0.25em] text-white/35">{label}</span>
-      <span
-        className={`lv-mono text-[11px] tracking-[0.2em] ${
-          warn ? "text-[#7B2FBE]" : accent ? "text-[#AAFF00]" : "text-white/85"
-        }`}
-      >
-        {value}
-      </span>
+    <div className="mb-8 max-w-3xl">
+      <div className="mb-4 flex items-center gap-3">
+        <span aria-hidden className="h-px w-7 bg-lime-300/50" />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">{label}</p>
+      </div>
+      <h2 className="mb-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">{title}</h2>
+      <p className="max-w-2xl text-base leading-relaxed text-white/58 sm:text-lg">{body}</p>
     </div>
   )
 }
 
+function FlowRow({ label, value, active = false }: { label: string; value: string; active?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
+      <span className="text-sm font-medium text-white/55">{label}</span>
+      <span className={`text-right text-sm font-semibold ${active ? "text-lime-300" : "text-white/75"}`}>{value}</span>
+    </div>
+  )
+}
