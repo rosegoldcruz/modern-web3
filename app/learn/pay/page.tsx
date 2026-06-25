@@ -427,7 +427,7 @@ function PayPageContent() {
           </div>
           IV-SOL IS A UTILITY TOKEN — NOT A STOCK OR SECURITY.<br />
           IT DOES NOT GUARANTEE FINANCIAL RETURNS.<br />
-          CRYPTO MARKETS ARE VOLATILE. BUT SO IS THE ECONOMY. LET'S WIN!
+          CRYPTO MARKETS ARE VOLATILE. BUT SO IS THE ECONOMY. LET&apos;S WIN!
         </div>
 
       </div>

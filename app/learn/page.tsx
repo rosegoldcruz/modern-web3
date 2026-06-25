@@ -8,33 +8,33 @@ import { AppverseFooter } from "@/components/appverse-footer"
 const promiseCards = [
   {
     title: "Education Before Participation",
-    body: "Iron Vault starts with learning because nobody should be rushed into token participation before they understand the system.",
+    body: "Start with the basics before choosing a paid track or entering the member experience.",
     icon: BookOpen,
   },
   {
     title: "Real Assets, Plain English",
-    body: "We explain real estate, digital assets, token utility, and platform access in direct language for everyday people.",
+    body: "Learn how real estate, digital ownership, custody, access, and utility are explained inside the Iron Vault ecosystem.",
     icon: ShieldCheck,
   },
   {
     title: "No Hype, No Guarantees",
-    body: "The Academy is built to slow down the decision, remove pressure, and make the risks easier to see before anyone pays.",
+    body: "The Academy is built to educate, not promise profit, token value, returns, or financial outcomes.",
     icon: Minus,
   },
   {
-    title: "Verify Before You Move",
-    body: "Completion, checkpoints, and platform rules come before deeper access, member tools, rewards, or token allocation eligibility.",
+    title: "Verify Before You Continue",
+    body: "Completion, checkpoints, and platform rules help determine access to deeper Academy areas and member features.",
     icon: CheckCircle2,
   },
 ] satisfies Array<{ title: string; body: string; icon: LucideIcon }>
 
 const pathSteps = [
-  { number: "01", title: "Acquire", body: "Start with the public Academy entry and understand what Iron Vault is teaching." },
-  { number: "02", title: "Verify", body: "Work through the lesson path and confirm the foundation before moving deeper." },
-  { number: "03", title: "Unlock", body: "Choose a paid track only after the Academy and platform rules make sense." },
-  { number: "04", title: "Understand", body: "Build context around real assets, token utility, custody, and risk." },
-  { number: "05", title: "Participate", body: "Enter the member portal with a clearer view of what access means." },
-  { number: "06", title: "Continue", body: "Use the paid dashboard for course progress, vault access, referrals, VIP, status, and account tools." },
+  { number: "01", title: "Learn", body: "Start with the free introduction and understand the foundation." },
+  { number: "02", title: "Review", body: "See what the full Academy covers before choosing a paid track." },
+  { number: "03", title: "Choose", body: "Select a track only if the education path and access level make sense." },
+  { number: "04", title: "Understand", body: "Build context around real assets, digital ownership, utility, custody, and risk." },
+  { number: "05", title: "Participate", body: "Continue through the Academy with clearer expectations and verified progress." },
+  { number: "06", title: "Continue", body: "Use the member portal for course progress, account access, referrals, and status." },
 ]
 
 const lockedModules = [
@@ -73,7 +73,7 @@ const tiers = [
 
 const transparency = [
   "Digital assets involve risk, volatility, and changing market conditions.",
-  "Education does not guarantee profit, returns, token value, or future financial outcomes.",
+  "Education does not guarantee profit, returns, token value, or financial outcomes.",
   "Token allocations, access, and rewards depend on verified completion and platform rules.",
 ]
 
@@ -95,7 +95,7 @@ export default function LearnPage() {
                 Learn first. Participate after.
               </h1>
               <p className="max-w-2xl text-lg leading-relaxed text-white/65 sm:text-xl">
-                Iron Vault starts with education before token participation. The Academy explains real assets, digital ownership, platform access, and risk in plain English before asking users to pay or enter the member system.
+                Iron Vault begins with education. Start with the free introduction, understand the foundation, then choose whether a paid Academy track is right for you.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -122,17 +122,16 @@ export default function LearnPage() {
             <div className="rounded-3xl border border-white/10 bg-[rgba(255,255,255,0.05)] p-4 shadow-[0_24px_90px_rgba(0,0,0,0.35)] backdrop-blur-xl sm:p-5">
               <div className="rounded-2xl border border-white/10 bg-black/35 p-5 sm:p-6">
                 <div className="mb-5 flex items-center justify-between gap-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Academy flow</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Academy Flow</p>
                   <span className="rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-xs font-semibold text-lime-200">
-                    Public first
+                    Public Entry
                   </span>
                 </div>
                 <div className="space-y-3">
-                  <FlowRow label="/learn" value="Academy landing" active />
-                  <FlowRow label="/academy" value="Free entry + Module 0" active />
-                  <FlowRow label="Modules 1-6" value="Locked previews" />
-                  <FlowRow label="/learn/pay" value="Pricing and unlock" />
-                  <FlowRow label="Member portal" value="Protected access" />
+                  <FlowRow label="Free Introduction" value="Start with the foundation" active />
+                  <FlowRow label="Academy Modules" value="Learn the core concepts" active />
+                  <FlowRow label="Track Selection" value="Choose only when ready" />
+                  <FlowRow label="Member Portal" value="Continue after access is unlocked" />
                 </div>
               </div>
             </div>
@@ -143,9 +142,9 @@ export default function LearnPage() {
         <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
           <div className="mx-auto max-w-6xl">
             <SectionIntro
-              label="Academy promise"
-              title="A cleaner path into the Vault."
-              body="The Learn page should answer the question before the paywall: what is this, why does the Academy exist, and what happens after someone understands it?"
+              label="ACADEMY PROMISE"
+              title="A clearer path into the Vault."
+              body="Before anyone participates, they should understand what Iron Vault is, how the Academy works, what digital assets involve, and what risks come with the space."
             />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {promiseCards.map(({ title, body, icon: Icon }) => (
@@ -168,19 +167,19 @@ export default function LearnPage() {
         <section id="modules" className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
           <div className="mx-auto max-w-6xl">
             <SectionIntro
-              label="Module path"
+              label="MODULE PATH"
               title="Six modules. One path."
-              body="Module 0 gives people the free entry point. Modules 1-6 stay visible as previews so the Academy has shape before payment."
+              body="Start with the free introduction. The remaining modules show what the Academy covers before choosing a paid track."
             />
 
             <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
               <div className="rounded-2xl border border-lime-400/30 bg-lime-400/[0.05] p-6 sm:p-8">
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Module 0 - Free</p>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">MODULE 0 — FREE</p>
                 <h2 className="mb-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
                   Start with the lesson, not the checkout.
                 </h2>
                 <p className="mb-6 text-base leading-relaxed text-white/60 sm:text-lg">
-                  The free entry explains why Iron Vault puts education first, what the Academy unlocks later, and why users should understand the system before entering a paid member area.
+                  The free entry explains why Iron Vault puts education first, what the Academy covers, and what to understand before moving into paid access.
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
                   <Link
@@ -236,9 +235,9 @@ export default function LearnPage() {
         <section id="pricing" className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
           <div className="mx-auto max-w-6xl">
             <SectionIntro
-              label="Pricing and unlock"
-              title="Choose the track after the Academy makes sense."
-              body="$100, $500, and $1,000 tracks remain the paid unlock path. The page explains the education before sending people to checkout."
+              label="PRICING AND UNLOCK"
+              title="Choose a track after the foundation is clear."
+              body="The $100, $500, and $1,000 tracks unlock deeper Academy access. Start with education first, then choose the track that fits your level of participation."
             />
 
             <div className="grid gap-5 lg:grid-cols-3">
@@ -253,7 +252,7 @@ export default function LearnPage() {
                 >
                   {tier.featured && (
                     <div className="mb-4 inline-flex rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs font-semibold text-lime-200">
-                      Popular track
+                      Popular Track
                     </div>
                   )}
                   <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">{tier.name}</p>
@@ -282,7 +281,7 @@ export default function LearnPage() {
           <div className="mx-auto max-w-3xl">
             <div className="mb-4 flex items-center gap-3">
               <span aria-hidden className="h-px w-7 bg-lime-300/50" />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Risk and transparency</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">RISK AND TRANSPARENCY</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)]">
               {transparency.map((item, index) => (
@@ -301,12 +300,12 @@ export default function LearnPage() {
         {/* Final CTA */}
         <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-24">
           <div className="mx-auto max-w-4xl rounded-3xl border border-lime-400/30 bg-[rgba(255,255,255,0.05)] p-6 text-center shadow-[0_24px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl sm:p-10">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Academy entry</p>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">ACADEMY ENTRY</p>
             <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
               Start with the lesson, not the hype.
             </h2>
             <p className="mx-auto mb-7 max-w-2xl text-base leading-relaxed text-white/58 sm:text-lg">
-              Learn what Iron Vault is building, preview the path, and move into paid access only when the Academy makes sense.
+              Learn what Iron Vault is building, review the foundation, and move into paid access only when the Academy path makes sense.
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Link
@@ -323,7 +322,7 @@ export default function LearnPage() {
                 data-reddit-event="Learn_FinalCTA_GetEarlyAccess_Click"
                 className="inline-flex min-h-[50px] items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition-all hover:border-lime-400/40 hover:bg-white/[0.08] hover:text-lime-200"
               >
-                Get Early Access
+                View Tracks
               </Link>
             </div>
           </div>
