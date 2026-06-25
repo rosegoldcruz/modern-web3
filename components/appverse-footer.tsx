@@ -115,7 +115,7 @@ export function AppverseFooter() {
       {/* Footer */}
       <footer className="border-t border-white/10 pb-20 md:pb-10">
         <div className="container mx-auto px-4 py-10">
-          <div className="grid gap-8 md:grid-cols-[1.2fr_1fr_1fr]">
+          <div className="grid gap-8">
             {/* Brand */}
             <div className="space-y-3">
               <div className="flex items-center gap-1.5">
@@ -123,22 +123,6 @@ export function AppverseFooter() {
                 <span className="text-xl font-semibold text-lime-300">Iron Vault</span>
               </div>
               <p className="max-w-sm text-sm text-neutral-400">{content.tagline}</p>
-            </div>
-
-            {/* Navigation */}
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <h5 className="mb-2 text-xs font-semibold uppercase tracking-widest text-neutral-400">Navigation</h5>
-                <ul className="space-y-2 text-sm text-neutral-300">
-                  {["Home", "How It Works", "Community", "Phases", "Education", "Whitepaper"].map((item) => (
-                    <li key={item}>
-                      <Link href={`#${item.toLowerCase().replace(/\s+/g, "-")}`} className="hover:text-lime-300">
-                        {item}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
           </div>
 
