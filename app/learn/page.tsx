@@ -77,17 +77,17 @@ export default function LearnPage() {
           </h1>
 
           <p className="lv-mono lv-fade mt-12 max-w-md text-[11px] leading-relaxed tracking-[0.18em] text-white/45">
-            VERIFIED PROGRESS UNLOCKS ALLOCATION.
+            START WITH THE FREE ACADEMY ENTRY.
             <br />
-            NO SHORTCUTS. NO PRE-SALE. NO PROMISES.
+            UNDERSTAND THE SYSTEM BEFORE YOU UNLOCK THE VAULT.
           </p>
 
           <div className="lv-fade mt-14 flex flex-col items-center gap-4 sm:flex-row">
             <Link
-              href="/learn/pay"
+              href="/academy"
               className="lv-display group relative inline-flex items-center gap-4 border border-[#AAFF00] bg-[#AAFF00] px-10 py-4 text-base text-black transition hover:bg-[#BFFF33]"
             >
-              <span>ENTER VAULT</span>
+              <span>START FREE MODULE</span>
               <span className="lv-mono text-[10px] tracking-[0.2em]">▸</span>
             </Link>
             <Link
@@ -176,7 +176,7 @@ export default function LearnPage() {
               {TIERS.map((tier, i) => (
                 <Link
                   key={tier.code}
-                  href="/learn/pay"
+                  href="/academy"
                   className={`lv-tier group grid grid-cols-12 items-center gap-4 px-5 py-6 transition hover:bg-white/[0.03] sm:px-8 sm:py-8 ${
                     i !== TIERS.length - 1 ? "border-b border-white/[0.06]" : ""
                   }`}
@@ -215,16 +215,16 @@ export default function LearnPage() {
         <section className="mx-auto max-w-5xl px-4 py-28 sm:px-8">
           <p className="lv-mono mb-4 text-[10px] tracking-[0.35em] text-white/40">{"// PROTOCOL"}</p>
           <h2 className="lv-display mb-16 text-5xl text-white sm:text-7xl">
-            SIX MODULES.
+            FREE ENTRY.
             <br />
-            <span className="text-white/30">ONE PATH.</span>
+            <span className="text-white/30">TWELVE PREVIEWS.</span>
           </h2>
 
           <div className="grid gap-px bg-white/[0.06] sm:grid-cols-3">
             {[
-              { n: "01", t: "ACQUIRE", d: "Select clearance tier. Initialize operator profile." },
-              { n: "02", t: "VERIFY", d: "Complete coursework. Pass module checkpoints." },
-              { n: "03", t: "UNLOCK", d: "IV-SOL allocation distributed after verified completion." },
+              { n: "01", t: "ORIENT", d: "Start Module 0 free. Learn what the academy is before payment." },
+              { n: "02", t: "PREVIEW", d: "Review Modules 1-12 as locked previews so the full path is visible." },
+              { n: "03", t: "UNLOCK", d: "Choose a paid track only after the education path makes sense." },
             ].map((step) => (
               <div key={step.n} className="bg-[#050505] p-8 sm:p-10">
                 <div className="lv-mono text-[10px] tracking-[0.3em] text-[#7B2FBE]">STEP_{step.n}</div>
@@ -250,10 +250,10 @@ export default function LearnPage() {
             </h2>
             <div className="mt-14">
               <Link
-                href="/learn/pay"
+                href="/academy"
                 className="lv-display inline-flex items-center gap-4 border border-[#AAFF00] bg-[#AAFF00] px-12 py-5 text-base text-black transition hover:bg-[#BFFF33]"
               >
-                <span>BEGIN VERIFICATION</span>
+                <span>OPEN ACADEMY ENTRY</span>
                 <span className="lv-mono text-[10px] tracking-[0.2em]">▸</span>
               </Link>
             </div>
