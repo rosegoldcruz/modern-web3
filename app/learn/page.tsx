@@ -100,7 +100,7 @@ export default function LearnPage() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/academy"
+                  href="https://member.ironvaulttoken.com/academy"
                   aria-label="Start learning now in the free Iron Vault Academy entry"
                   data-reddit-event="Learn_Hero_StartLearning_Click"
                   className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
@@ -183,7 +183,7 @@ export default function LearnPage() {
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
                   <Link
-                    href="/academy"
+                    href="https://member.ironvaulttoken.com/academy"
                     aria-label="Open Module 0 free academy entry"
                     data-reddit-event="Learn_Body_Module0_Click"
                     className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.28)] transition-all hover:scale-[1.02] hover:bg-lime-300"
@@ -309,7 +309,7 @@ export default function LearnPage() {
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Link
-                href="/academy"
+                href="https://member.ironvaulttoken.com/academy"
                 aria-label="Start learning now with the free Academy entry"
                 data-reddit-event="Learn_FinalCTA_StartLearning_Click"
                 className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
