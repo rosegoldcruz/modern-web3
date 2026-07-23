@@ -1,15 +1,19 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Iron Vault Sales | Get Started Today",
-  description:
-    "Ready to take the next step with Iron Vault? Fill out the form and our team will reach out to get you started.",
+  title: "IVT Internal Sales Handoff",
+  description: "Internal sales submission form for IVT Media Group.",
   robots: {
     index: false,
     follow: false,
+    nocache: true,
   },
 }
 
-export default function SalesLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+export default function SalesLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return children
 }
