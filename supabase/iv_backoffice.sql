@@ -1,3 +1,5 @@
+create extension if not exists pgcrypto;
+
 create table if not exists iv_user_profiles (
   id uuid primary key default gen_random_uuid(),
   privy_user_id text unique not null,
@@ -64,6 +66,30 @@ create table if not exists iv_status_tickets (
   constraint iv_status_tickets_status_check check (status in ('PENDING', 'RESPONDED', 'CLOSED'))
 );
 
+create table if not exists iv_auth_identity_links (
+  id uuid primary key default gen_random_uuid(),
+  clerk_user_id text not null unique,
+  privy_user_id text not null,
+  email text,
+  wallet_address text,
+  link_strategy text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  last_seen_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint iv_auth_identity_links_link_strategy_check check (
+    link_strategy in (
+      'existing_link',
+      'trusted_clerk_legacy_id',
+      'verified_email',
+      'verified_wallet',
+      'verified_identity',
+      'new_clerk_user',
+      'webhook'
+    )
+  )
+);
+
 create or replace function set_updated_at()
 returns trigger as $$
 begin
@@ -92,6 +118,11 @@ create trigger set_iv_status_tickets_updated_at
 before update on iv_status_tickets
 for each row execute procedure set_updated_at();
 
+drop trigger if exists set_iv_auth_identity_links_updated_at on iv_auth_identity_links;
+create trigger set_iv_auth_identity_links_updated_at
+before update on iv_auth_identity_links
+for each row execute procedure set_updated_at();
+
 create index if not exists iv_user_profiles_privy_user_id_idx on iv_user_profiles(privy_user_id);
 create index if not exists iv_user_profiles_referral_code_idx on iv_user_profiles(referral_code);
 create index if not exists iv_user_profiles_created_at_idx on iv_user_profiles(created_at);
@@ -106,3 +137,12 @@ create index if not exists iv_user_positions_created_at_idx on iv_user_positions
 create index if not exists iv_status_tickets_privy_user_id_idx on iv_status_tickets(privy_user_id);
 create index if not exists iv_status_tickets_status_idx on iv_status_tickets(status);
 create index if not exists iv_status_tickets_created_at_idx on iv_status_tickets(created_at);
+
+create index if not exists iv_auth_identity_links_privy_user_id_idx on iv_auth_identity_links(privy_user_id);
+create index if not exists iv_auth_identity_links_email_idx on iv_auth_identity_links(email);
+create index if not exists iv_auth_identity_links_wallet_address_idx on iv_auth_identity_links(wallet_address);
+
+alter table iv_auth_identity_links enable row level security;
+
+comment on table iv_auth_identity_links is
+  'Maps Clerk authenticated users to the existing Iron Vault legacy privy_user_id application identity.';
