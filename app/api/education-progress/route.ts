@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
+import { requireIronVaultUser } from "@/lib/server/clerk-auth"
 import { getProgress, markLessonComplete, saveQuizResult } from "@/lib/education-actions"
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value.trim().length > 0
-}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { action, userId } = body as { action?: string; userId?: string }
-
-    if (!isNonEmptyString(userId)) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 })
-    }
+    const { action } = body as { action?: string }
+    const auth = await requireIronVaultUser(req)
+    const userId = auth.privyUserId
 
     if (action === "get") {
       const data = await getProgress(userId)
@@ -47,6 +42,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Failed to process progress request"
-    return NextResponse.json({ error: message }, { status: 500 })
+    const status = message.startsWith("Unauthorized:") ? 401 : 500
+    return NextResponse.json({ error: message }, { status })
   }
 }

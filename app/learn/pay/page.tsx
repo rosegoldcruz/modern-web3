@@ -1,202 +1,13 @@
 'use client'
 
-import { usePrivy } from '@privy-io/react-auth'
+import { useClerk, useUser } from '@clerk/nextjs'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import { PrivyAuthProvider } from '@/components/privy-auth-provider'
+import { ArrowRight, CheckCircle2, PhoneCall } from 'lucide-react'
+import { SiteHeader } from '@/components/site-header'
+import { BottomNav } from '@/components/bottom-nav'
+import { AppverseFooter } from '@/components/appverse-footer'
 import { getPaymentTiers, type PaymentTier } from '@/lib/payment-tiers'
-
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');`
-
-const CSS = `
-  ${FONTS}
-  *{box-sizing:border-box;margin:0;padding:0;}
-  .pv{
-    min-height:100vh;
-    background:#080808;
-    color:#E8E8E8;
-    font-family:'DM Sans',sans-serif;
-    position:relative;overflow-x:hidden;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:60px 24px;
-  }
-  .pv::before{
-    content:'';position:fixed;inset:0;
-    background-image:
-      linear-gradient(rgba(123,47,190,0.04) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(123,47,190,0.04) 1px,transparent 1px);
-    background-size:80px 80px;
-    pointer-events:none;z-index:0;
-  }
-  .pv::after{
-    content:'';position:fixed;top:-300px;right:-300px;
-    width:800px;height:800px;
-    background:radial-gradient(circle,rgba(123,47,190,0.08) 0%,transparent 70%);
-    pointer-events:none;z-index:0;
-  }
-  .pv-inner{position:relative;z-index:1;width:100%;max-width:1100px;}
-  .pv-eyebrow{
-    font-family:'Space Mono',monospace;font-size:9px;
-    letter-spacing:3px;color:#AAFF00;margin-bottom:10px;text-align:center;
-  }
-  .pv-h1{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:clamp(42px,6vw,72px);line-height:1;letter-spacing:2px;
-    color:#fff;text-align:center;margin-bottom:10px;
-  }
-  .pv-sub{
-    font-size:14px;color:#555;line-height:1.7;
-    max-width:560px;margin:0 auto 22px;text-align:center;
-  }
-  .pv-reward-callout{
-    max-width:620px;margin:0 auto 42px;text-align:center;
-    border:1px solid rgba(170,255,0,0.18);background:rgba(170,255,0,0.035);
-    border-radius:4px;padding:18px 20px;
-  }
-  .pv-reward-title{
-    font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;
-    color:#AAFF00;margin-bottom:6px;
-  }
-  .pv-reward-sub{font-size:13px;color:#888;line-height:1.6;}
-  .pv-reward-line{
-    font-family:'Space Mono',monospace;font-size:11px;line-height:1.5;
-    color:#AAFF00;margin-bottom:8px;
-  }
-  .pv-module-line{
-    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;
-    color:#999;margin-bottom:14px;
-  }
-  .pv-phantom-strip{
-    display:flex;align-items:center;justify-content:center;
-    gap:12px;margin-bottom:44px;
-  }
-  .pv-phantom-connected{
-    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;
-    color:#AAFF00;border:1px solid rgba(170,255,0,0.3);
-    background:rgba(170,255,0,0.04);
-    padding:8px 18px;border-radius:2px;
-  }
-  .pv-phantom-btn{
-    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;
-    color:#7B2FBE;border:1px solid rgba(123,47,190,0.3);
-    background:rgba(123,47,190,0.06);
-    padding:8px 18px;border-radius:2px;cursor:pointer;transition:all 0.2s;
-  }
-  .pv-phantom-btn:hover{border-color:#7B2FBE;color:#fff;}
-  .pv-phantom-btn:disabled{opacity:0.4;cursor:not-allowed;}
-  .pv-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:16px;margin-bottom:52px;
-  }
-  .pv-card{
-    background:#0F0F0F;border:1px solid #1A1A1A;
-    border-radius:4px;padding:28px 24px;
-    position:relative;overflow:hidden;transition:all 0.2s;
-    animation:fadeUp 0.4s ease both;
-  }
-  .pv-card:hover{border-color:rgba(123,47,190,0.4);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.5);}
-  .pv-card::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    background:linear-gradient(90deg,transparent,#7B2FBE,transparent);
-  }
-  .pv-card.featured{border-color:rgba(170,255,0,0.25);}
-  .pv-card.featured{padding-top:36px;}
-  .pv-card.featured::before{background:linear-gradient(90deg,transparent,#AAFF00,transparent);}
-  .pv-card-delay-0{animation-delay:0s;}
-  .pv-card-delay-1{animation-delay:0.07s;}
-  .pv-card-delay-2{animation-delay:0.14s;}
-  .pv-card-delay-3{animation-delay:0.21s;}
-  .pv-card-delay-4{animation-delay:0.28s;}
-  .pv-featured-badge{
-    position:absolute;top:-1px;left:50%;transform:translateX(-50%);
-    background:#AAFF00;color:#080808;
-    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;
-    padding:4px 14px;font-weight:700;
-  }
-  .pv-tag{
-    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;
-    color:#7B2FBE;margin-bottom:8px;
-  }
-  .pv-price{
-    font-family:'Bebas Neue',sans-serif;
-    font-size:52px;line-height:1;letter-spacing:1px;
-    color:#fff;margin-bottom:2px;
-  }
-  .pv-price-label{
-    font-family:'Space Mono',monospace;font-size:9px;
-    color:#444;letter-spacing:1px;margin-bottom:16px;
-  }
-  .pv-allocation{
-    font-family:'Bebas Neue',sans-serif;font-size:18px;
-    letter-spacing:1px;color:#AAFF00;margin-bottom:4px;
-  }
-  .pv-desc{font-size:12px;color:#444;line-height:1.6;margin-bottom:24px;}
-  .pv-divider{height:1px;background:#141414;margin-bottom:20px;}
-  .pv-module-picker{margin-bottom:20px;}
-  .pv-module-label{
-    display:block;font-family:'Space Mono',monospace;font-size:8px;
-    letter-spacing:2px;color:#777;margin-bottom:10px;
-  }
-  .pv-module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .pv-module-option{
-    border:1px solid #242424;background:#0A0A0A;color:#777;
-    border-radius:3px;padding:9px 6px;font-family:'Space Mono',monospace;
-    font-size:9px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;
-  }
-  .pv-module-option:hover{border-color:rgba(170,255,0,0.35);color:#E8E8E8;}
-  .pv-module-option.active{border-color:#AAFF00;background:rgba(170,255,0,0.08);color:#AAFF00;}
-  .pv-scope-note{font-size:11px;color:#666;line-height:1.5;margin-bottom:18px;}
-  .pv-btn{
-    width:100%;border:none;border-radius:3px;
-    padding:15px;font-family:'Bebas Neue',sans-serif;
-    font-size:16px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;
-  }
-  .pv-btn-lime{background:#AAFF00;color:#080808;}
-  .pv-btn-lime:hover{background:#BFFF33;transform:translateY(-1px);}
-  .pv-btn-ghost{
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.12);color:#666;
-  }
-  .pv-btn-ghost:hover{border-color:rgba(123,47,190,0.4);color:#E8E8E8;}
-  .pv-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-  .pv-status{
-    font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;
-    color:#7B2FBE;text-align:center;margin-bottom:16px;
-  }
-  .pv-phone{text-align:center;margin-bottom:32px;}
-  .pv-phone-label{
-    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;
-    color:#333;margin-bottom:10px;
-  }
-  .pv-phone-num{
-    font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;
-    color:#AAFF00;text-decoration:none;transition:opacity 0.2s;
-  }
-  .pv-phone-num:hover{opacity:0.8;}
-  .pv-legal{
-    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;
-    color:#2A2A2A;text-align:center;max-width:480px;margin:0 auto;line-height:1.8;
-  }
-  .pv-reward-note{
-    font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;
-    color:#444;text-align:center;max-width:560px;margin:0 auto 18px;line-height:1.8;
-  }
-  .pv-access-check{
-    min-height:100vh;background:#080808;
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Space Mono',monospace;font-size:10px;
-    letter-spacing:3px;color:#AAFF00;
-  }
-  @keyframes fadeUp{
-    from{opacity:0;transform:translateY(14px);}
-    to{opacity:1;transform:translateY(0);}
-  }
-  @media(max-width:768px){
-    .pv-grid{grid-template-columns:1fr;}
-    .pv{padding:40px 16px;}
-  }
-`
 
 const TIER_NAME_MAP: Record<string, string> = {
   MODULE: 'ENTRY',
@@ -214,8 +25,11 @@ const REWARD_ELIGIBILITY: Record<string, string> = {
   TEST_MODULE: '1000 raw IV-SOL micro test',
 }
 
+const CORE_MODULE_LABELS = ['Vault Thesis', 'Digital Ownership Basics', 'Token Utility', 'Real-World Asset Foundations', 'Risk And Volatility', 'Verification Path']
+
 function PayPageContent() {
-  const { user, authenticated, ready, login, getAccessToken } = usePrivy()
+  const { isLoaded, isSignedIn } = useUser()
+  const { openSignIn } = useClerk()
   const searchParams = useSearchParams()
   const internalTestEnabled = searchParams.get('internal_test') === '1'
   const tiers = getPaymentTiers(internalTestEnabled)
@@ -229,23 +43,19 @@ function PayPageContent() {
   const [status, setStatus] = useState('')
 
   useEffect(() => {
-    if (!ready) return
-    if (!authenticated) { setChecking(false); return }
+    if (!isLoaded) return
+    if (!isSignedIn) { setChecking(false); return }
 
     let cancelled = false
 
     ;(async () => {
       try {
-        const token = await getAccessToken()
-        const headers: HeadersInit = { 'Content-Type': 'application/json' }
-        if (token) {
-          headers.Authorization = `Bearer ${token}`
-        }
-
         const response = await fetch('/api/check-payment', {
           method: 'POST',
-          headers,
-          body: JSON.stringify({ userId: user?.id }),
+          credentials: 'same-origin',
+          cache: 'no-store',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
         })
 
         const data = await response.json()
@@ -271,10 +81,10 @@ function PayPageContent() {
     return () => {
       cancelled = true
     }
-  }, [ready, authenticated, user, searchParams, selectedModule, getAccessToken])
+  }, [isLoaded, isSignedIn, searchParams, selectedModule])
 
   const handleStripeCheckout = async (tier: PaymentTier) => {
-    if (!authenticated) { login(); return }
+    if (!isSignedIn) { openSignIn(); return }
 
     const stripeTier = TIER_NAME_MAP[tier.name]
     if (!stripeTier) {
@@ -291,16 +101,11 @@ function PayPageContent() {
     setStatus('▸ REDIRECTING TO CHECKOUT...')
 
     try {
-      const token = await getAccessToken()
-      if (!token) {
-        throw new Error('Sign in required before checkout.')
-      }
-
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           tier: stripeTier,
@@ -326,33 +131,47 @@ function PayPageContent() {
   }
 
   if (checking) return (
-    null
+    <main className="min-h-[100dvh] overflow-hidden text-white">
+      <SiteHeader />
+      <section className="mx-auto flex min-h-[60vh] w-full max-w-[1200px] items-center justify-center px-4 py-20 sm:px-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-lime-300">Checking access...</p>
+      </section>
+    </main>
   )
 
   return (
-    <div className="pv">
-      <style>{CSS}</style>
-      <div className="pv-inner">
+    <>
+      <main className="min-h-[100dvh] overflow-hidden pb-[calc(env(safe-area-inset-bottom)+88px)] text-white lg:pb-0">
+        <SiteHeader />
 
-        <div className="pv-eyebrow">▸ FOUNDING MEMBER ACCESS</div>
-        <h1 className="pv-h1">Choose Your Track</h1>
-        <p className="pv-sub">
-          Pay by card with secure checkout. Access unlocks after payment confirmation.
-        </p>
-        <div className="pv-reward-callout">
-          <div className="pv-reward-title">Earn IV-SOL as you learn</div>
-          <div className="pv-reward-sub">
-            Reward eligibility is calculated at 1,000 IV-SOL per $1 spent after completing eligible coursework.
+        <section className="relative mx-auto w-full max-w-[1400px] px-4 pt-10 pb-12 sm:px-6 sm:pt-18 sm:pb-16">
+          <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[520px] max-w-5xl rounded-full bg-[radial-gradient(circle_at_center,rgba(132,204,22,0.11),rgba(126,34,206,0.11)_38%,transparent_70%)] blur-3xl" />
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-lime-300">ACADEMY CHECKOUT</p>
+            <h1 className="mb-4 max-w-4xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">Choose Your Track</h1>
+            <p className="max-w-3xl text-base leading-relaxed text-white/65 sm:text-lg">
+              Secure checkout for Academy access. Start with a single core module or unlock the full Academy path with a multi-module track.
+            </p>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-lime-400/25 bg-lime-400/10 px-4 py-2 text-xs font-semibold text-lime-200">
+              <CheckCircle2 className="h-4 w-4" aria-hidden />
+              Reward eligibility is calculated after verified coursework completion.
+            </div>
           </div>
-        </div>
+        </section>
 
-        {funding && <div className="pv-status">{status}</div>}
+        <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="mx-auto max-w-6xl">
+            {funding && (
+              <div className="mb-5 rounded-2xl border border-purple-400/30 bg-purple-500/10 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-purple-200">
+                {status}
+              </div>
+            )}
 
-        <div className="pv-grid">
-          {tiers.map((tier, i) => {
+            <div className="grid gap-5 lg:grid-cols-3 xl:grid-cols-4">
+          {tiers.map((tier) => {
             const isModuleTier = tier.name === 'MODULE' || tier.name === 'TEST_MODULE'
             const isTestTier = tier.name === 'TEST_MODULE'
-            const featured = tier.name === 'FOUNDER' || isModuleTier
+            const featured = tier.name === 'BUILDER' || tier.name === 'FOUNDER'
             const description = isModuleTier && selectedModule
               ? `Unlock Module ${selectedModule} only. All other modules require another purchase or upgrade.`
               : tier.description
@@ -360,87 +179,127 @@ function PayPageContent() {
             return (
               <div
                 key={tier.name}
-                className={`pv-card pv-card-delay-${i} ${featured ? 'featured' : ''}`}
+                className={`relative overflow-hidden rounded-2xl border p-6 transition-colors sm:p-7 ${
+                  featured
+                    ? 'border-lime-400/35 bg-lime-400/[0.055]'
+                    : 'border-white/10 bg-[rgba(255,255,255,0.04)] hover:border-lime-400/25'
+                }`}
               >
-                {featured && <div className="pv-featured-badge">{isTestTier ? 'INTERNAL TEST' : isModuleTier ? 'CHOOSE MODULE' : 'FOUNDER'}</div>}
-                <div className="pv-tag">▸ {tier.tag}</div>
-                <div className="pv-price">{tier.label}</div>
-                <div className="pv-price-label">IN COURSEWORK</div>
-                <div className="pv-allocation">→ {tier.tokenDisplay}</div>
-                <div className="pv-reward-line">Reward eligibility: {REWARD_ELIGIBILITY[tier.name]}</div>
-                <div className="pv-module-line">{isModuleTier ? 'Choose any 1 module' : 'All 6 modules'}</div>
-                <div className="pv-desc">{description}</div>
+                {(featured || isTestTier) && (
+                  <div className="mb-4 inline-flex rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-lime-200">
+                    {isTestTier ? 'Internal Test' : tier.name === 'BUILDER' ? 'Popular Track' : 'Founder Track'}
+                  </div>
+                )}
+
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">{tier.tag}</p>
+                <div className="mb-4 flex items-end gap-3">
+                  <p className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{tier.label}</p>
+                  <p className="pb-2 text-sm text-white/45">in coursework</p>
+                </div>
+                <p className="mb-2 text-xl font-extrabold tracking-tight text-lime-300">{isModuleTier ? 'Single Module Access' : 'Full Academy Access'}</p>
+                <p className="mb-2 text-xs leading-relaxed text-lime-200/85">Reward eligibility: {REWARD_ELIGIBILITY[tier.name]}</p>
+                <p className="mb-4 text-sm leading-relaxed text-white/58">{description}</p>
+
                 {isModuleTier ? (
                   <>
-                    <div className="pv-module-picker">
-                      <span className="pv-module-label">SELECT ONE MODULE</span>
-                      <div className="pv-module-grid">
+                    <div className="mb-5">
+                      <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">Select One Core Module</span>
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                         {[1, 2, 3, 4, 5, 6].map((moduleNumber) => (
                           <button
                             key={moduleNumber}
                             type="button"
-                            className={`pv-module-option ${selectedModule === moduleNumber ? 'active' : ''}`}
+                            className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors ${
+                              selectedModule === moduleNumber
+                                ? 'border-lime-400/40 bg-lime-400/10 text-lime-200'
+                                : 'border-white/10 bg-black/20 text-white/70 hover:border-lime-400/25'
+                            }`}
                             onClick={() => setSelectedModule(moduleNumber)}
                             disabled={funding}
                           >
-                            Module {moduleNumber}
+                            <span className="block text-[10px] uppercase tracking-[0.15em] text-white/45">Module {moduleNumber}</span>
+                            <span className="mt-1 block text-[11px] leading-tight">{CORE_MODULE_LABELS[moduleNumber - 1]}</span>
                           </button>
                         ))}
                       </div>
                     </div>
-                    <div className="pv-scope-note">
+
+                    <div className="mb-6 text-xs leading-relaxed text-white/55">
                       {isTestTier
                         ? '$1 internal micro test unlocks one selected module only and is not a customer reward amount.'
                         : '$25 unlocks one selected module only. You choose which module; all other modules require another purchase or upgrade.'}
                     </div>
                   </>
                 ) : (
-                  <div className="pv-scope-note">$100, $500, and $1,000 tracks unlock all 6 modules.</div>
+                  <div className="mb-6 text-xs leading-relaxed text-white/55">$100, $500, and $1,000 tracks unlock the full Academy path.</div>
                 )}
-                <div className="pv-divider" />
+
                 <button
                   onClick={() => handleStripeCheckout(tier)}
                   disabled={checkoutDisabled}
-                  className={`pv-btn ${featured ? 'pv-btn-lime' : 'pv-btn-ghost'}`}
+                  className={`inline-flex min-h-[48px] w-full items-center justify-center rounded-full px-5 text-sm font-semibold transition-all ${
+                    featured || isModuleTier
+                      ? 'bg-lime-400 text-black shadow-[0_0_20px_rgba(163,230,53,0.28)] hover:scale-[1.02] hover:bg-lime-300'
+                      : 'border border-white/15 bg-white/[0.04] text-white hover:border-lime-400/40 hover:text-lime-200'
+                  } disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100`}
                 >
-                  {!authenticated
-                    ? 'Sign in required'
+                  {!isSignedIn
+                    ? 'Sign In Required'
                     : funding
-                    ? status || 'Payment pending'
+                    ? status || 'Payment Pending'
                     : isModuleTier && !selectedModule
-                    ? 'CHOOSE MODULE'
-                    : 'START LEARNING NOW'}
+                    ? 'Choose Module'
+                    : 'Start Learning Now'}
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
                 </button>
               </div>
             )
           })}
-        </div>
-
-        <div className="pv-phone">
-          <div className="pv-phone-label">▸ PREFER TO ENROLL BY PHONE?</div>
-          <a href="tel:8883682502" className="pv-phone-num">(888) 368-2502</a>
-        </div>
-
-        <div className="pv-legal">
-          <div className="pv-reward-note">
-            IV-SOL rewards are distributed after eligible module completion and quiz requirements are met. Token transfers may be subject to network/token transfer fees.
+            </div>
           </div>
-          IV-SOL IS A UTILITY TOKEN — NOT A STOCK OR SECURITY.<br />
-          IT DOES NOT GUARANTEE FINANCIAL RETURNS.<br />
-          CRYPTO MARKETS ARE VOLATILE. BUT SO IS THE ECONOMY. LET&apos;S WIN!
-        </div>
+        </section>
 
-      </div>
-    </div>
+        <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-24">
+          <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-6 text-center sm:p-10">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-lime-300">Support</p>
+            <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Need Help Before Checkout?</h2>
+            <p className="mx-auto mb-6 max-w-2xl text-sm leading-relaxed text-white/60 sm:text-base">
+              Our team can help you choose the right Academy track and explain what each access level includes.
+            </p>
+            <a
+              href="tel:8883682502"
+              className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
+            >
+              <PhoneCall className="mr-2 h-4 w-4" aria-hidden />
+              Call (888) 368-2502
+            </a>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-[1400px] px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.03)] px-5 py-6 sm:px-8">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/60">Risk and Compliance</p>
+            <p className="text-sm leading-relaxed text-white/55">
+              IV-SOL rewards are distributed after eligible module completion and quiz requirements are met. Token transfers may be subject to network or token transfer fees.
+            </p>
+            <div className="my-4 h-px bg-white/10" />
+            <p className="text-sm leading-relaxed text-white/55">
+              IV-SOL is a utility token and not a stock or security. It does not guarantee financial returns. Digital asset markets involve volatility and risk.
+            </p>
+          </div>
+        </section>
+
+        <AppverseFooter />
+      </main>
+      <BottomNav />
+    </>
   )
 }
 
 export default function PayPage() {
   return (
-    <PrivyAuthProvider>
-      <Suspense fallback={null}>
-        <PayPageContent />
-      </Suspense>
-    </PrivyAuthProvider>
+    <Suspense fallback={null}>
+      <PayPageContent />
+    </Suspense>
   )
 }

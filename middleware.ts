@@ -1,6 +1,7 @@
+import { clerkMiddleware } from "@clerk/nextjs/server"
 import { NextResponse, type NextRequest } from "next/server"
 
-export default function middleware(request: NextRequest) {
+export default clerkMiddleware((_auth, request: NextRequest) => {
   const hostname = request.headers.get("host") ?? ""
   const url = request.nextUrl.clone()
 
@@ -11,8 +12,12 @@ export default function middleware(request: NextRequest) {
   }
 
   return NextResponse.next()
-}
+})
 
 export const config = {
-  matcher: ["/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)", "/(api|trpc)(.*)"],
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
+    "/__clerk/:path*",
+  ],
 }

@@ -1,6 +1,5 @@
 "use client"
 
-import { usePrivy } from '@privy-io/react-auth'
 import { useEffect, useMemo, useState } from 'react'
 import { fetchBackofficeJson, type BackofficePositionResponse } from '@/lib/backoffice-client'
 import type { UserPosition } from '@/types/backoffice'
@@ -26,26 +25,16 @@ function formatNumber(value: number) {
 }
 
 export function PositionSummary() {
-  const { ready, authenticated, getAccessToken } = usePrivy()
   const [position, setPosition] = useState<UserPosition | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!ready || !authenticated) {
-      return
-    }
-
     const loadPosition = async () => {
       try {
         setLoading(true)
         setError(null)
-        const token = await getAccessToken()
-        if (!token) {
-          throw new Error('Unauthorized: unable to retrieve access token')
-        }
-
-        const payload = await fetchBackofficeJson<BackofficePositionResponse>('/api/backoffice/positions', token)
+        const payload = await fetchBackofficeJson<BackofficePositionResponse>('/api/backoffice/positions')
         setPosition(payload.position)
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to load position data'
@@ -56,7 +45,7 @@ export function PositionSummary() {
     }
 
     void loadPosition()
-  }, [authenticated, getAccessToken, ready])
+  }, [])
 
   const numericCards = useMemo(
     () => [

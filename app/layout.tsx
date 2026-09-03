@@ -1,4 +1,7 @@
+import { ClerkProvider } from "@clerk/nextjs"
+import { shadcn } from "@clerk/ui/themes"
 import type React from "react"
+import "@clerk/ui/themes/shadcn.css"
 import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
@@ -60,9 +63,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <RedditTrackingProvider />
-        <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_80%_-10%,rgba(139,92,246,0.16),transparent_48%),linear-gradient(180deg,#050507_0%,#0a0a0d_100%)]" />
-        <div className="relative z-10">{children}</div>
+        <ClerkProvider appearance={{ theme: shadcn }}>
+          <RedditTrackingProvider />
+          <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_80%_-10%,rgba(139,92,246,0.16),transparent_48%),linear-gradient(180deg,#050507_0%,#0a0a0d_100%)]" />
+          <div className="relative z-10">{children}</div>
+        </ClerkProvider>
       </body>
     </html>
   )

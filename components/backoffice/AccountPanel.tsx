@@ -9,7 +9,7 @@ export function AccountPanel() {
     <section className="space-y-6">
       <div className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-6">
         <h1 className="text-2xl font-semibold text-zinc-100 mb-2">Account</h1>
-        <p className="text-sm text-zinc-400">Profile values are sourced from iv_user_profiles and tied to your authenticated Privy identity.</p>
+        <p className="text-sm text-zinc-400">Profile values are sourced from iv_user_profiles and tied to your authenticated Iron Vault identity.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

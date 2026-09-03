@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requirePrivyUser } from '@/lib/server/privy-auth'
+import { requireIronVaultUser } from '@/lib/server/clerk-auth'
 import { ensureUserProfile } from '@/lib/backoffice-profile'
 
 export async function GET(req: NextRequest) {
   try {
-    const auth = await requirePrivyUser(req)
+    const auth = await requireIronVaultUser(req)
     const profile = await ensureUserProfile(auth.privyUserId, {
       email: auth.email,
       walletAddress: auth.walletAddress,

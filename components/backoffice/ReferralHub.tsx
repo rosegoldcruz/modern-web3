@@ -1,6 +1,5 @@
 "use client"
 
-import { usePrivy } from '@privy-io/react-auth'
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Copy, Link2 } from 'lucide-react'
 import {
@@ -31,7 +30,6 @@ const defaultForm: ReferralFormState = {
 
 export function ReferralHub() {
   const { profile } = useBackofficeAuth()
-  const { ready, authenticated, getAccessToken } = usePrivy()
 
   const [referrals, setReferrals] = useState<ReferralLead[]>([])
   const [loading, setLoading] = useState(true)
@@ -53,21 +51,11 @@ export function ReferralHub() {
   }, [profile?.referral_code])
 
   useEffect(() => {
-    if (!ready || !authenticated) {
-      return
-    }
-
     const loadReferrals = async () => {
       try {
         setLoading(true)
         setError(null)
-        const token = await getAccessToken()
-
-        if (!token) {
-          throw new Error('Unauthorized: unable to retrieve access token')
-        }
-
-        const payload = await fetchBackofficeJson<BackofficeReferralsResponse>('/api/backoffice/referrals', token)
+        const payload = await fetchBackofficeJson<BackofficeReferralsResponse>('/api/backoffice/referrals')
         setReferrals(payload.referrals)
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to load referral leads'
@@ -78,7 +66,7 @@ export function ReferralHub() {
     }
 
     void loadReferrals()
-  }, [authenticated, getAccessToken, ready])
+  }, [])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -92,12 +80,7 @@ export function ReferralHub() {
       setSubmitting(true)
       setError(null)
 
-      const token = await getAccessToken()
-      if (!token) {
-        throw new Error('Unauthorized: unable to retrieve access token')
-      }
-
-      const payload = await fetchBackofficeJson<BackofficeReferralCreateResponse>('/api/backoffice/referrals', token, {
+      const payload = await fetchBackofficeJson<BackofficeReferralCreateResponse>('/api/backoffice/referrals', {
         method: 'POST',
         body: {
           name: form.name,
