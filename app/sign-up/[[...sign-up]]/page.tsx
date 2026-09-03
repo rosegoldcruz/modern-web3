@@ -1,28 +1,30 @@
+import { SignUp } from "@clerk/nextjs"
 import Link from "next/link"
-import { PrivyAuthProvider } from "@/components/privy-auth-provider"
-import { PrivySignUpCard } from "@/components/privy-sign-up-card"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 export default function SignUpPage() {
-  if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4">
-        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#0F0F0F] p-8 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#080808] px-4 py-12">
+      <div className="grid w-full max-w-5xl items-center gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(360px,1fr)]">
+        <section className="text-white">
           <p className="mb-3 text-xs uppercase tracking-[0.3em] text-[#AAFF00]">New Member</p>
-          <h1 className="mb-4 text-4xl font-semibold">Sign up is not configured</h1>
-          <p className="mb-8 text-sm text-white/70">
-            Set `NEXT_PUBLIC_PRIVY_APP_ID` in your deployment environment before using Privy signup.
+          <h1 className="mb-4 text-4xl font-semibold sm:text-5xl">Create your access</h1>
+          <p className="max-w-md text-sm leading-6 text-white/70">
+            Create a Clerk-backed Iron Vault account. Access and rewards remain controlled by the Iron Vault member database.
           </p>
-          <Link href="/" className="inline-flex rounded-full bg-[#AAFF00] px-5 py-3 font-semibold text-black transition hover:bg-[#98e600]">
+          <Link href="/" className="mt-8 inline-flex rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-white/70 transition hover:border-white/30 hover:text-white">
             Back to home
           </Link>
-        </div>
-      </main>
-    )
-  }
-
-  return (
-    <PrivyAuthProvider>
-      <PrivySignUpCard />
-    </PrivyAuthProvider>
+        </section>
+        <section className="flex justify-center">
+          <SignUp
+            routing="path"
+            path="/sign-up"
+            signInUrl="/sign-in"
+            fallbackRedirectUrl={IRON_VAULT_ROUTES.memberPortal}
+          />
+        </section>
+      </div>
+    </main>
   )
 }

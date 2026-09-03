@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { PublicKey } from '@solana/web3.js'
 import { getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
+import { requireIronVaultUser } from '@/lib/server/clerk-auth'
 
 function requireEnv(name: string) {
   const value = process.env[name]
@@ -26,9 +27,11 @@ function getTreasuryWallet() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, tier, amount, selectedModule } = await req.json()
+    const auth = await requireIronVaultUser(req)
+    const userId = auth.privyUserId
+    const { tier, amount, selectedModule } = await req.json()
 
-    if (!userId || !tier || typeof amount !== 'number') {
+    if (!tier || typeof amount !== 'number') {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
@@ -83,6 +86,7 @@ export async function POST(req: NextRequest) {
   } catch (e: unknown) {
     console.error('create-payment error:', e)
     const message = e instanceof Error ? e.message : 'Failed to create payment'
-    return NextResponse.json({ error: message }, { status: 500 })
+    const status = message.startsWith('Unauthorized:') ? 401 : 500
+    return NextResponse.json({ error: message }, { status })
   }
 }

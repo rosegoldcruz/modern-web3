@@ -4,6 +4,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
 import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
+import { requireIronVaultUser } from '@/lib/server/clerk-auth'
 
 const USDC_MINT = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 
@@ -27,23 +28,25 @@ function getTreasuryPublicKey() {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId, walletAddress, txSignature, tier, amount, selectedModule } = await req.json()
-
-  if (!userId || !walletAddress || !txSignature || !tier) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-  }
-
-  const isTestPaymentEnabled = process.env.ENABLE_USDC_TEST_PAYMENT === 'true'
-  if (tier === 'TEST_MODULE' && !isTestPaymentEnabled) {
-    return NextResponse.json({ error: 'Test payment is disabled' }, { status: 403 })
-  }
-
-  const selectedTier = getPaymentTier(tier, isTestPaymentEnabled)
-  if (!selectedTier || selectedTier.price !== amount) {
-    return NextResponse.json({ error: 'Invalid payment tier' }, { status: 400 })
-  }
-
   try {
+    const auth = await requireIronVaultUser(req)
+    const userId = auth.privyUserId
+    const { walletAddress, txSignature, tier, amount, selectedModule } = await req.json()
+
+    if (!walletAddress || !txSignature || !tier) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    const isTestPaymentEnabled = process.env.ENABLE_USDC_TEST_PAYMENT === 'true'
+    if (tier === 'TEST_MODULE' && !isTestPaymentEnabled) {
+      return NextResponse.json({ error: 'Test payment is disabled' }, { status: 403 })
+    }
+
+    const selectedTier = getPaymentTier(tier, isTestPaymentEnabled)
+    if (!selectedTier || selectedTier.price !== amount) {
+      return NextResponse.json({ error: 'Invalid payment tier' }, { status: 400 })
+    }
+
     const supabase = getSupabase()
     const { data: existingPayment } = await supabase
       .from('iv_payments')
@@ -72,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     const senderPubkey = new PublicKey(walletAddress)
-  const treasuryPubkey = getTreasuryPublicKey()
+    const treasuryPubkey = getTreasuryPublicKey()
     const senderATA = await getAssociatedTokenAddress(USDC_MINT, senderPubkey)
     const treasuryATA = await getAssociatedTokenAddress(USDC_MINT, treasuryPubkey)
     const hasExpectedTransfer = tx.transaction.message.instructions.some((instruction) => {
@@ -133,6 +136,7 @@ export async function POST(req: NextRequest) {
   } catch (e: unknown) {
     console.error('confirm-payment error:', e)
     const message = e instanceof Error ? e.message : 'Failed to confirm payment'
-    return NextResponse.json({ error: message }, { status: 500 })
+    const status = message.startsWith('Unauthorized:') ? 401 : 500
+    return NextResponse.json({ error: message }, { status })
   }
 }
