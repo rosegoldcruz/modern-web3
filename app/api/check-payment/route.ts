@@ -4,7 +4,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { ALL_MODULES, getPaymentTier, modulesForPurchase } from '@/lib/payment-tiers'
 import { syncUserProfileFromPayment } from '@/lib/backoffice-profile'
-import { requireIronVaultUser } from '@/lib/server/clerk-auth'
+import { requirePrivyUser } from '@/lib/server/privy-auth'
 import { getActiveMemberEntitlementScope } from '@/lib/server/member-entitlements'
 
 function getSupabase() {
@@ -289,17 +289,16 @@ async function verifyPendingPayment(userId: string, paymentId: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { paymentId } = body
+    const { userId, paymentId } = body
 
     let auth: { privyUserId: string; email: string | null; walletAddress: string | null } | null = null
     try {
-      auth = await requireIronVaultUser(req)
-    } catch (error) {
-      const message = getErrorMessage(error)
-      if (!message.startsWith('Unauthorized:')) throw error
+      auth = await requirePrivyUser(req)
+    } catch {
+      auth = null
     }
 
-    const effectiveUserId = auth?.privyUserId ?? null
+    const effectiveUserId = auth?.privyUserId ?? (typeof userId === 'string' ? userId : null)
 
     if (!effectiveUserId) {
       return NextResponse.json({ paid: false, status: 'sign_in_required', modulesUnlocked: [] })
@@ -343,7 +342,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase
       .from('iv_payments')
       .select('modules_unlocked, tier')
-      .eq('privy_user_id', effectiveUserId)
+      .eq('privy_user_id', userId)
       .eq('status', 'confirmed')
 
     if (!error) {
@@ -360,7 +359,7 @@ export async function POST(req: NextRequest) {
     const { data: legacyData } = await supabase
       .from('iv_payments')
       .select('modules_unlocked, tier')
-      .eq('user_id', effectiveUserId)
+      .eq('user_id', userId)
       .eq('paid', true)
 
     const modulesUnlocked = aggregateModules(legacyData ?? [])

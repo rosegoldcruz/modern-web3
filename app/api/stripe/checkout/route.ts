@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { requireIronVaultUser } from '@/lib/server/clerk-auth'
+import { requirePrivyUser } from '@/lib/server/privy-auth'
 import { getStripePackageConfig, modulesForStripePackage } from '@/lib/server/stripe-package-config'
 import { createRedditConversionId } from '@/lib/reddit/events'
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const stripeSecretKey = requireEnv('STRIPE_SECRET_KEY')
     const successUrl = process.env.STRIPE_CHECKOUT_SUCCESS_URL?.trim() || 'https://www.ironvaulttoken.com/learn/dashboard?payment=success'
     const cancelUrl = process.env.STRIPE_CHECKOUT_CANCEL_URL?.trim() || 'https://ironvaulttoken.com/learn'
-    const auth = await requireIronVaultUser(req)
+    const auth = await requirePrivyUser(req)
     const redditClickId = req.cookies.get('rdt_cid')?.value
     const redditConversionId = createRedditConversionId()
 
@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
     const metadata: Record<string, string> = {
       userId: auth.privyUserId,
       privyUserId: auth.privyUserId,
-      clerkUserId: auth.clerkUserId,
       product_key: config.tier,
       tier: config.paymentTier,
       paymentTier: config.paymentTier,

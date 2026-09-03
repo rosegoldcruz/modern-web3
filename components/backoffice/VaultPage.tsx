@@ -1,5 +1,6 @@
 "use client"
 
+import { usePrivy } from '@privy-io/react-auth'
 import { useEffect, useMemo, useState } from 'react'
 import { Copy } from 'lucide-react'
 import { fetchBackofficeJson, type BackofficePositionResponse } from '@/lib/backoffice-client'
@@ -27,6 +28,7 @@ function formatNumber(value: number) {
 
 export function VaultPage() {
   const { profile } = useBackofficeAuth()
+  const { ready, authenticated, getAccessToken } = usePrivy()
   const [position, setPosition] = useState<UserPosition | null>(null)
   const [posLoading, setPosLoading] = useState(true)
   const [posError, setPosError] = useState<string | null>(null)
@@ -38,15 +40,18 @@ export function VaultPage() {
   }, [profile?.referral_code])
 
   useEffect(() => {
+    if (!ready || !authenticated) return
     const load = async () => {
       try {
         setPosLoading(true); setPosError(null)
-        const payload = await fetchBackofficeJson<BackofficePositionResponse>('/api/backoffice/positions')
+        const token = await getAccessToken()
+        if (!token) throw new Error('Unauthorized: unable to retrieve access token')
+        const payload = await fetchBackofficeJson<BackofficePositionResponse>('/api/backoffice/positions', token)
         setPosition(payload.position)
       } catch (err: unknown) { setPosError(err instanceof Error ? err.message : 'Failed to load position data') } finally { setPosLoading(false) }
     }
     void load()
-  }, [])
+  }, [authenticated, getAccessToken, ready])
 
   const copyLink = async () => {
     if (!referralLink) { setCopyState('failed'); return }
@@ -123,7 +128,7 @@ export function VaultPage() {
             <h2 className="text-lg font-semibold text-zinc-100 mb-3">Resources &amp; Education</h2>
             <div className="space-y-3">
               {[
-                { title: 'Iron Vault Academy', desc: 'Complete the core modules to unlock your full token allocation.' },
+                { title: 'Iron Vault Academy', desc: 'Complete all 6 modules to unlock your full token allocation.' },
                 { title: 'Vault Fundamentals', desc: 'Understanding royalty positions, dividends, and token mechanics.' },
                 { title: 'Referral Program', desc: 'Refer qualified members and track your network growth.' },
               ].map((item) => (

@@ -1,5 +1,6 @@
 "use client"
 
+import { usePrivy } from '@privy-io/react-auth'
 import { FormEvent, useEffect, useState } from 'react'
 import {
   fetchBackofficeJson,
@@ -18,6 +19,7 @@ type TicketFormState = {
 
 export function StatusDesk() {
   const { profile } = useBackofficeAuth()
+  const { ready, authenticated, getAccessToken } = usePrivy()
 
   const [tickets, setTickets] = useState<StatusTicket[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,11 +37,21 @@ export function StatusDesk() {
   }, [profile?.email])
 
   useEffect(() => {
+    if (!ready || !authenticated) {
+      return
+    }
+
     const loadTickets = async () => {
       try {
         setLoading(true)
         setError(null)
-        const payload = await fetchBackofficeJson<BackofficeTicketsResponse>('/api/backoffice/tickets')
+        const token = await getAccessToken()
+
+        if (!token) {
+          throw new Error('Unauthorized: unable to retrieve access token')
+        }
+
+        const payload = await fetchBackofficeJson<BackofficeTicketsResponse>('/api/backoffice/tickets', token)
         setTickets(payload.tickets)
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Failed to load status tickets'
@@ -50,7 +62,7 @@ export function StatusDesk() {
     }
 
     void loadTickets()
-  }, [])
+  }, [authenticated, getAccessToken, ready])
 
   const submitTicket = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -64,7 +76,12 @@ export function StatusDesk() {
       setSubmitting(true)
       setError(null)
 
-      const payload = await fetchBackofficeJson<BackofficeTicketCreateResponse>('/api/backoffice/tickets', {
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('Unauthorized: unable to retrieve access token')
+      }
+
+      const payload = await fetchBackofficeJson<BackofficeTicketCreateResponse>('/api/backoffice/tickets', token, {
         method: 'POST',
         body: {
           name: form.name,

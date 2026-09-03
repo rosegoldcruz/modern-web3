@@ -213,13 +213,13 @@ export async function grantStripeMemberEntitlement(
     const existing = await check
     if (!existing || !isActiveEntitlement(existing)) continue
 
-    // Cross-account guard: an email or wallet match that belongs to a different legacy app user
+    // Cross-account guard: an email or wallet match that belongs to a different Privy user
     // must not block entitlement creation for the actual paying user. Only the privy_user_id
-    // check is authoritative for dedup when both sides have a legacy user id.
+    // check is authoritative for dedup when both sides have a privy_user_id.
     if (identity.privyUserId && existing.privy_user_id && existing.privy_user_id !== identity.privyUserId) {
       console.warn('grantStripeMemberEntitlement: skipping cross-account identity match', {
         matchedEntitlementId: existing.id,
-        payingLegacyUserId: identity.privyUserId,
+        payingPrivyUserId: identity.privyUserId,
       })
       continue
     }

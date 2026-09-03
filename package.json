@@ -10,9 +10,9 @@
     "verify:package-coverage": "tsx scripts/verify-package-coverage.ts"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.9.1",
-    "@clerk/ui": "^1.32.2",
     "@hookform/resolvers": "^3.10.0",
+    "@privy-io/react-auth": "^3.22.1",
+    "@privy-io/server-auth": "^1.32.5",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -77,7 +77,6 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.5.15",
     "postcss": "^8.5",

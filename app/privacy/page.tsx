@@ -36,9 +36,9 @@ const sections = [
   {
     id: "third-party-services",
     eyebrow: "Third-Party Services",
-    title: "Some functions rely on outside providers such as Clerk and MoonPay.",
+    title: "Some functions rely on outside providers such as Privy and MoonPay.",
     body: [
-      "Iron Vault may use third-party service providers to deliver certain features. At present, this includes Clerk for authentication and MoonPay for payment-related functionality where applicable. These providers may process information necessary to perform their services, such as authentication identifiers, device or session data, payment details, wallet information, or related transaction metadata.",
+      "Iron Vault may use third-party service providers to deliver certain features. At present, this includes Privy for authentication and embedded wallet-related functionality, and MoonPay for payment-related functionality where applicable. These providers may process information necessary to perform their services, such as authentication identifiers, device or session data, payment details, wallet information, or related transaction metadata.",
       "When you interact with these third-party services, their own terms, policies, and operational practices may apply in addition to ours. We are not responsible for the privacy, security, or data-handling practices of third-party providers beyond our own role in selecting and integrating them. You should review the privacy policies and terms of those providers if you use their services through the platform.",
       "We may also use additional vendors for hosting, analytics, communications, customer support, media delivery, infrastructure, or compliance operations. Those providers may process data on our behalf only as needed to support legitimate platform operations.",
     ],
@@ -92,7 +92,7 @@ export default function PrivacyPage() {
               </p>
               <p className="text-base leading-relaxed text-white/70 sm:text-lg">
                 We collect information such as your name, email, phone number, and wallet address to provide course access,
-                token distribution workflows, and communications. We do not sell your data. Iron Vault may use providers including Clerk for authentication and MoonPay for payments.
+                token distribution workflows, and communications. We do not sell your data. Iron Vault may use providers including Privy for authentication and MoonPay for payments.
               </p>
             </div>
 

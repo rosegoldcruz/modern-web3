@@ -29,6 +29,7 @@ async function readErrorMessage(res: Response): Promise<string> {
 
 export async function fetchBackofficeJson<T>(
   path: string,
+  accessToken: string,
   options: BackofficeRequestOptions = {},
 ): Promise<T> {
   const method = options.method ?? 'GET'
@@ -36,8 +37,8 @@ export async function fetchBackofficeJson<T>(
   const res = await fetch(path, {
     method,
     cache: options.cache ?? 'no-store',
-    credentials: 'same-origin',
     headers: {
+      Authorization: `Bearer ${accessToken}`,
       ...(options.body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,

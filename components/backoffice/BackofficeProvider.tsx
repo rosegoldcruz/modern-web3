@@ -1,6 +1,6 @@
 "use client"
 
-import { SignInButton, useAuth } from '@clerk/nextjs'
+import { usePrivy } from '@privy-io/react-auth'
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { fetchBackofficeJson, type BackofficeProfileResponse } from '@/lib/backoffice-client'
 import type { BackofficeProfile } from '@/types/backoffice'
@@ -21,17 +21,17 @@ type BackofficeProviderProps = {
 }
 
 export function BackofficeProvider({ children }: BackofficeProviderProps) {
-  const { isLoaded, isSignedIn } = useAuth()
+  const { ready, authenticated, login, getAccessToken } = usePrivy()
   const [profile, setProfile] = useState<BackofficeProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const refreshProfile = useCallback(async () => {
-    if (!isLoaded) {
+    if (!ready) {
       return
     }
 
-    if (!isSignedIn) {
+    if (!authenticated) {
       setProfile(null)
       setError(null)
       setLoading(false)
@@ -42,7 +42,12 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
     setError(null)
 
     try {
-      const payload = await fetchBackofficeJson<BackofficeProfileResponse>('/api/backoffice/profile')
+      const token = await getAccessToken()
+      if (!token) {
+        throw new Error('Unauthorized: unable to retrieve access token')
+      }
+
+      const payload = await fetchBackofficeJson<BackofficeProfileResponse>('/api/backoffice/profile', token)
       setProfile(payload.profile)
       setError(null)
     } catch (err: unknown) {
@@ -52,7 +57,7 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
     } finally {
       setLoading(false)
     }
-  }, [isLoaded, isSignedIn])
+  }, [authenticated, getAccessToken, ready])
 
   useEffect(() => {
     void refreshProfile()
@@ -71,25 +76,24 @@ export function BackofficeProvider({ children }: BackofficeProviderProps) {
     }
   }, [error, loading, profile, refreshProfile])
 
-  if (!isLoaded) {
+  if (!ready) {
     return null
   }
 
-  if (!isSignedIn) {
+  if (!authenticated) {
     return (
       <div className="min-h-screen bg-[#080808] text-zinc-100 grid place-items-center px-6">
         <div className="w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-950/70 p-8 text-center">
           <p className="text-xs uppercase tracking-[0.24em] text-lime-300 mb-3">Iron Vault</p>
           <h1 className="text-2xl font-semibold mb-3">Sign in to continue</h1>
           <p className="text-sm text-zinc-400 mb-6">Backoffice access requires your authenticated Iron Vault account.</p>
-          <SignInButton mode="modal">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-md bg-lime-300 px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-lime-200"
-            >
-              Sign In
-            </button>
-          </SignInButton>
+          <button
+            type="button"
+            onClick={() => login()}
+            className="inline-flex items-center justify-center rounded-md bg-lime-300 px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-lime-200"
+          >
+            Sign In
+          </button>
         </div>
       </div>
     )

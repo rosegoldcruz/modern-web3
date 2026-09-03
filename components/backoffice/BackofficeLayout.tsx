@@ -1,7 +1,6 @@
 "use client"
 
 import Link from 'next/link'
-import { SignOutButton } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 import { useState, type ComponentType, type ReactNode } from 'react'
 import {
@@ -16,6 +15,7 @@ import {
   Menu,
   X,
 } from 'lucide-react'
+import { usePrivy } from '@privy-io/react-auth'
 import { useBackofficeAuth } from '@/hooks/useBackofficeAuth'
 import { cn } from '@/lib/utils'
 
@@ -36,6 +36,8 @@ const NAV_ITEMS: NavItem[] = [
 ]
 
 function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+  const { logout } = usePrivy()
+
   return (
     <nav className="space-y-1">
       {NAV_ITEMS.map((item) => {
@@ -59,16 +61,14 @@ function NavLinks({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
           </Link>
         )
       })}
-      <SignOutButton>
-        <button
-          type="button"
-          onClick={() => onNavigate?.()}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-red-300 border border-transparent transition-colors"
-        >
-          <LogOut className="h-4 w-4" />
-          <span>Logout</span>
-        </button>
-      </SignOutButton>
+      <button
+        type="button"
+        onClick={() => { onNavigate?.(); void logout() }}
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-red-300 border border-transparent transition-colors"
+      >
+        <LogOut className="h-4 w-4" />
+        <span>Logout</span>
+      </button>
     </nav>
   )
 }

@@ -21,7 +21,6 @@ function parseMetadata(session: Stripe.Checkout.Session) {
   const tier = metadata.tier
   const paymentTier = metadata.paymentTier ?? metadata.payment_tier ?? metadata.tier
   const userId = metadata.userId ?? metadata.privyUserId
-  const clerkUserId = metadata.clerkUserId ?? metadata.clerk_user_id ?? null
   const accessType = metadata.access_type
   const rewardTrack = metadata.reward_track
   const modulesToUnlockRaw = metadata.modulesToUnlock
@@ -57,7 +56,7 @@ function parseMetadata(session: Stripe.Checkout.Session) {
 
   if (accessType === 'all_modules' && validModules.length !== ALL_MODULES.length) throw new Error('Invalid all modules scope')
 
-  return { metadata, userId, clerkUserId, productKey, tier, paymentTier, legacyTier, accessType, rewardTrack, validModules, moduleNumber }
+  return { metadata, userId, productKey, tier, paymentTier, legacyTier, accessType, rewardTrack, validModules, moduleNumber }
 }
 
 export async function fulfillStripeCheckoutSession(
@@ -105,7 +104,6 @@ export async function fulfillStripeCheckoutSession(
       legacyTier: parsed.legacyTier,
       legacy_tier: parsed.legacyTier,
       reward_track: parsed.rewardTrack,
-      clerk_user_id: parsed.clerkUserId,
       stripe_price_id: parsed.metadata.stripe_price_id ?? null,
       stripe_session_id: session.id,
       internal_test: parsed.metadata.internal_test === 'true',
