@@ -134,9 +134,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, modulesUnlocked })
   } catch (e: unknown) {
-    console.error('confirm-payment error:', e)
     const message = e instanceof Error ? e.message : 'Failed to confirm payment'
     const status = message.startsWith('Unauthorized:') ? 401 : 500
+    if (status === 500) console.error('confirm-payment error:', e)
     return NextResponse.json({ error: message }, { status })
   }
 }
