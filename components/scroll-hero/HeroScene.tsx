@@ -47,6 +47,7 @@ const FLIGHT_DAMPING = 15;
 const APPROACH_DAMPING = 42;
 const HOP_SPIN_EASE = [1, 1.6, 2.1] as const;
 const LAUNCH_SPIN_EASE = 2.6;
+const COIN_SCALE_MULTIPLIER = 1.33;
 const DRACO_DECODER_PATH = "/draco/";
 const HERO_COIN_MODEL_URL = "/animate/ivsol_coin_LIVE.optimized.glb";
 const HERO_COIN_FRONT_NAME = "tripo_node_8175b927-0694-410e-825a-46cb097d1866.001";
@@ -153,7 +154,7 @@ function HeroCoin({
     const normalizedY = ((launching ? launchedScreenY : screenY) - canvasRect.top) / canvasRect.height;
     const hop = launching ? Math.sin((1 - launchLocal) * Math.PI * 0.5) * 0.58 : Math.sin(flightLocal * Math.PI);
     const hopHeight = mobile ? 1.25 : 2.15 + Math.min(0.75, Math.abs(toRect.left - fromRect.left) / 360);
-    const baseScale = mobile ? 1.7 : 2.2;
+    const baseScale = (mobile ? 1.7 : 2.2) * COIN_SCALE_MULTIPLIER;
 
     pointer.current.set(normalizedX * 2 - 1, 1 - normalizedY * 2);
     raycaster.current.setFromCamera(pointer.current, camera);
@@ -266,7 +267,7 @@ function HeroCoin({
       const visualHop = launching ? hop : THREE.MathUtils.clamp(lift / hopHeight, 0, 1);
       shadow.current.visible = !launching || launchLocal < 0.72;
       shadow.current.position.y = -lift;
-      shadow.current.scale.set((1 - visualHop * 0.42) * (1 - easedLaunch * 0.68), 0.18 - visualHop * 0.06, 1);
+      shadow.current.scale.set((1 - visualHop * 0.42) * (1 - easedLaunch * 0.68) * COIN_SCALE_MULTIPLIER, 0.18 - visualHop * 0.06, 1);
       const material = shadow.current.material;
       if (material instanceof THREE.MeshBasicMaterial) material.opacity = 0.13 * (1 - visualHop * 0.82) * (1 - easedLaunch);
     }
