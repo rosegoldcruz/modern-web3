@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useBackofficeAuth } from '@/hooks/useBackofficeAuth'
+import { IRON_VAULT_ROUTES } from '@/lib/iron-vault-routes'
 
 type VIPGateProps = {
   children: ReactNode
@@ -25,7 +26,7 @@ export function VIPGate({ children }: VIPGateProps) {
         <h2 className="text-2xl font-semibold text-zinc-100 mb-3">Become VIP to access</h2>
         <p className="text-sm text-zinc-400 mb-6">Upgrade your Iron Vault tier to unlock Position Matrix access.</p>
         <Link
-          href="/learn/pay"
+          href={IRON_VAULT_ROUTES.academyAccess}
           className="inline-flex items-center justify-center rounded-md bg-lime-300 px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-lime-200"
         >
           Upgrade on Payment Page

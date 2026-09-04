@@ -4,6 +4,7 @@ import Link from "next/link"
 import { motion } from "motion/react"
 import { GraduationCap, Rocket } from "lucide-react"
 import LazyVideo from "./lazy-video"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 const spring = { type: "spring", stiffness: 220, damping: 26, mass: 0.9 } as const
 
@@ -76,7 +77,7 @@ export function Hero() {
           className="flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:gap-4"
         >
           <Link
-            href="/learn"
+            href={IRON_VAULT_ROUTES.module0}
             className="inline-flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-2xl bg-lime-400 px-6 text-base font-semibold text-black shadow-[0_10px_30px_rgba(132,204,22,0.35)] active:scale-[0.98] transition-transform"
           >
             <GraduationCap className="h-5 w-5" aria-hidden />

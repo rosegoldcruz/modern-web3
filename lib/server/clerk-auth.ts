@@ -25,7 +25,6 @@ type LegacyIdRow = {
 type LegacyCandidate = {
   privyUserId: string
   strategy: 'trusted_clerk_legacy_id' | 'verified_email' | 'verified_wallet'
-  source: 'trusted' | 'profile' | 'entitlement' | 'active_entitlement'
 }
 
 export type AuthenticatedIronVaultUser = {
@@ -135,23 +134,15 @@ async function findCandidatesByColumn(
   column: 'email' | 'wallet_address',
   values: string[],
   strategy: 'verified_email' | 'verified_wallet',
-  source: LegacyCandidate['source'],
-  activeOnly = false,
 ): Promise<LegacyCandidate[]> {
   const candidates: LegacyCandidate[] = []
-  const nowIso = new Date().toISOString()
   for (const value of values) {
-    let query = getSupabaseAdmin().from(table).select('privy_user_id').eq(column, value)
-    if (table === 'iv_member_entitlements' && activeOnly) {
-      query = query.eq('status', 'active').or(`expires_at.is.null,expires_at.gt.${nowIso}`)
-    }
-
-    const { data, error } = await query
+    const { data, error } = await getSupabaseAdmin().from(table).select('privy_user_id').eq(column, value)
     if (error) throw error
 
     for (const row of (data ?? []) as LegacyIdRow[]) {
       const privyUserId = normalizeOptional(row.privy_user_id)
-      if (privyUserId) candidates.push({ privyUserId, strategy, source })
+      if (privyUserId) candidates.push({ privyUserId, strategy })
     }
   }
 
@@ -163,69 +154,39 @@ async function findLegacyCandidates(user: User, emails: string[], wallets: strin
   const trustedCandidates: LegacyCandidate[] = []
   for (const trustedId of trustedIds) {
     if (await legacyIdExists(trustedId)) {
-      trustedCandidates.push({ privyUserId: trustedId, strategy: 'trusted_clerk_legacy_id', source: 'trusted' })
+      trustedCandidates.push({ privyUserId: trustedId, strategy: 'trusted_clerk_legacy_id' })
     }
   }
 
-  const [profileEmail, entitlementEmail, activeEntitlementEmail, profileWallet, entitlementWallet] = await Promise.all([
-    findCandidatesByColumn('iv_user_profiles', 'email', emails, 'verified_email', 'profile'),
-    findCandidatesByColumn('iv_member_entitlements', 'email', emails, 'verified_email', 'entitlement'),
-    findCandidatesByColumn('iv_member_entitlements', 'email', emails, 'verified_email', 'active_entitlement', true),
-    findCandidatesByColumn('iv_user_profiles', 'wallet_address', wallets, 'verified_wallet', 'profile'),
-    findCandidatesByColumn('iv_member_entitlements', 'wallet_address', wallets, 'verified_wallet', 'entitlement'),
+  const [profileEmail, entitlementEmail, profileWallet, entitlementWallet] = await Promise.all([
+    findCandidatesByColumn('iv_user_profiles', 'email', emails, 'verified_email'),
+    findCandidatesByColumn('iv_member_entitlements', 'email', emails, 'verified_email'),
+    findCandidatesByColumn('iv_user_profiles', 'wallet_address', wallets, 'verified_wallet'),
+    findCandidatesByColumn('iv_member_entitlements', 'wallet_address', wallets, 'verified_wallet'),
   ])
 
-  return [...trustedCandidates, ...profileEmail, ...entitlementEmail, ...activeEntitlementEmail, ...profileWallet, ...entitlementWallet]
+  return [...trustedCandidates, ...profileEmail, ...entitlementEmail, ...profileWallet, ...entitlementWallet]
 }
 
 function resolveCandidate(candidates: LegacyCandidate[]): { privyUserId: string; strategy: IdentityLinkStrategy } | null {
-  const idsForStrategy = (strategy: LegacyCandidate['strategy']) => [
-    ...new Set(candidates.filter((candidate) => candidate.strategy === strategy).map((candidate) => candidate.privyUserId)),
-  ]
-  const idsForSource = (strategy: LegacyCandidate['strategy'], source: LegacyCandidate['source']) => [
-    ...new Set(
-      candidates
-        .filter((candidate) => candidate.strategy === strategy && candidate.source === source)
-        .map((candidate) => candidate.privyUserId),
-    ),
-  ]
-  const throwAmbiguous = () => {
+  const uniqueIds = [...new Set(candidates.map((candidate) => candidate.privyUserId))]
+  if (uniqueIds.length === 0) return null
+  if (uniqueIds.length > 1) {
     throw new Error('Forbidden: multiple legacy accounts match this verified Clerk identity')
   }
 
-  const trustedIds = idsForStrategy('trusted_clerk_legacy_id')
-  if (trustedIds.length > 1) throwAmbiguous()
-  if (trustedIds.length === 1) {
-    return { privyUserId: trustedIds[0], strategy: 'trusted_clerk_legacy_id' }
-  }
+  const matched = candidates.find((candidate) => candidate.privyUserId === uniqueIds[0])
+  if (!matched) return null
 
-  const walletIds = idsForStrategy('verified_wallet')
-  const emailIds = idsForStrategy('verified_email')
-  if (walletIds.length > 1) throwAmbiguous()
-  if (emailIds.length > 1 && walletIds.length !== 1) {
-    const activeEntitlementEmailIds = idsForSource('verified_email', 'active_entitlement')
-    if (activeEntitlementEmailIds.length === 1 && emailIds.includes(activeEntitlementEmailIds[0])) {
-      return { privyUserId: activeEntitlementEmailIds[0], strategy: 'verified_email' }
-    }
-    throwAmbiguous()
-  }
+  const strategies = new Set(candidates.map((candidate) => candidate.strategy))
+  const strategy =
+    strategies.has('trusted_clerk_legacy_id')
+      ? 'trusted_clerk_legacy_id'
+      : strategies.size > 1
+        ? 'verified_identity'
+        : matched.strategy
 
-  if (walletIds.length === 1) {
-    const walletId = walletIds[0]
-    if (emailIds.length === 1 && emailIds[0] !== walletId) throwAmbiguous()
-    if (emailIds.length > 1 && !emailIds.includes(walletId)) throwAmbiguous()
-
-    return {
-      privyUserId: walletId,
-      strategy: emailIds.length === 1 ? 'verified_identity' : 'verified_wallet',
-    }
-  }
-
-  if (emailIds.length === 1) {
-    return { privyUserId: emailIds[0], strategy: 'verified_email' }
-  }
-
-  return null
+  return { privyUserId: matched.privyUserId, strategy }
 }
 
 async function upsertIdentityLink(params: {

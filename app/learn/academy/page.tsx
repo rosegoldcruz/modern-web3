@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');`
 
@@ -67,13 +68,13 @@ export default function AcademyPage() {
             </p>
             <div className="mt-12 flex flex-col gap-4 sm:flex-row">
               <a
-                href="#module-0"
+                href={IRON_VAULT_ROUTES.module0}
                 className="academy-display inline-flex items-center justify-center border border-[#AAFF00] bg-[#AAFF00] px-9 py-4 text-base text-black transition hover:bg-[#BFFF33]"
               >
                 START MODULE 0
               </a>
               <Link
-                href="/learn/pay"
+                href={IRON_VAULT_ROUTES.academyAccess}
                 className="academy-mono inline-flex items-center justify-center border border-white/15 px-8 py-4 text-[10px] tracking-[0.28em] text-white/60 transition hover:border-white/40 hover:text-white"
               >
                 UNLOCK FULL ACADEMY
@@ -159,13 +160,13 @@ export default function AcademyPage() {
             </h2>
             <div className="mt-12 flex flex-col justify-center gap-4 sm:flex-row">
               <Link
-                href="/learn/pay"
+                href={IRON_VAULT_ROUTES.academyAccess}
                 className="academy-display inline-flex items-center justify-center border border-[#AAFF00] bg-[#AAFF00] px-10 py-4 text-base text-black transition hover:bg-[#BFFF33]"
               >
                 VIEW PRICING
               </Link>
               <Link
-                href="https://member.ironvaulttoken.com/dashboard"
+                href={IRON_VAULT_ROUTES.memberPortal}
                 className="academy-mono inline-flex items-center justify-center border border-white/15 px-8 py-4 text-[10px] tracking-[0.28em] text-white/60 transition hover:border-white/40 hover:text-white"
               >
                 MEMBER LOGIN

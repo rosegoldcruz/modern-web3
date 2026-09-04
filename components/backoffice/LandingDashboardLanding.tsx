@@ -13,7 +13,7 @@ const quickLinks = [
 ]
 
 const updates = [
-  { title: 'Iron Vault Academy Live', body: 'All 6 modules are available. Complete them in order to unlock your full token allocation.' },
+  { title: 'Iron Vault Academy Live', body: 'The Academy path is available. Complete the core modules in order to unlock your full token allocation.' },
   { title: 'Referral Program Active', body: 'Submit leads through your backoffice. Commission tracking is coming soon.' },
   { title: 'Vault Backoffice Launch', body: 'Your full member backoffice is now live. Track positions, referrals, and status from one place.' },
 ]

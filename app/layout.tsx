@@ -4,16 +4,24 @@ import type React from "react"
 import "@clerk/ui/themes/shadcn.css"
 import "./globals.css"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Geist, Geist_Mono, Instrument_Serif, Inter_Tight } from "next/font/google"
 import Script from "next/script"
 import { RedditTrackingProvider } from "@/components/analytics/reddit-tracking-provider"
 
-const inter = Inter({ subsets: ["latin"], display: "swap" })
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" })
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight", display: "swap" })
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument-serif",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: "Iron Vault | Real Estate. Tokenized. Understood.",
+  title: "Iron Vault | Vaulted Academy",
   description:
-    "Iron Vault is an education-first entry point into understanding how real-world assets \u2014 specifically real estate \u2014 can be structured, represented, and integrated into decentralized financial systems.",
+    "Iron Vault is an education-first digital ecosystem built around Vaulted Academy, IV-SOL, and practical participation in the digital economy.",
   generator: "Iron Vault Token",
   icons: {
     icon: [
@@ -34,8 +42,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.className}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geist.variable} ${geistMono.variable} ${interTight.variable} ${instrumentSerif.variable}`}
+    >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('iv-theme');if(t!=='light'&&t!=='dark')t='light';document.documentElement.dataset.ivTheme=t;document.documentElement.style.colorScheme=t}catch(e){}})()",
+          }}
+        />
+        <link rel="preload" href="/animate/ivsol_coin_LIVE.optimized.glb" as="fetch" type="model/gltf-binary" crossOrigin="anonymous" />
         {/* Google Tag Manager (deferred) */}
         <Script id="gtm-script" strategy="lazyOnload">
           {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

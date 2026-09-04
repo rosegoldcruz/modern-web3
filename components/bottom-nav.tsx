@@ -4,11 +4,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "motion/react"
 import { Home, Compass, GraduationCap, HelpCircle, Info } from "lucide-react"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 const tabs = [
   { href: "/", label: "Home", icon: Home },
   { href: "/how-it-works", label: "How", icon: Compass },
-  { href: "/learn", label: "Learn", icon: GraduationCap },
+  { href: IRON_VAULT_ROUTES.academyHome, label: "Learn", icon: GraduationCap },
   { href: "/faq", label: "FAQ", icon: HelpCircle },
   { href: "/about", label: "About", icon: Info },
 ] as const

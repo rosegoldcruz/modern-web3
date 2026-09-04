@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import LazyVideo from "./lazy-video"
 import Image from "next/image"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 interface FooterContent {
   tagline: string
@@ -80,7 +81,7 @@ export function AppverseFooter() {
                 asChild
                 className="mt-5 rounded-full bg-[#AAFF00] px-6 py-2 text-sm font-medium text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] hover:bg-lime-300"
               >
-                <Link href="/learn">Start Learning Now →</Link>
+                <Link href={IRON_VAULT_ROUTES.module0}>Start Learning Now →</Link>
               </Button>
             </div>
 

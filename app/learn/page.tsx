@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BottomNav } from "@/components/bottom-nav"
 import { AppverseFooter } from "@/components/appverse-footer"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 const promiseCards = [
   {
@@ -44,6 +45,7 @@ const lockedModules = [
   "Real-World Asset Foundations",
   "Risk And Volatility",
   "Verification Path",
+  "Continuing Lessons",
 ]
 
 const tiers = [
@@ -100,7 +102,7 @@ export default function LearnPage() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="https://member.ironvaulttoken.com/academy"
+                  href={IRON_VAULT_ROUTES.module0}
                   aria-label="Start learning now in the free Iron Vault Academy entry"
                   data-reddit-event="Learn_Hero_StartLearning_Click"
                   className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
@@ -168,8 +170,8 @@ export default function LearnPage() {
           <div className="mx-auto max-w-6xl">
             <SectionIntro
               label="MODULE PATH"
-              title="Six modules. One path."
-              body="Start with the free introduction. The remaining modules show what the Academy covers before choosing a paid track."
+              title="Start with the foundation. Keep building from there."
+              body="Begin with the free introduction, then continue through an expanding Academy path as new lessons, tracks, and resources are added."
             />
 
             <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
@@ -183,7 +185,7 @@ export default function LearnPage() {
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
                   <Link
-                    href="https://member.ironvaulttoken.com/academy"
+                    href={IRON_VAULT_ROUTES.module0}
                     aria-label="Open Module 0 free academy entry"
                     data-reddit-event="Learn_Body_Module0_Click"
                     className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.28)] transition-all hover:scale-[1.02] hover:bg-lime-300"
@@ -191,7 +193,7 @@ export default function LearnPage() {
                     Open Module 0
                   </Link>
                   <Link
-                    href="#pricing"
+                    href={IRON_VAULT_ROUTES.academyAccess}
                     aria-label="View Iron Vault Academy pricing tiers"
                     data-reddit-event="Learn_Body_ViewPricing_Click"
                     className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition hover:border-lime-400/40 hover:text-lime-200"
@@ -201,21 +203,26 @@ export default function LearnPage() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                {lockedModules.map((module, index) => (
-                  <article key={module} className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-5">
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
-                        Module {String(index + 1).padStart(2, "0")}
-                      </p>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/45">
-                        <Lock className="h-3 w-3" aria-hidden />
-                        Preview
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold tracking-tight text-white">{module}</h3>
-                  </article>
-                ))}
+              <div className="flex flex-col">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {lockedModules.map((module, index) => (
+                    <article key={module} className="rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.04)] p-5">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/42">
+                          Module {String(index + 1).padStart(2, "0")}
+                        </p>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/45">
+                          <Lock className="h-3 w-3" aria-hidden />
+                          Preview
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold tracking-tight text-white">{module}</h3>
+                    </article>
+                  ))}
+                </div>
+                <p className="mt-6 text-sm text-center text-white/40">
+                  Additional lessons and resources may be added as the Academy expands.
+                </p>
               </div>
             </div>
 
@@ -263,7 +270,7 @@ export default function LearnPage() {
                   <p className="mb-4 text-2xl font-extrabold tracking-tight text-lime-300">{tier.allocation}</p>
                   <p className="mb-7 text-sm leading-relaxed text-white/58 sm:text-base">{tier.body}</p>
                   <Link
-                    href="/learn/pay"
+                    href={IRON_VAULT_ROUTES.academyAccess}
                     aria-label={`Unlock the ${tier.name} Academy track`}
                     data-reddit-event={tier.event}
                     className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-lime-400 px-5 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.28)] transition-all hover:scale-[1.02] hover:bg-lime-300"
@@ -309,7 +316,7 @@ export default function LearnPage() {
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Link
-                href="https://member.ironvaulttoken.com/academy"
+                href={IRON_VAULT_ROUTES.module0}
                 aria-label="Start learning now with the free Academy entry"
                 data-reddit-event="Learn_FinalCTA_StartLearning_Click"
                 className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_24px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
@@ -317,7 +324,7 @@ export default function LearnPage() {
                 Start Learning Now
               </Link>
               <Link
-                href="/learn/pay"
+                href={IRON_VAULT_ROUTES.academyAccess}
                 aria-label="Get early access through Iron Vault Academy pricing"
                 data-reddit-event="Learn_FinalCTA_GetEarlyAccess_Click"
                 className="inline-flex min-h-[50px] items-center justify-center rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-semibold text-white transition-all hover:border-lime-400/40 hover:bg-white/[0.08] hover:text-lime-200"

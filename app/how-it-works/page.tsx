@@ -6,6 +6,7 @@ import { ArrowRight, Minus } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BottomNav } from "@/components/bottom-nav"
 import { AppverseFooter } from "@/components/appverse-footer"
+import { IRON_VAULT_ROUTES } from "@/lib/iron-vault-routes"
 
 const tiers = [
   { amount: "$100", tokens: "100,000", label: "Starter", featured: false },
@@ -175,7 +176,7 @@ export default function HowItWorksPage() {
 
             <div className="mt-8 flex justify-center">
               <Link
-                href="/learn"
+                href={IRON_VAULT_ROUTES.module0}
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
               >
                 Start Learning Now
@@ -256,7 +257,7 @@ export default function HowItWorksPage() {
               </p>
               <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
                 <Link
-                  href="/learn"
+                  href={IRON_VAULT_ROUTES.module0}
                   className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-lime-400 px-6 text-sm font-semibold text-black shadow-[0_0_20px_rgba(163,230,53,0.35)] transition-all hover:scale-[1.02] hover:bg-lime-300"
                 >
                   Start Learning

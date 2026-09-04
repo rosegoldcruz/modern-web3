@@ -84,9 +84,9 @@ export async function POST(req: NextRequest) {
       destinationWallet,
     })
   } catch (e: unknown) {
+    console.error('create-payment error:', e)
     const message = e instanceof Error ? e.message : 'Failed to create payment'
     const status = message.startsWith('Unauthorized:') ? 401 : 500
-    if (status === 500) console.error('create-payment error:', e)
     return NextResponse.json({ error: message }, { status })
   }
 }
