@@ -3,13 +3,13 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SceneGate } from "./SceneGate";
 import { SiteSections } from "./SiteSections";
 import { TokenomicsScroll } from "./TokenomicsScroll";
 import { OVERVIEW_COPY } from "./data";
 import styles from "./scrollHero.module.css";
-import type { HeroHopAnchors } from "./HeroScene";
+import type { HeroHopAnchors, HeroImpactDriver } from "./HeroScene";
 
 const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
 const SCROLL_KEYS = new Set(["ArrowDown", "ArrowUp", "PageDown", "PageUp", "End", "Home", " "]);
@@ -20,15 +20,14 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
   const heroFrameRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const hopAnchorsRef = useRef<HeroHopAnchors>([]);
+  const heroImpactRef = useRef<HeroImpactDriver | null>(null);
   const heroInvalidateRef = useRef<(() => void) | null>(null);
   const launchAssetsEnabledRef = useRef(false);
   const overviewRef = useRef<HTMLElement>(null);
   const heroProgress = useRef(0);
   const [heroSceneEnabled, setHeroSceneEnabled] = useState(true);
-  const [heroSceneReady, setHeroSceneReady] = useState(false);
   const [launchAssetsEnabled, setLaunchAssetsEnabled] = useState(false);
   const words = OVERVIEW_COPY.split(" ");
-  const handleCoinReady = useCallback(() => setHeroSceneReady(true), []);
 
   useEffect(() => {
     const enableScene = () => setHeroSceneEnabled(true);
@@ -67,7 +66,6 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
           end: string,
           headlineShift: number,
           squashAnchorIndexes: number[],
-          squashTimes: number[],
         ) => {
           const heroTimeline = gsap.timeline({
             scrollTrigger: {
@@ -75,7 +73,7 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
               start: "top top",
               end,
               pin: heroFrame,
-              scrub: 1.65,
+              scrub: 1,
               invalidateOnRefresh: true,
             },
           });
@@ -90,14 +88,17 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
           heroTimeline.to(headline, { xPercent: headlineShift, ease: "none" }, 0);
           heroTimeline.to(headline, { yPercent: -150, ease: "none" }, 0.91);
 
+          // Letter impacts are NOT on the scrubbed timeline: the rendered coin (HeroScene) scrubs these when it actually makes contact.
           const landingNodes = hopAnchorsRef.current;
-          squashAnchorIndexes.forEach((anchorIndex, landingIndex) => {
+          const impactProxies = squashAnchorIndexes.map(() => ({ c: 0 }));
+          const impactTimelines = squashAnchorIndexes.map((anchorIndex, landingIndex) => {
             const letter = landingNodes[anchorIndex];
-            if (!letter) return;
+            if (!letter) return null;
 
             // Each successive landing compresses harder (V < I < M).
             const s = 1 + landingIndex * 0.35;
-            heroTimeline.to(
+            const impact = gsap.timeline({ paused: true });
+            impact.to(
               letter,
               {
                 keyframes: [
@@ -108,15 +109,41 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
                 ],
                 transformOrigin: "50% 100%",
               },
-              squashTimes[landingIndex] - 0.018,
+              0,
             );
+            impact.to(
+              impactProxies[landingIndex],
+              {
+                keyframes: [
+                  { c: 1, duration: 0.026, ease: "power3.in" },
+                  { c: -0.45, duration: 0.035, ease: "power3.out" },
+                  { c: 0.12, duration: 0.026, ease: "power2.inOut" },
+                  { c: 0, duration: 0.03, ease: "back.out(2.4)" },
+                ],
+              },
+              0,
+            );
+            return impact;
           });
 
-          return heroTimeline;
+          heroImpactRef.current = {
+            set: (landingIndex, level) => {
+              const impact = impactTimelines[landingIndex];
+              if (!impact) return 0;
+              impact.progress(level);
+              return impactProxies[landingIndex].c;
+            },
+          };
+
+          return () => {
+            heroImpactRef.current = null;
+            impactTimelines.forEach((impact) => impact?.kill());
+            heroTimeline.kill();
+          };
         };
 
         media.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
-          const heroTimeline = setupHeroTimeline("+=380%", -15, [1, 2, 3], [0.3, 0.6, 0.91]);
+          const killHero = setupHeroTimeline("+=380%", -15, [1, 2, 3]);
           const wordNodes = gsap.utils.toArray<HTMLElement>(`.${styles.overviewWord}`);
           const wordTimeline = gsap.timeline({
             scrollTrigger: {
@@ -129,16 +156,16 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
           wordTimeline.to(wordNodes, { color: "#111111", stagger: 0.065, ease: "none" });
 
           return () => {
-            heroTimeline.kill();
+            killHero();
             wordTimeline.kill();
           };
         });
 
         media.add("(max-width: 767px) and (prefers-reduced-motion: no-preference)", () => {
-          const heroTimeline = setupHeroTimeline("+=330%", -5, [4, 3], [0.36, 0.68]);
+          const killHero = setupHeroTimeline("+=330%", -5, [4, 3]);
 
           return () => {
-            heroTimeline.kill();
+            killHero();
           };
         });
 
@@ -202,16 +229,6 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
                 <span ref={(node) => { hopAnchorsRef.current[0] = node; }} className={styles.heroLandingLetter} data-hop-target="T">t</span>
               </span>
             </h1>
-            <Image
-              className={`${styles.heroCoinFallback} ${heroSceneReady ? styles.heroCoinFallbackHidden : ""}`}
-              src="/animate/ivsol_coin_LIVE.fallback.png"
-              alt=""
-              width={1024}
-              height={1024}
-              priority
-              sizes="(max-width: 767px) 72vw, 240px"
-              aria-hidden="true"
-            />
             {heroSceneEnabled ? (
               <SceneGate className={styles.heroCanvas}>
                 {(active) => (
@@ -219,9 +236,10 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
                     active={active}
                     progress={heroProgress}
                     anchors={hopAnchorsRef}
+                    impact={heroImpactRef}
                     invalidateRef={heroInvalidateRef}
                     launchAssetsEnabled={launchAssetsEnabled}
-                    onCoinReady={handleCoinReady}
+                    onCoinReady={() => undefined}
                   />
                 )}
               </SceneGate>
