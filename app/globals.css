@@ -142,6 +142,8 @@
 
 /* Iron Vault editorial design system */
 :root {
+  /* donor homepage CSS references --font-geist-sans; production registers Geist as --font-geist */
+  --font-geist-sans: var(--font-geist);
   --iv-paper: #FAF9F7;
   --iv-white: #FFFFFF;
   --iv-ink: #1D1D1F;
@@ -182,12 +184,12 @@ body {
   overflow-x: hidden;
 }
 
-.iv-shell {
+.iv-shell:where(:not(.iv-root *)) {
   width: min(100% - 32px, 1440px);
   margin-inline: auto;
 }
 
-.iv-nav {
+.iv-nav:where(:not(.iv-root *)) {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -195,7 +197,7 @@ body {
   pointer-events: none;
 }
 
-.iv-nav-inner {
+.iv-nav-inner:where(:not(.iv-root *)) {
   min-height: 64px;
   display: flex;
   align-items: center;
@@ -209,7 +211,7 @@ body {
   pointer-events: auto;
 }
 
-.iv-wordmark {
+.iv-wordmark:where(:not(.iv-root *)) {
   display: inline-flex;
   min-width: 182px;
   align-items: baseline;
@@ -222,13 +224,13 @@ body {
   white-space: nowrap;
 }
 
-.iv-wordmark span {
+.iv-wordmark:where(:not(.iv-root *)) span {
   font-family: var(--font-instrument-serif), Georgia, serif;
   font-size: 17px;
   color: rgba(247, 247, 245, .74);
 }
 
-.iv-nav-links {
+.iv-nav-links:where(:not(.iv-root *)) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -238,14 +240,14 @@ body {
   font-size: 14px;
 }
 
-.iv-nav-links a,
+.iv-nav-links:where(:not(.iv-root *)) a,
 .iv-nav-mobile a {
   color: rgba(247, 247, 245, .72);
   text-decoration: none;
   transition: color .18s ease;
 }
 
-.iv-nav-links a:hover,
+.iv-nav-links:where(:not(.iv-root *)) a:hover,
 .iv-nav-mobile a:hover {
   color: #fff;
 }
@@ -256,8 +258,8 @@ body {
   gap: 10px;
 }
 
-.iv-theme-toggle,
-.iv-nav-cta,
+.iv-theme-toggle:where(:not(.iv-root *)),
+.iv-nav-cta:where(:not(.iv-root *)),
 .iv-nav-menu-button {
   min-height: 42px;
   display: inline-flex;
@@ -274,18 +276,18 @@ body {
   transition: background .18s ease, border-color .18s ease, transform .18s ease;
 }
 
-.iv-theme-toggle {
+.iv-theme-toggle:where(:not(.iv-root *)) {
   gap: 8px;
   background: var(--iv-nav-bg);
   color: #fff;
   padding: 0 14px;
 }
 
-.iv-nav .iv-theme-toggle {
+.iv-nav .iv-theme-toggle:where(:not(.iv-root *)) {
   background: rgba(255, 255, 255, .06);
 }
 
-.iv-nav-cta {
+.iv-nav-cta:where(:not(.iv-root *)) {
   min-width: 88px;
   background: #050506;
   padding: 0 18px;
@@ -297,14 +299,14 @@ body {
   width: 42px;
 }
 
-.iv-theme-toggle:hover,
-.iv-nav-cta:hover,
+.iv-theme-toggle:where(:not(.iv-root *)):hover,
+.iv-nav-cta:where(:not(.iv-root *)):hover,
 .iv-nav-menu-button:hover {
   border-color: rgba(255, 255, 255, .22);
   background: rgba(255, 255, 255, .1);
 }
 
-.iv-nav-cta:hover {
+.iv-nav-cta:where(:not(.iv-root *)):hover {
   background: #111114;
 }
 
@@ -500,7 +502,7 @@ body {
   background: rgb(17 17 17 / 12%);
 }
 
-.iv-section {
+.iv-section:where(:not(.iv-root *)) {
   padding: clamp(76px, 10vw, 156px) 0;
   background: var(--iv-paper);
 }
@@ -1097,7 +1099,7 @@ body {
 }
 
 @media (max-width: 1024px) {
-  .iv-nav-links {
+  .iv-nav-links:where(:not(.iv-root *)) {
     display: none;
   }
 
@@ -1128,36 +1130,36 @@ body {
 }
 
 @media (max-width: 760px) {
-  .iv-shell {
+  .iv-shell:where(:not(.iv-root *)) {
     width: min(100% - 24px, 1440px);
   }
 
-  .iv-nav {
+  .iv-nav:where(:not(.iv-root *)) {
     padding-top: 10px;
   }
 
-  .iv-nav-inner {
+  .iv-nav-inner:where(:not(.iv-root *)) {
     min-height: 58px;
     padding: 8px 9px 8px 15px;
   }
 
-  .iv-wordmark {
+  .iv-wordmark:where(:not(.iv-root *)) {
     min-width: 0;
     flex-direction: column;
     gap: 2px;
     font-size: 13px;
   }
 
-  .iv-wordmark span {
+  .iv-wordmark:where(:not(.iv-root *)) span {
     font-size: 15px;
   }
 
-  .iv-theme-toggle span,
-  .iv-nav-cta {
+  .iv-theme-toggle:where(:not(.iv-root *)) span,
+  .iv-nav-cta:where(:not(.iv-root *)) {
     display: none;
   }
 
-  .iv-theme-toggle,
+  .iv-theme-toggle:where(:not(.iv-root *)),
   .iv-nav-menu-button {
     width: 42px;
     padding: 0;
@@ -1202,7 +1204,7 @@ body {
     scroll-margin-top: 138px;
   }
 
-  .iv-section {
+  .iv-section:where(:not(.iv-root *)) {
     padding: 70px 0;
   }
 

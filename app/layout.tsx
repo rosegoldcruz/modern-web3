@@ -3,6 +3,7 @@ import { shadcn } from "@clerk/ui/themes"
 import type React from "react"
 import "@clerk/ui/themes/shadcn.css"
 import "./globals.css"
+import "./iv/iron.css"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono, Instrument_Serif, Inter_Tight } from "next/font/google"
 import Script from "next/script"
@@ -51,7 +52,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var t=localStorage.getItem('iv-theme');if(t!=='light'&&t!=='dark')t='light';document.documentElement.dataset.ivTheme=t;document.documentElement.style.colorScheme=t}catch(e){}})()",
+              "(function(){try{var t=localStorage.getItem('iv-theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.ivTheme=t;document.documentElement.style.colorScheme=t}catch(e){}})()",
           }}
         />
         <link rel="preload" href="/animate/ivsol_coin_LIVE.optimized.glb" as="fetch" type="model/gltf-binary" crossOrigin="anonymous" />

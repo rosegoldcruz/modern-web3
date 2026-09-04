@@ -1,40 +1,28 @@
-import { SiteHeader } from "@/components/site-header"
-import { IronVaultHome } from "@/components/iron-vault-home"
-import Script from "next/script"
+import type { Metadata } from "next";
+import { IronVaultScroll } from "@/components/scroll-hero/IronVaultScroll";
+import { IvNav } from "./iv/IvNav";
+import { SmoothScroll } from "./SmoothScroll";
 
-// Force static generation for low TTFB
-export const dynamic = "force-static"
+export const metadata: Metadata = {
+  title: "Iron Vault | Vaulted Academy",
+  description:
+    "Build capability for the digital economy through Vaulted Academy, Iron Vault infrastructure, and IV-SOL.",
+};
 
-export default function Page() {
-  const pageStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "@id": "https://ironvaulttoken.com/",
-    name: "Iron Vault | Vaulted Academy",
-    description:
-      "Iron Vault is an education-first digital ecosystem built around Vaulted Academy, IV-SOL, and practical participation in the digital economy.",
-    url: "https://ironvaulttoken.com/",
-    mainEntity: {
-      "@type": "Organization",
-      name: "Iron Vault",
-      url: "https://ironvaulttoken.com",
-      sameAs: [],
-    },
-  }
-
+export default function Home() {
   return (
-    <>
-      <SiteHeader />
-      <IronVaultHome />
-
-      <Script
-        id="page-structured-data"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(pageStructuredData),
-        }}
-      />
-    </>
-  )
+    <SmoothScroll>
+      <div className="iv-root">
+        <link
+          rel="preload"
+          href="/animate/ivsol_coin_LIVE.optimized.glb"
+          as="fetch"
+          type="model/gltf-binary"
+          crossOrigin="anonymous"
+        />
+        <IvNav />
+        <IronVaultScroll showHeader={false} />
+      </div>
+    </SmoothScroll>
+  );
 }
