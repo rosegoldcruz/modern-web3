@@ -121,7 +121,7 @@
 .root .heroHeadline {
   position: absolute;
   z-index: 1;
-  top: 52%;
+  top: 65%;
   left: 20.5%;
   width: max-content;
   margin: 0;
@@ -1006,7 +1006,7 @@
   }
 
   .root .heroHeadline {
-    top: 46%;
+    top: 59%;
     left: 7%;
     width: 86%;
     font-size: clamp(5.5rem, 25vw, 9rem);
