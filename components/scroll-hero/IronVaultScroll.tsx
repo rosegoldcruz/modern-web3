@@ -19,6 +19,11 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
   const heroRef = useRef<HTMLElement>(null);
   const heroFrameRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const vaultTRef = useRef<HTMLSpanElement>(null);
+  const vaultVRef = useRef<HTMLSpanElement>(null);
+  const ironIRef = useRef<HTMLSpanElement>(null);
+  const meetMRef = useRef<HTMLSpanElement>(null);
+  const mobileNRef = useRef<HTMLSpanElement>(null);
   const hopAnchorsRef = useRef<HeroHopAnchors>([]);
   const heroImpactRef = useRef<HeroImpactDriver | null>(null);
   const heroInvalidateRef = useRef<(() => void) | null>(null);
@@ -47,6 +52,14 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
       window.removeEventListener("keydown", enableSceneFromKeyboard);
     };
   }, []);
+
+  useEffect(() => {
+    hopAnchorsRef.current[0] = vaultTRef.current;
+    hopAnchorsRef.current[1] = vaultVRef.current;
+    hopAnchorsRef.current[2] = ironIRef.current;
+    hopAnchorsRef.current[3] = meetMRef.current;
+    hopAnchorsRef.current[4] = mobileNRef.current;
+  });
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -215,18 +228,18 @@ export function IronVaultScroll({ showHeader = true }: { showHeader?: boolean })
               aria-label="Meet Iron Vault"
             >
               <span className={styles.heroWord} aria-hidden="true">
-                <span ref={(node) => { hopAnchorsRef.current[3] = node; }} className={styles.heroLandingLetter} data-hop-target="M">M</span>
+                <span ref={meetMRef} id="meetM" className={styles.heroLandingLetter} data-hop-target="M">M</span>
                 <span>e</span><span>e</span><span>t</span>
               </span>{" "}
               <span className={styles.heroWord} aria-hidden="true">
-                <span ref={(node) => { hopAnchorsRef.current[2] = node; }} className={styles.heroLandingLetter} data-hop-target="I">I</span>
+                <span ref={ironIRef} id="ironI" className={styles.heroLandingLetter} data-hop-target="I">I</span>
                 <span>r</span><span>o</span>
-                <span ref={(node) => { hopAnchorsRef.current[4] = node; }} className={styles.heroLandingLetter} data-hop-target="mobile-n">n</span>
+                <span ref={mobileNRef} className={styles.heroLandingLetter} data-hop-target="mobile-n">n</span>
               </span>{" "}
               <span className={styles.heroWord} aria-hidden="true">
-                <span ref={(node) => { hopAnchorsRef.current[1] = node; }} className={styles.heroLandingLetter} data-hop-target="V">V</span>
+                <span ref={vaultVRef} id="vaultV" className={styles.heroLandingLetter} data-hop-target="V">V</span>
                 <span>a</span><span>u</span><span>l</span>
-                <span ref={(node) => { hopAnchorsRef.current[0] = node; }} className={styles.heroLandingLetter} data-hop-target="T">t</span>
+                <span ref={vaultTRef} id="vaultT" className={styles.heroLandingLetter} data-hop-target="T">t</span>
               </span>
             </h1>
             {heroSceneEnabled ? (
