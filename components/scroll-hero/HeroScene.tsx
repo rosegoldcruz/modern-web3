@@ -36,9 +36,10 @@ const ROCKET_END = 1;
 const PAYLOAD_RELEASE = 0.97;
 const HOP_DWELL = 0.12;
 // Contact is decided by the rendered coin: past apex and its lowest point within this many world units (per unit of coin scale) of the live landing point.
-const CONTACT_START_PROGRESS = 0.5;
-const CONTACT_DISTANCE_PER_SCALE = 0.045;
+const CONTACT_START_PROGRESS = 0.42;
+const CONTACT_DISTANCE_PER_SCALE = 0.072;
 const CONTACT_RESET_MARGIN = 0.008;
+const LANDING_BASELINE_RATIO = 0.84;
 // Impact envelope is scrubbed by scroll progress from the detected contact so the letter rebound peak lands on the coin's takeoff.
 const IMPACT_REBOUND_AT = 0.52;
 const IMPACT_MIN_SPAN = 0.015;
@@ -144,9 +145,10 @@ function HeroCoin({
     const flightLocal = launching ? 1 : THREE.MathUtils.clamp((local - HOP_DWELL) / (1 - HOP_DWELL * 2), 0, 1);
     const eased = launching ? 1 : THREE.MathUtils.smoothstep(flightLocal, 0, 1);
     const targetScreenX = toRect.left + toRect.width * 0.5;
-    const targetScreenY = toRect.top + 3;
+    const fromBaselineY = fromRect.top + fromRect.height * LANDING_BASELINE_RATIO;
+    const targetScreenY = toRect.top + toRect.height * LANDING_BASELINE_RATIO;
     const screenX = THREE.MathUtils.lerp(fromRect.left + fromRect.width * 0.5, targetScreenX, eased);
-    const screenY = THREE.MathUtils.lerp(fromRect.top + 3, targetScreenY, eased);
+    const screenY = THREE.MathUtils.lerp(fromBaselineY, targetScreenY, eased);
     const ricochetLift = Math.sin(launchLocal * Math.PI) * canvasRect.height * (mobile ? 0.24 : 0.34);
     const launchedScreenX = THREE.MathUtils.lerp(screenX, canvasRect.left - canvasRect.width * (mobile ? 0.2 : 0.24), easedLaunch);
     const launchedScreenY = THREE.MathUtils.lerp(screenY, screenY - canvasRect.height * (mobile ? 0.24 : 0.36), easedLaunch) - ricochetLift;
