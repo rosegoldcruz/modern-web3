@@ -22,6 +22,7 @@ export default function SignInPage() {
         </section>
         <section className="flex justify-center">
           <SignIn
+            withSignUp
             routing="path"
             path="/sign-in"
             signUpUrl="/sign-up"
