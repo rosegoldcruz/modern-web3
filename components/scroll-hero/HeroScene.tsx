@@ -39,7 +39,6 @@ const HOP_DWELL = 0.12;
 const CONTACT_START_PROGRESS = 0.42;
 const CONTACT_DISTANCE_PER_SCALE = 0.072;
 const CONTACT_RESET_MARGIN = 0.008;
-const LANDING_BASELINE_RATIO = 0.84;
 // Impact envelope is scrubbed by scroll progress from the detected contact so the letter rebound peak lands on the coin's takeoff.
 const IMPACT_REBOUND_AT = 0.52;
 const IMPACT_MIN_SPAN = 0.015;
@@ -145,10 +144,14 @@ function HeroCoin({
     const flightLocal = launching ? 1 : THREE.MathUtils.clamp((local - HOP_DWELL) / (1 - HOP_DWELL * 2), 0, 1);
     const eased = launching ? 1 : THREE.MathUtils.smoothstep(flightLocal, 0, 1);
     const targetScreenX = toRect.left + toRect.width * 0.5;
-    const fromBaselineY = fromRect.top + fromRect.height * LANDING_BASELINE_RATIO;
-    const targetScreenY = toRect.top + toRect.height * LANDING_BASELINE_RATIO;
+
+    // Landing surface is the TOP of the glyph.
+    // The coin's physical bottom/support offset is handled in world space.
+    const fromScreenY = fromRect.top;
+    const targetScreenY = toRect.top;
+
     const screenX = THREE.MathUtils.lerp(fromRect.left + fromRect.width * 0.5, targetScreenX, eased);
-    const screenY = THREE.MathUtils.lerp(fromBaselineY, targetScreenY, eased);
+    const screenY = THREE.MathUtils.lerp(fromScreenY, targetScreenY, eased);
     const ricochetLift = Math.sin(launchLocal * Math.PI) * canvasRect.height * (mobile ? 0.24 : 0.34);
     const launchedScreenX = THREE.MathUtils.lerp(screenX, canvasRect.left - canvasRect.width * (mobile ? 0.2 : 0.24), easedLaunch);
     const launchedScreenY = THREE.MathUtils.lerp(screenY, screenY - canvasRect.height * (mobile ? 0.24 : 0.36), easedLaunch) - ricochetLift;
@@ -158,12 +161,22 @@ function HeroCoin({
     const hopHeight = mobile ? 1.25 : 2.15 + Math.min(0.75, Math.abs(toRect.left - fromRect.left) / 360);
     const baseScale = (mobile ? 1.7 : 2.2) * COIN_SCALE_MULTIPLIER;
 
+    if (!coinDisc.current && coinModel.current) coinDisc.current = measureCoinDisc(coinModel.current);
+    let bottomOffset = 0;
+    const disc = coinDisc.current;
+    if (disc) {
+      discCenter.current.copy(disc.center).applyQuaternion(currentCoin.quaternion);
+      const normalY = Math.abs(discNormal.current.set(0, 0, 1).applyQuaternion(currentCoin.quaternion).y);
+      const rimDrop = disc.radius * Math.sqrt(Math.max(0, 1 - normalY * normalY)) + disc.halfThickness * normalY;
+      bottomOffset = currentPhysics.scale.y * (discCenter.current.y - rimDrop);
+    }
+
     pointer.current.set(normalizedX * 2 - 1, 1 - normalizedY * 2);
     raycaster.current.setFromCamera(pointer.current, camera);
     const intersection = raycaster.current.ray.intersectPlane(landingPlane.current, landingPoint.current);
     if (!intersection) return;
     const targetX = intersection.x;
-    const targetY = intersection.y + hop * hopHeight;
+    const targetY = intersection.y - bottomOffset + hop * hopHeight;
 
     // Live world-space landing point of the current hop target (read from its rect every frame; the headline is moving).
     targetPointer.current.set(
@@ -197,15 +210,6 @@ function HeroCoin({
     const descending = !(currentRoot.position.y > previousRootY.current + 1e-4);
     previousRootY.current = currentRoot.position.y;
     if (!launching && landing && !hitTarget && descending && flightLocal >= CONTACT_START_PROGRESS) {
-      if (!coinDisc.current && coinModel.current) coinDisc.current = measureCoinDisc(coinModel.current);
-      let bottomOffset = 0;
-      const disc = coinDisc.current;
-      if (disc) {
-        discCenter.current.copy(disc.center).applyQuaternion(currentCoin.quaternion);
-        const normalY = Math.abs(discNormal.current.set(0, 0, 1).applyQuaternion(currentCoin.quaternion).y);
-        const rimDrop = disc.radius * Math.sqrt(Math.max(0, 1 - normalY * normalY)) + disc.halfThickness * normalY;
-        bottomOffset = currentPhysics.scale.y * (discCenter.current.y - rimDrop);
-      }
       const dx = currentRoot.position.x - landing.x;
       const dy = currentRoot.position.y + bottomOffset - landing.y;
       if (Math.hypot(dx, dy) <= CONTACT_DISTANCE_PER_SCALE * baseScale) contactProgress.current[landingIndex] = p;
