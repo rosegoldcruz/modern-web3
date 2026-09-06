@@ -1529,3 +1529,16 @@ html[data-iv-theme="light"] .iv-member-shell {
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+
+/* Jupiter Widget Styles */
+.jupiter-container {
+  width: 100%;
+}
+
+.jupiter-disclaimer {
+  font-size: 12px;
+  color: var(--muted-foreground, #666);
+  margin-top: 16px;
+  text-align: center;
+  line-height: 1.5;
+}

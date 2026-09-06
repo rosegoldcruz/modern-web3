@@ -33,9 +33,9 @@ const ecosystemRows = [
   },
   {
     number: "03",
-    title: "Community",
-    body: "A network of capable learners, contributors, and builders advancing the future of digital economy participation.",
-    href: "#partnership-inquiry",
+    title: "Swap IV-SOL",
+    body: "Swap supported Solana assets into the verified IV-SOL token through Jupiter.",
+    href: "/swap",
   },
 ] as const;
 

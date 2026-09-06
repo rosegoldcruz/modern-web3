@@ -1,0 +1,163 @@
+.swapRoot {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  display: flex;
+  flex-direction: column;
+}
+
+.swapContainer {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  flex: 1;
+}
+
+.swapHeader {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.headerContent h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+.headerContent p {
+  font-size: 18px;
+  color: var(--muted-foreground);
+  margin: 0 0 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.docsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.docsLink:hover {
+  opacity: 0.8;
+}
+
+.swapWidget {
+  max-width: 600px;
+  margin: 0 auto 60px;
+  padding: 24px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.swapInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.infoCard {
+  padding: 24px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.infoCard h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.infoCard code {
+  display: block;
+  background: var(--background);
+  padding: 12px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  word-break: break-all;
+  margin-bottom: 12px;
+  color: var(--accent);
+}
+
+.infoCard p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+.infoCard p:last-child {
+  margin-bottom: 0;
+}
+
+.infoCard ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.infoCard li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.infoCard a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.infoCard a:hover {
+  text-decoration: underline;
+}
+
+.disclaimer {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  font-style: italic;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .swapContainer {
+    padding: 24px 16px;
+  }
+
+  .swapHeader {
+    margin-bottom: 40px;
+  }
+
+  .headerContent h1 {
+    font-size: 32px;
+  }
+
+  .headerContent p {
+    font-size: 16px;
+  }
+
+  .swapWidget {
+    margin-bottom: 40px;
+    padding: 16px;
+  }
+
+  .swapInfo {
+    gap: 24px;
+  }
+
+  .infoCard {
+    padding: 16px;
+  }
+}
