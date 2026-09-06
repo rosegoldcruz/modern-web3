@@ -293,7 +293,7 @@ export function IronVaultScroll({
             });
 
             wordTimeline.to(wordNodes, {
-              color: "#111111",
+              color: "var(--iv-ink)",
               stagger: 0.065,
               ease: "none",
             });
@@ -322,7 +322,7 @@ export function IronVaultScroll({
 
         media.add("(prefers-reduced-motion: reduce)", () => {
           gsap.set(`.${styles.overviewWord}`, {
-            color: "#111111",
+            color: "var(--iv-ink)",
           });
         });
 
