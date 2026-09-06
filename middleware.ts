@@ -11,6 +11,15 @@ export default clerkMiddleware((_auth, request: NextRequest) => {
     return NextResponse.rewrite(url)
   }
 
+  // Route docs.ironvaulttoken.com → /docs while keeping Phantom OAuth callback canonical.
+  if (hostname.startsWith("docs.")) {
+    if (url.pathname === "/auth/callback") return NextResponse.next()
+    if (!url.pathname.startsWith("/docs")) {
+      url.pathname = `/docs${url.pathname === "/" ? "" : url.pathname}`
+      return NextResponse.rewrite(url)
+    }
+  }
+
   return NextResponse.next()
 })
 
