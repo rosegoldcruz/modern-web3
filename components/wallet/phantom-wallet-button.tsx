@@ -13,7 +13,7 @@ function PortalConnectButton({ className = '' }: { className?: string }) {
   const { isConnected, isLoading } = usePhantom()
   const accounts = useAccounts()
   const { disconnect, isDisconnecting } = useDisconnect()
-  const address = accounts.find((account) => account.addressType === AddressType.solana)?.address
+  const address = accounts?.find((account) => account.addressType === AddressType.solana)?.address
 
   if (isConnected && address) {
     return (
