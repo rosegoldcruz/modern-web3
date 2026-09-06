@@ -25,7 +25,8 @@ export default function SignUpPage() {
             routing="path"
             path="/sign-up"
             signInUrl="/sign-in"
-            fallbackRedirectUrl={IRON_VAULT_ROUTES.memberPortal}
+            forceRedirectUrl={IRON_VAULT_ROUTES.memberAcademy}
+            fallbackRedirectUrl={IRON_VAULT_ROUTES.memberAcademy}
           />
         </section>
       </div>

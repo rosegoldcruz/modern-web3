@@ -4,4 +4,5 @@ export const IRON_VAULT_ROUTES = {
   module0: "https://member.ironvaulttoken.com/learn/module-0",
   academyAccess: "https://member.ironvaulttoken.com/learn/pay",
   memberPortal: "https://member.ironvaulttoken.com",
+  memberAcademy: "https://member.ironvaulttoken.com/academy",
 } as const
